@@ -79,29 +79,55 @@
     const dateKey = `reset_${day}`;
     const today = new Date().toLocaleDateString();
 
-    const defaultTasks = [
-      "Dream Journal",
-      "Brush Teeth",
-      "Take Medication",
-      "Shower",
-      "10 Minute Stretch",
-      "Eat Breakfast",
-      "5 Hour Work Day at Apple",
-      "30 Minute Walk",
-      "Eat Lunch",
-      "Eat Dinner",
-      "Family Time",
-      "15 Minute House Clean Up",
-      "Learn Spanish",
-      "Review Email Accounts",
-      "Review Social Media",
-      "Strength Train",
-      "Stretch",
-      "Read a Chapter of a Book",
-      "Journal",
-      "Drink a Gallon of Water",
-      "Update Planner"
-    ];
+    const taskMap = {
+      Monday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
+        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Tuesday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
+        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Wednesday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "30 Minute Walk", "Eat Lunch", "Pay Bills", "File Sales Use Tax", "Make Roth IRA Contribution",
+        "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks", "Eat Dinner", "Family Time",
+        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Thursday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "5 Hour Work Day at Apple", "Check on CPAP Supplies", "Call IRS to Setup Payment Plan", "30 Minute Walk",
+        "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "Finish MKG540 Module 8 Portfolio Project",
+        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Friday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
+        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Saturday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "30 Minute Walk", "Deep Clean House", "1 PM Soccer", "Eat Lunch", "Laundry", "Yard Work",
+        "Eat Dinner", "Family Time", "Work on Alchemy Body Werks", "15 Minute House Clean Up", "Learn Spanish",
+        "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch",
+        "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ],
+      Sunday: [
+        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
+        "30 Minute Walk", "CSU Homework", "Eat Lunch", "CSU Homework", "Eat Dinner", "Family Time",
+        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
+        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
+      ]
+    };
+
+    const defaultTasks = taskMap[day] || [];
 
     if (localStorage.getItem(dateKey) !== today) {
       const tasks = defaultTasks.map(text => ({ text, done: false }));
