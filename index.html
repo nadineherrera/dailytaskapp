@@ -79,16 +79,38 @@
     const dateKey = `reset_${day}`;
     const today = new Date().toLocaleDateString();
 
-    // Reset tasks if a new day
+    const defaultTasks = [
+      "Dream Journal",
+      "Brush Teeth",
+      "Take Medication",
+      "Shower",
+      "10 Minute Stretch",
+      "Eat Breakfast",
+      "5 Hour Work Day at Apple",
+      "30 Minute Walk",
+      "Eat Lunch",
+      "Eat Dinner",
+      "Family Time",
+      "15 Minute House Clean Up",
+      "Learn Spanish",
+      "Review Email Accounts",
+      "Review Social Media",
+      "Strength Train",
+      "Stretch",
+      "Read a Chapter of a Book",
+      "Journal",
+      "Drink a Gallon of Water",
+      "Update Planner"
+    ];
+
     if (localStorage.getItem(dateKey) !== today) {
-      const tasks = getTasks();
-      tasks.forEach(task => task.done = false);
+      const tasks = defaultTasks.map(text => ({ text, done: false }));
       saveTasks(tasks);
       localStorage.setItem(dateKey, today);
     }
 
     function getTasks() {
-      return JSON.parse(localStorage.getItem(storageKey)) || [];
+      return JSON.parse(localStorage.getItem(storageKey)) || defaultTasks.map(text => ({ text, done: false }));
     }
 
     function saveTasks(tasks) {
