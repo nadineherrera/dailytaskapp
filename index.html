@@ -131,16 +131,8 @@
         };
         const span = document.createElement('span');
         span.textContent = task.text;
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑';
-        deleteBtn.onclick = () => {
-          tasks.splice(index, 1);
-          saveTasks(tasks);
-          renderTasks();
-        };
         h2.appendChild(checkbox);
         h2.appendChild(span);
-        h2.appendChild(deleteBtn);
         taskList.appendChild(h2);
       });
     }
