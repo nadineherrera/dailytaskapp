@@ -17,7 +17,7 @@
     }
     h1 {
       text-align: center;
-      background-color: #4b7eb4;
+      background-color: #7eb123;
       color: white;
       padding: 1rem;
       margin: -1rem -1rem 1rem -1rem;
@@ -48,133 +48,13 @@
       color: #4b7eb4;
       font-weight: bold;
     }
+    .delete-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: red;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
   </style>
 </head>
-<body>
-  <h1 id="page-title">Daily Tasks</h1>
-
-  <div class="day-nav">
-    <a href="?day=Monday">Mon</a>
-    <a href="?day=Tuesday">Tue</a>
-    <a href="?day=Wednesday">Wed</a>
-    <a href="?day=Thursday">Thu</a>
-    <a href="?day=Friday">Fri</a>
-    <a href="?day=Saturday">Sat</a>
-    <a href="?day=Sunday">Sun</a>
-  </div>
-
-  <div id="task-list"></div>
-  <input type="text" id="new-task" placeholder="Add new task">
-  <button onclick="addTask()">Add Task</button>
-
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const day = urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    const pageTitle = document.getElementById('page-title');
-    pageTitle.textContent = `Tasks for ${day}`;
-
-    const taskList = document.getElementById('task-list');
-    const newTaskInput = document.getElementById('new-task');
-    const storageKey = `tasks_${day}`;
-    const dateKey = `reset_${day}`;
-    const today = new Date().toLocaleDateString();
-
-    const taskMap = {
-      Monday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
-        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Tuesday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
-        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Wednesday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "30 Minute Walk", "Eat Lunch", "Pay Bills", "File Sales Use Tax", "Make Roth IRA Contribution",
-        "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks", "Eat Dinner", "Family Time",
-        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Thursday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "5 Hour Work Day at Apple", "Check on CPAP Supplies", "Call IRS to Setup Payment Plan", "30 Minute Walk",
-        "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "Finish MKG540 Module 8 Portfolio Project",
-        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Friday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner",
-        "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Saturday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "30 Minute Walk", "Deep Clean House", "1 PM Soccer", "Eat Lunch", "Laundry", "Yard Work",
-        "Eat Dinner", "Family Time", "Work on Alchemy Body Werks", "15 Minute House Clean Up", "Learn Spanish",
-        "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch",
-        "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ],
-      Sunday: [
-        "Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast",
-        "30 Minute Walk", "CSU Homework", "Eat Lunch", "CSU Homework", "Eat Dinner", "Family Time",
-        "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media",
-        "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"
-      ]
-    };
-
-    const defaultTasks = taskMap[day] || [];
-
-    if (localStorage.getItem(dateKey) !== today) {
-      const tasks = defaultTasks.map(text => ({ text, done: false }));
-      saveTasks(tasks);
-      localStorage.setItem(dateKey, today);
-    }
-
-    function getTasks() {
-      return JSON.parse(localStorage.getItem(storageKey)) || defaultTasks.map(text => ({ text, done: false }));
-    }
-
-    function saveTasks(tasks) {
-      localStorage.setItem(storageKey, JSON.stringify(tasks));
-    }
-
-    function renderTasks() {
-      const tasks = getTasks();
-      taskList.innerHTML = '';
-      tasks.forEach((task, index) => {
-        const h2 = document.createElement('h2');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = task.done;
-        checkbox.onchange = () => {
-          tasks[index].done = checkbox.checked;
-          saveTasks(tasks);
-        };
-        const span = document.createElement('span');
-        span.textContent = task.text;
-        h2.appendChild(checkbox);
-        h2.appendChild(span);
-        taskList.appendChild(h2);
-      });
-    }
-
-    function addTask() {
-      const text = newTaskInput.value.trim();
-      if (text) {
-        const tasks = getTasks();
-        tasks.push({ text, done: false });
-        saveTasks(tasks);
-        newTaskInput.value = '';
-        renderTasks();
-      }
-    }
-
-    renderTasks();
-  </script>
-</body>
-</html>
