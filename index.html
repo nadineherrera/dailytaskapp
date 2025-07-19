@@ -57,24 +57,9 @@
       cursor: pointer;
     }
   </style>
-  <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-  const firebaseConfig = {
-    // paste your config here
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-</script>
-
 </head>
 <body>
   <h1 id="page-title">Daily Tasks</h1>
-
   <div class="day-nav">
     <a href="?day=Monday">Mon</a>
     <a href="?day=Tuesday">Tue</a>
@@ -84,117 +69,119 @@
     <a href="?day=Saturday">Sat</a>
     <a href="?day=Sunday">Sun</a>
   </div>
-
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const day = urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    const pageTitle = document.getElementById('page-title');
-    pageTitle.textContent = `Tasks for ${day}`;
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-    const taskList = document.getElementById('task-list');
-    const newTaskInput = document.getElementById('new-task');
-    const storageKey = `tasks_${day}`;
-    const dateKey = `reset_${day}`;
-    const today = new Date().toLocaleDateString();
-
-    const taskMap = {
-      Monday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Tuesday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Wednesday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "Eat Lunch", "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Thursday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Friday: ["Dream Journal", "Brush Teeth", "Take Medication", "Take Out Trash", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "Call IRS to Setup Payment Plan", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Finish MKG540 Module 8 Portfolio Project", "Family Time", "Find Treadmill Remote", "Find Lenovo Charger", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Saturday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "Deep Clean House", "1 PM Soccer", "Eat Lunch", "Laundry", "Yard Work", "Eat Dinner", "Family Time", "Work on Alchemy Body Werks", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
-      Sunday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "CSU Homework", "Eat Lunch", "CSU Homework", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"]
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
+      authDomain: "my-daily-tasks-5a313.firebaseapp.com",
+      projectId: "my-daily-tasks-5a313",
+      storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
+      messagingSenderId: "676679892031",
+      appId: "1:676679892031:web:4746c594d8415697394c8a",
+      measurementId: "G-7DEQC4CWQH"
     };
 
-    const defaultTasks = taskMap[day] || [];
-    const savedTasks = localStorage.getItem(storageKey);
-    const storedDate = localStorage.getItem(dateKey);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    if (!savedTasks || storedDate !== today) {
-      const tasks = defaultTasks.map(text => ({ text, done: false, manual: false }));
-      saveTasks(tasks);
-      localStorage.setItem(dateKey, today);
+    let userId = 'guest';
+
+    signInAnonymously(auth).then(userCred => {
+      userId = userCred.user.uid;
+      initTaskApp();
+    });
+
+    async function saveTasks(tasks) {
+      const day = getCurrentDay();
+      await setDoc(doc(db, 'users', userId, day), { tasks });
     }
 
-    function getTasks() {
-      return JSON.parse(localStorage.getItem(storageKey)) || defaultTasks.map(text => ({ text, done: false, manual: false }));
-    }
-
-    function saveTasks(tasks) {
-      localStorage.setItem(storageKey, JSON.stringify(tasks));
-    }
-
-    function renderTasks() {
-      const tasks = getTasks();
-      taskList.innerHTML = '';
-      tasks.forEach((task, index) => {
-        const h2 = document.createElement('h2');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = task.done;
-        checkbox.onchange = () => {
-          tasks[index].done = checkbox.checked;
-          saveTasks(tasks);
-        };
-        const span = document.createElement('span');
-        span.textContent = task.text;
-        h2.appendChild(checkbox);
-        h2.appendChild(span);
-
-        if (task.manual) {
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = '❌';
-          deleteBtn.className = 'delete-btn';
-          deleteBtn.onclick = () => {
-            tasks.splice(index, 1);
-            saveTasks(tasks);
-            renderTasks();
-          };
-          h2.appendChild(deleteBtn);
-        }
-
-        taskList.appendChild(h2);
-      });
-    }
-
-    function addTask() {
-      const text = newTaskInput.value.trim();
-      if (text) {
-        const tasks = getTasks();
-        tasks.push({ text, done: false, manual: true });
-        saveTasks(tasks);
-        newTaskInput.value = '';
-        renderTasks();
+    async function loadTasks() {
+      const day = getCurrentDay();
+      const docSnap = await getDoc(doc(db, 'users', userId, day));
+      if (docSnap.exists()) {
+        return docSnap.data().tasks;
       }
+      return getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
     }
 
-    renderTasks();
+    function getCurrentDay() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    }
+
+    async function initTaskApp() {
+      const pageTitle = document.getElementById('page-title');
+      const taskList = document.getElementById('task-list');
+      const newTaskInput = document.getElementById('new-task');
+      const day = getCurrentDay();
+      pageTitle.textContent = `Tasks for ${day}`;
+
+      let tasks = await loadTasks();
+
+      function renderTasks() {
+        taskList.innerHTML = '';
+        tasks.forEach((task, index) => {
+          const h2 = document.createElement('h2');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = task.done;
+          checkbox.onchange = () => {
+            tasks[index].done = checkbox.checked;
+            saveTasks(tasks);
+          };
+          const span = document.createElement('span');
+          span.textContent = task.text;
+          h2.appendChild(checkbox);
+          h2.appendChild(span);
+          if (task.manual) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '❌';
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.onclick = () => {
+              tasks.splice(index, 1);
+              saveTasks(tasks);
+              renderTasks();
+            };
+            h2.appendChild(deleteBtn);
+          }
+          taskList.appendChild(h2);
+        });
+      }
+
+      window.addTask = function () {
+        const text = newTaskInput.value.trim();
+        if (text) {
+          tasks.push({ text, done: false, manual: true });
+          saveTasks(tasks);
+          newTaskInput.value = '';
+          renderTasks();
+        }
+      };
+
+      renderTasks();
+    }
+
+    function getDefaultTasksForDay(day) {
+      const taskMap = {
+        Monday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Tuesday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Wednesday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "Eat Lunch", "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Thursday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Friday: ["Dream Journal", "Brush Teeth", "Take Medication", "Take Out Trash", "Shower", "10 Minute Stretch", "Eat Breakfast", "5 Hour Work Day at Apple", "Call IRS to Setup Payment Plan", "30 Minute Walk", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Finish MKG540 Module 8 Portfolio Project", "Family Time", "Find Treadmill Remote", "Find Lenovo Charger", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Saturday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "Deep Clean House", "1 PM Soccer", "Eat Lunch", "Laundry", "Yard Work", "Eat Dinner", "Family Time", "Work on Alchemy Body Werks", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"],
+        Sunday: ["Dream Journal", "Brush Teeth", "Take Medication", "Shower", "10 Minute Stretch", "Eat Breakfast", "30 Minute Walk", "CSU Homework", "Eat Lunch", "CSU Homework", "Eat Dinner", "Family Time", "15 Minute House Clean Up", "Learn Spanish", "Review Email Accounts", "Review Social Media", "Strength Train", "Shower", "Stretch", "Read a Chapter of a Book", "Journal", "Drink a Gallon of Water", "Update Planner"]
+      };
+      return taskMap[day] || [];
+    }
   </script>
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
-  authDomain: "my-daily-tasks-5a313.firebaseapp.com",
-  projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
-  messagingSenderId: "676679892031",
-  appId: "1:676679892031:web:4746c594d8415697394c8a",
-  measurementId: "G-7DEQC4CWQH"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 </body>
 </html>
