@@ -96,26 +96,36 @@
 
     signInAnonymously(auth).then(userCred => {
       userId = userCred.user.uid;
-      initTaskApp();
+      initializeAllDays();
     });
+
+    async function saveTasksForDay(day, tasks) {
+      await setDoc(doc(db, 'users', userId, day), { tasks });
+    }
+
+    async function initializeAllDays() {
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      for (const day of days) {
+        const docRef = doc(db, 'users', userId, day);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+          await saveTasksForDay(day, defaultTasks);
+        }
+      }
+      initTaskApp();
+    }
 
     async function saveTasks(tasks) {
       const day = getCurrentDay();
-      await setDoc(doc(db, 'users', userId, day), { tasks });
+      await saveTasksForDay(day, tasks);
     }
 
     async function loadTasks() {
       const day = getCurrentDay();
       const docRef = doc(db, 'users', userId, day);
       const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        return docSnap.data().tasks;
-      } else {
-        const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
-        await setDoc(docRef, { tasks: defaultTasks });
-        return defaultTasks;
-      }
+      return docSnap.exists() ? docSnap.data().tasks : [];
     }
 
     function getCurrentDay() {
