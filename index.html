@@ -92,12 +92,8 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    let userId = 'guest';
-
-    signInAnonymously(auth).then(userCred => {
-      userId = userCred.user.uid;
-      initializeAllDays();
-    });
+    const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
+initializeAllDays();
 
     async function saveTasksForDay(day, tasks) {
       await setDoc(doc(db, 'users', userId, day), { tasks });
