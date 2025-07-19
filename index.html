@@ -106,11 +106,16 @@
 
     async function loadTasks() {
       const day = getCurrentDay();
-      const docSnap = await getDoc(doc(db, 'users', userId, day));
+      const docRef = doc(db, 'users', userId, day);
+      const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
         return docSnap.data().tasks;
+      } else {
+        const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+        await setDoc(docRef, { tasks: defaultTasks });
+        return defaultTasks;
       }
-      return getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
     }
 
     function getCurrentDay() {
