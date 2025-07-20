@@ -1,10 +1,7 @@
+// main.js
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -20,22 +17,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ✅ Hardcoded user ID for reliable access
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
-
-// Wait for login to complete
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    initTaskApp(); // Start app once logged in
-  } else {
-    console.warn("User not signed in.");
-    // Optional: redirect or show login form
-  }
-});
+initializeAllDays();
 
 async function saveTasksForDay(day, tasks) {
-  const docRef = doc(db, 'users', userId, day, 'default');
-  await setDoc(docRef, { tasks });
+  await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
+}
+
+async function initializeAllDays() {
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  for (const day of days) {
+    const docRef = doc(db, 'users', userId, day, 'default');
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+      await saveTasksForDay(day, defaultTasks);
+    }
+  }
+  initTaskApp();
 }
 
 async function saveTasks(tasks) {
@@ -46,18 +45,7 @@ async function saveTasks(tasks) {
 async function loadTasks() {
   const day = getCurrentDay();
   const docRef = doc(db, 'users', userId, day, 'default');
-  let docSnap = await getDoc(docRef);
-
-  if (!docSnap.exists()) {
-    const defaultTasks = getDefaultTasksForDay(day).map(text => ({
-      text,
-      done: false,
-      manual: false
-    }));
-    await saveTasksForDay(day, defaultTasks);
-    docSnap = await getDoc(docRef);
-  }
-
+  const docSnap = await getDoc(docRef);
   return docSnap.exists() ? docSnap.data().tasks : [];
 }
 
@@ -71,9 +59,7 @@ async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
   const day = getCurrentDay();
-
   pageTitle.textContent = `Tasks for ${day}`;
-  pageTitle.style.visibility = 'visible'; // Show immediately
 
   let tasks = await loadTasks();
 
