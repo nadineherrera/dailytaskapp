@@ -51,7 +51,8 @@
       color: white;
       font-weight: bold;
       font-size: 1.1rem;
-      position: relative; /* enables celebration emoji positioning */
+      position: relative; /* enables centered emoji */
+      overflow: hidden;
     }
     button {
       margin-top: 1rem;
@@ -91,27 +92,29 @@
     }
 
     .celebration {
-      margin-left: 10px;
-      font-size: 1.5rem;
       position: absolute;
-      left: 30px;
-      top: -10px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
       pointer-events: none;
-      animation: sparkleFade 1.2s ease-out forwards;
+      z-index: 1;
+      animation: popSparkle 0.8s ease-out forwards;
+      filter: drop-shadow(0 0 4px white);
     }
 
-    @keyframes sparkleFade {
+    @keyframes popSparkle {
       0% {
         opacity: 0;
-        transform: translateY(0px) scale(1);
+        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
       }
-      30% {
+      50% {
         opacity: 1;
-        transform: translateY(-10px) scale(1.6) rotate(10deg);
+        transform: translate(-50%, -50%) scale(1.8) rotate(20deg);
       }
       100% {
         opacity: 0;
-        transform: translateY(-20px) scale(0.8) rotate(-10deg);
+        transform: translate(-50%, -50%) scale(1) rotate(-20deg);
       }
     }
   </style>
