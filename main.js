@@ -17,10 +17,8 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
-const yaySound = new Audio('yay-6120.mp3');
-let soundEnabled = true;
-let volumeLevel = 1.0;
-yaySound.volume = volumeLevel;
+const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
+yaySound.volume = 1.0;
 
 initializeAllDays();
 
@@ -65,42 +63,6 @@ async function initTaskApp() {
   const newTaskInput = document.getElementById('new-task');
   let tasks = await loadTasks();
 
-  // Create controls for sound toggle and volume
-  const controlPanel = document.createElement('div');
-  controlPanel.style.margin = '1rem 0';
-
-  const toggleLabel = document.createElement('label');
-  toggleLabel.textContent = '🔊 Sound Enabled';
-  toggleLabel.style.marginRight = '10px';
-
-  const toggle = document.createElement('input');
-  toggle.type = 'checkbox';
-  toggle.checked = soundEnabled;
-  toggle.onchange = () => {
-    soundEnabled = toggle.checked;
-  };
-  toggleLabel.appendChild(toggle);
-
-  const volumeLabel = document.createElement('label');
-  volumeLabel.textContent = '🔉 Volume';
-  volumeLabel.style.marginLeft = '20px';
-
-  const volumeControl = document.createElement('input');
-  volumeControl.type = 'range';
-  volumeControl.min = 0;
-  volumeControl.max = 1;
-  volumeControl.step = 0.01;
-  volumeControl.value = volumeLevel;
-  volumeControl.oninput = () => {
-    volumeLevel = parseFloat(volumeControl.value);
-    yaySound.volume = volumeLevel;
-  };
-  volumeLabel.appendChild(volumeControl);
-
-  controlPanel.appendChild(toggleLabel);
-  controlPanel.appendChild(volumeLabel);
-  document.body.insertBefore(controlPanel, taskList);
-
   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, index) => {
@@ -121,10 +83,9 @@ async function initTaskApp() {
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
           h2.appendChild(emoji);
-          if (soundEnabled) {
-            yaySound.currentTime = 0;
-            yaySound.play();
-          }
+          yaySound.currentTime = 0;
+          yaySound.play();
+
           setTimeout(() => {
             emoji.remove();
             renderTasks();
