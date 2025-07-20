@@ -31,8 +31,9 @@ async function initializeAllDays() {
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
+    const data = docSnap.exists() ? docSnap.data() : {};
 
-    if (!docSnap.exists() || !docSnap.data().tasks || docSnap.data().tasks.length === 0) {
+    if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await saveTasksForDay(day, defaultTasks);
     }
@@ -78,7 +79,7 @@ async function initTaskApp() {
         saveTasks(tasks);
 
         if (checkbox.checked) {
-          const emojis = ['🥳', '👏', '✨', 🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
+          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
