@@ -109,6 +109,7 @@
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
+  <button onclick="loadAllTasks()">Debug: Show All Tasks</button>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -147,7 +148,7 @@
             loadTasks();
           });
           h2.appendChild(checkbox);
-          h2.appendChild(document.createTextNode(task.text));
+          h2.appendChild(document.createTextNode(task.text + ` (${task.day})`));
           list.appendChild(h2);
         }
       });
@@ -172,6 +173,18 @@
         await updateDoc(doc(db, 'tasks', docSnap.id), { done: false });
       });
       loadTasks();
+    }
+
+    async function loadAllTasks() {
+      const list = document.getElementById('task-list');
+      list.innerHTML = '<h2>All Tasks (Debug)</h2>';
+      const snapshot = await getDocs(collection(db, 'tasks'));
+      snapshot.forEach(docSnap => {
+        const task = docSnap.data();
+        const h2 = document.createElement('h2');
+        h2.textContent = `${task.day}: ${task.text} ${task.done ? '(Done)' : ''}`;
+        list.appendChild(h2);
+      });
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
