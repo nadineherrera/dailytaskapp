@@ -4,71 +4,88 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="My Daily Tasks">
+  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
-  <title>My Daily Tasks</title>
+  <title>Daily Task App</title>
   <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 1rem;
-    background: white;
-  }
-
-  #task-list h2 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 1rem;
-    background: #4caf50; /* Green */
-    color: white;
-    font-weight: bold;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-  }
-
-  button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  input[type="text"] {
-    width: 80%;
-    padding: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .day-nav {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  .day-nav a {
-    margin: 0 5px;
-    text-decoration: none;
-    color: #4b7eb4;
-    font-weight: bold;
-  }
-
-  .delete-btn {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.2rem;
-    cursor: pointer;
-  }
-</style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: #845EC2;
+    }
+    header {
+      text-align: center;
+      background-color: #FFD966;
+      padding: 1rem;
+      margin: -1rem -1rem 1rem -1rem;
+    }
+    header img {
+      max-width: 100px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    h1 {
+      color: white;
+      font-weight: bold;
+      font-size: 1.5rem;
+      visibility: hidden;
+      margin-top: 0.5rem;
+    }
+    #task-list h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 1rem;
+      background: #66B032;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #66B032;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 0.5rem;
+      margin-top: 1rem;
+    }
+    .day-nav {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .day-nav a {
+      margin: 0 5px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+    .delete-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="page-title" style="visibility: hidden;">Daily Tasks</h1>
+  <header>
+    <img src="apple-touch-icon.png" alt="App Logo">
+    <h1 id="page-title">Daily Tasks</h1>
+  </header>
   <div class="day-nav">
     <a href="?day=Monday">Mon</a>
     <a href="?day=Tuesday">Tue</a>
@@ -81,8 +98,16 @@
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
+  <button onclick="resetTasks()">Reset All Tasks</button>
 
-  <!-- Load logic from your GitHub main.js -->
   <script type="module" src="main.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const title = document.getElementById('page-title');
+      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      title.textContent = `Tasks for ${day}`;
+      title.style.visibility = 'visible';
+    });
+  </script>
 </body>
 </html>
