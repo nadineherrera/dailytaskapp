@@ -51,8 +51,7 @@
       color: white;
       font-weight: bold;
       font-size: 1.1rem;
-      position: relative; /* enables centered emoji */
-      overflow: hidden;
+      position: relative;
     }
     button {
       margin-top: 1rem;
@@ -92,29 +91,23 @@
     }
 
     .celebration {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      pointer-events: none;
-      z-index: 1;
-      animation: popSparkle 0.8s ease-out forwards;
-      filter: drop-shadow(0 0 4px white);
+      margin-left: 5px;
+      font-size: 1.5rem;
+      animation: emojiPop 0.6s ease-out forwards;
     }
 
-    @keyframes popSparkle {
+    @keyframes emojiPop {
       0% {
+        transform: scale(0.4) rotate(-10deg);
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
       }
       50% {
+        transform: scale(1.6) rotate(10deg);
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1.8) rotate(20deg);
       }
       100% {
+        transform: scale(1) rotate(0deg);
         opacity: 0;
-        transform: translate(-50%, -50%) scale(1) rotate(-20deg);
       }
     }
   </style>
