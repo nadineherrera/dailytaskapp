@@ -93,20 +93,27 @@
     .celebration {
       margin-left: 5px;
       font-size: 1.5rem;
-      animation: emojiPop 0.6s ease-out forwards;
+      animation: emojiPopBounce 1.6s ease-out forwards;
     }
 
-    @keyframes emojiPop {
+    @keyframes emojiPopBounce {
       0% {
         transform: scale(0.4) rotate(-10deg);
         opacity: 0;
       }
-      50% {
+      30% {
         transform: scale(1.6) rotate(10deg);
         opacity: 1;
       }
-      100% {
+      70% {
         transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      85% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(0.9);
         opacity: 0;
       }
     }
