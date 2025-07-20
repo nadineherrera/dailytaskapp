@@ -114,15 +114,16 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-   const firebaseConfig = {
-  apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
-  authDomain: "my-daily-tasks-5a313.firebaseapp.com",
-  projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
-  messagingSenderId: "676679892031",
-  appId: "1:676679892031:web:4746c594d8415697394c8a",
-  measurementId: "G-7DEQC4CWQH"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
+      authDomain: "my-daily-tasks-5a313.firebaseapp.com",
+      projectId: "my-daily-tasks-5a313",
+      storageBucket: "my-daily-tasks-5a313.appspot.com",
+      messagingSenderId: "676679892031",
+      appId: "1:676679892031:web:4746c594d8415697394c8a",
+      measurementId: "G-7DEQC4CWQH"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -135,12 +136,14 @@
       const snapshot = await getDocs(q);
       snapshot.forEach(docSnap => {
         const task = docSnap.data();
+        const taskId = docSnap.id;
         if (!task.done) {
           const h2 = document.createElement('h2');
           const checkbox = document.createElement('input');
           checkbox.type = 'checkbox';
+          checkbox.checked = false;
           checkbox.addEventListener('change', async () => {
-            await updateDoc(doc(db, 'tasks', docSnap.id), { done: true });
+            await updateDoc(doc(db, 'tasks', taskId), { done: true });
             loadTasks();
           });
           h2.appendChild(checkbox);
@@ -152,8 +155,9 @@
 
     async function addTask() {
       const input = document.getElementById('new-task');
+      if (!input.value.trim()) return;
       await addDoc(collection(db, 'tasks'), {
-        text: input.value,
+        text: input.value.trim(),
         done: false,
         day: day
       });
