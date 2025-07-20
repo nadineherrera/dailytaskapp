@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -16,7 +16,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Hardcoded user (if you're not dynamically signing in yet)
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 
 initializeAllDays();
@@ -30,11 +29,16 @@ async function initializeAllDays() {
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) {
+
+    if (!docSnap.exists() || !docSnap.data().tasks || docSnap.data().tasks.length === 0) {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await saveTasksForDay(day, defaultTasks);
+      console.log(`Initialized ${day}`);
+    } else {
+      console.log(`${day} already exists`);
     }
   }
+
   initTaskApp();
 }
 
@@ -56,12 +60,8 @@ function getCurrentDay() {
 }
 
 async function initTaskApp() {
-  const pageTitle = document.getElementById('page-title');
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
-  const day = getCurrentDay();
-  pageTitle.textContent = `Tasks for ${day}`;
-
   let tasks = await loadTasks();
 
   function renderTasks() {
@@ -120,15 +120,22 @@ async function initTaskApp() {
 }
 
 function getDefaultTasksForDay(day) {
-  const taskMap = {
-    Monday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Tuesday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    // Add the rest of the week here...
-    Wednesday: [...],
-    Thursday: [...],
-    Friday: [...],
-    Saturday: [...],
-    Sunday: [...]
+  const baseTasks = [
+    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
+    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
+    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
+    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
+    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
+    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
+  ];
+  const extended = {
+    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
+    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
+    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
   };
-  return taskMap[day] || [];
+  return extended[day] || baseTasks;
 }
