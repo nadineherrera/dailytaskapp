@@ -9,54 +9,74 @@
   <link rel="manifest" href="manifest.json">
   <title>Daily Task App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: #4b7eb4;
-    }
-    h1 {
-      text-align: center;
-      background-color: #f7ab3e;
-      color: white;
-      padding: 1rem;
-      margin: -1rem -1rem 1rem -1rem;
-    }
-    #task-list h2 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0.5rem;
-      background: #fff;
-      margin-bottom: 5px;
-      border-radius: 5px;
-    }
-    button {
-      margin-top: 1rem;
-    }
-    input[type="text"] {
-      width: 80%;
-      padding: 0.5rem;
-    }
-    .day-nav {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .day-nav a {
-      margin: 0 5px;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-    }
-    .delete-btn {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: red;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-  </style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background: white;
+  }
+
+  h1 {
+    text-align: center;
+    background-color: #ffde59; /* Bright yellow */
+    color: #fff;
+    padding: 1rem;
+    margin: -1rem -1rem 1rem -1rem;
+    font-weight: bold;
+    color: #fff;
+    font-size: 1.5rem;
+  }
+
+  #task-list h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem;
+    background: #4caf50; /* Green */
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+
+  button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    width: 80%;
+    padding: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .day-nav {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .day-nav a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #4b7eb4;
+    font-weight: bold;
+  }
+
+  .delete-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
   <h1 id="page-title">Daily Tasks</h1>
