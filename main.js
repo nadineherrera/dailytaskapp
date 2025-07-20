@@ -80,7 +80,7 @@ async function initTaskApp() {
 
         if (checkbox.checked) {
           // 🎉 Create randomized celebration emoji
-          const emojis = ['🌟', '👏', '🎉', '✅'];
+          const emojis = ['⭐️', '👏', '🎉', '🫶🏼', '👍', '🥳', '🔥',];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
