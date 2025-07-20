@@ -59,7 +59,9 @@ async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
   const day = getCurrentDay();
+
   pageTitle.textContent = `Tasks for ${day}`;
+  pageTitle.style.visibility = 'visible'; // ✅ Smooth UX fix here
 
   let tasks = await loadTasks();
 
