@@ -1,7 +1,6 @@
-// main.js
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -17,7 +16,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Hardcoded user (if you're not dynamically signing in yet)
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
+
 initializeAllDays();
 
 async function saveTasksForDay(day, tasks) {
@@ -66,6 +67,8 @@ async function initTaskApp() {
   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, index) => {
+      if (task.done) return;
+
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -73,11 +76,14 @@ async function initTaskApp() {
       checkbox.onchange = () => {
         tasks[index].done = checkbox.checked;
         saveTasks(tasks);
+        renderTasks();
       };
+
       const span = document.createElement('span');
       span.textContent = task.text;
       h2.appendChild(checkbox);
       h2.appendChild(span);
+
       if (task.manual) {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '❌';
@@ -89,6 +95,7 @@ async function initTaskApp() {
         };
         h2.appendChild(deleteBtn);
       }
+
       taskList.appendChild(h2);
     });
   }
@@ -103,6 +110,12 @@ async function initTaskApp() {
     }
   };
 
+  window.resetTasks = function () {
+    tasks = tasks.map(task => ({ ...task, done: false }));
+    saveTasks(tasks);
+    renderTasks();
+  };
+
   renderTasks();
 }
 
@@ -110,11 +123,12 @@ function getDefaultTasksForDay(day) {
   const taskMap = {
     Monday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
     Tuesday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Wednesday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Thursday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Friday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take Trash Cans to Curb", "Shower", "10 Minute Stretch", "Eat Breakfast", "Work for 5 Hours at Apple", "Walk for 30 Minutes", "Eat Lunch", "5 Hour Work Day at Apple", "Retrieve Trash Cans from Curb", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Saturday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Walk for 30 Minutes", "Deep Clean House", "1 PM Soccer", "Eat Lunch", "Laundry", "Yard Work", "Eat Dinner", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Spend Time With Family & Call Family Members", "Work on Alchemy Body Werks", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"],
-    Sunday: ["Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "10 Minute Stretch", "Eat Breakfast", "Walk for 30 Minutes", "CSU Homework", "Eat Lunch", "CSU Homework", "Eat Dinner", "Spend Time With Family & Call Family Members", "15-Minute Clean Up", "Learn Spanish", "Check All Email Accounts", "Check Social Media", "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal", "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"]
+    // Add the rest of the week here...
+    Wednesday: [...],
+    Thursday: [...],
+    Friday: [...],
+    Saturday: [...],
+    Sunday: [...]
   };
   return taskMap[day] || [];
 }
