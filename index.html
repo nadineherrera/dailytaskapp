@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
-  
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/manifest.json">
 
-<!-- Favicon + Icons for iOS & Android -->
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Favicon + Icons for iOS & Android -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
   <title>Daily Task App</title>
 
@@ -111,13 +110,71 @@
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
-  <script type="module" src="main.js"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+   const firebaseConfig = {
+  apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
+  authDomain: "my-daily-tasks-5a313.firebaseapp.com",
+  projectId: "my-daily-tasks-5a313",
+  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
+  messagingSenderId: "676679892031",
+  appId: "1:676679892031:web:4746c594d8415697394c8a",
+  measurementId: "G-7DEQC4CWQH"
+};
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+    async function loadTasks() {
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+      const q = query(collection(db, 'tasks'), where('day', '==', day));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(docSnap => {
+        const task = docSnap.data();
+        if (!task.done) {
+          const h2 = document.createElement('h2');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.addEventListener('change', async () => {
+            await updateDoc(doc(db, 'tasks', docSnap.id), { done: true });
+            loadTasks();
+          });
+          h2.appendChild(checkbox);
+          h2.appendChild(document.createTextNode(task.text));
+          list.appendChild(h2);
+        }
+      });
+    }
+
+    async function addTask() {
+      const input = document.getElementById('new-task');
+      await addDoc(collection(db, 'tasks'), {
+        text: input.value,
+        done: false,
+        day: day
+      });
+      input.value = '';
+      loadTasks();
+    }
+
+    async function resetTasks() {
+      const q = query(collection(db, 'tasks'), where('day', '==', day));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(async docSnap => {
+        await updateDoc(doc(db, 'tasks', docSnap.id), { done: false });
+      });
+      loadTasks();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
       const title = document.getElementById('page-title');
-      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
       title.textContent = `Tasks for ${day}`;
       title.style.visibility = 'visible';
+      await loadTasks();
     });
   </script>
 </body>
