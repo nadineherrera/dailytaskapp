@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
-  
+
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -51,6 +51,7 @@
       color: white;
       font-weight: bold;
       font-size: 1.1rem;
+      position: relative; /* enables celebration emoji positioning */
     }
     button {
       margin-top: 1rem;
@@ -87,6 +88,31 @@
       color: white;
       font-size: 1.2rem;
       cursor: pointer;
+    }
+
+    .celebration {
+      margin-left: 10px;
+      font-size: 1.5rem;
+      position: absolute;
+      left: 30px;
+      top: -10px;
+      pointer-events: none;
+      animation: sparkleFade 1.2s ease-out forwards;
+    }
+
+    @keyframes sparkleFade {
+      0% {
+        opacity: 0;
+        transform: translateY(0px) scale(1);
+      }
+      30% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.6) rotate(10deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.8) rotate(-10deg);
+      }
     }
   </style>
 </head>
