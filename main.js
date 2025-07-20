@@ -61,7 +61,7 @@ async function initTaskApp() {
   const day = getCurrentDay();
 
   pageTitle.textContent = `Tasks for ${day}`;
-  pageTitle.style.visibility = 'visible'; // ✅ Smooth UX fix here
+  pageTitle.style.visibility = 'visible'; // ✅ Show title right away
 
   let tasks = await loadTasks();
 
