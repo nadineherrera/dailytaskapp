@@ -33,9 +33,6 @@ async function initializeAllDays() {
     if (!docSnap.exists() || !docSnap.data().tasks || docSnap.data().tasks.length === 0) {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await saveTasksForDay(day, defaultTasks);
-      console.log(`Initialized ${day}`);
-    } else {
-      console.log(`${day} already exists`);
     }
   }
 
@@ -79,8 +76,7 @@ async function initTaskApp() {
         saveTasks(tasks);
 
         if (checkbox.checked) {
-          // 🎉 Create randomized celebration emoji
-          const emojis = ['⭐️', '👏', '🎉', '🫶🏼', '👍', '🥳', '🔥',];
+          const emojis = ['🌟', '👏', '🎉', '✅'];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -88,8 +84,8 @@ async function initTaskApp() {
 
           setTimeout(() => {
             emoji.remove();
-            renderTasks(); // Re-render to hide task
-          }, 1200);
+            renderTasks();
+          }, 1600);
         } else {
           renderTasks();
         }
