@@ -20,21 +20,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let userId = null;
+// ✅ Hardcoded user ID for reliable access
+const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 
-// Wait for login before initializing tasks
+// Wait for login to complete
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    userId = user.uid;
-    initTaskApp();
+    initTaskApp(); // Start app once logged in
   } else {
     console.warn("User not signed in.");
-    // Optionally redirect to login page or show login form
+    // Optional: redirect or show login form
   }
 });
 
-// Call this function somewhere after user logs in
-// Example: signInWithEmailAndPassword(auth, 'email@example.com', 'password');
 async function saveTasksForDay(day, tasks) {
   const docRef = doc(db, 'users', userId, day, 'default');
   await setDoc(docRef, { tasks });
@@ -75,7 +73,7 @@ async function initTaskApp() {
   const day = getCurrentDay();
 
   pageTitle.textContent = `Tasks for ${day}`;
-  pageTitle.style.visibility = 'visible';
+  pageTitle.style.visibility = 'visible'; // Show immediately
 
   let tasks = await loadTasks();
 
