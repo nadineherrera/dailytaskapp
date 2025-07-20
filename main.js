@@ -73,10 +73,26 @@ async function initTaskApp() {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
+
       checkbox.onchange = () => {
         tasks[index].done = checkbox.checked;
         saveTasks(tasks);
-        renderTasks();
+
+        if (checkbox.checked) {
+          // 🎉 Create randomized celebration emoji
+          const emojis = ['🌟', '👏', '🎉', '✅'];
+          const emoji = document.createElement('span');
+          emoji.className = 'celebration';
+          emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          h2.appendChild(emoji);
+
+          setTimeout(() => {
+            emoji.remove();
+            renderTasks(); // Re-render to hide task
+          }, 1200);
+        } else {
+          renderTasks();
+        }
       };
 
       const span = document.createElement('span');
