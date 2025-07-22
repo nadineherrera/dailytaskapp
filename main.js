@@ -161,7 +161,6 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// ✅ Fetch and display motivational quote from Firestore with logging
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) {
@@ -172,24 +171,35 @@ async function displayDailyQuote() {
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
     const quotes = snapshot.docs.map(doc => doc.data());
-    console.log(`✅ Quotes fetched: ${quotes.length}`, quotes);
 
     if (quotes.length > 0) {
       const randomIndex = Math.floor(Math.random() * quotes.length);
       const { text, author } = quotes[randomIndex];
 
       if (text && author) {
-        quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
+        quoteContainer.innerHTML = `
+          “${text}”
+          <span class="author">– ${author}</span>
+        `;
       } else {
         console.warn("❗ A quote is missing 'text' or 'author'.");
-        quoteContainer.textContent = "You are strong. Trust the process.";
+        quoteContainer.innerHTML = `
+          “You are strong. Trust the process.”
+          <span class="author">– Daily Task App</span>
+        `;
       }
     } else {
       console.warn("❗ No quotes found in Firestore.");
-      quoteContainer.textContent = "Keep going. Your effort matters.";
+      quoteContainer.innerHTML = `
+        “Keep going. Your effort matters.”
+        <span class="author">– Daily Task App</span>
+      `;
     }
   } catch (error) {
     console.error("🔥 Error fetching quote:", error);
-    quoteContainer.textContent = "You’re doing great. Just keep showing up.";
+    quoteContainer.innerHTML = `
+      “You're doing great. Just keep showing up.”
+      <span class="author">– Daily Task App</span>
+    `;
   }
 }
