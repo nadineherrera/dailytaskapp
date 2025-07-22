@@ -21,21 +21,18 @@
       padding: 1rem;
       background: white;
     }
-
     header {
       text-align: center;
       background-color: #FFD966;
       padding: 1rem;
       margin: -1rem -1rem 1rem -1rem;
     }
-
     header img {
       max-width: 100px;
       height: auto;
       display: block;
       margin: 0 auto;
     }
-
     h1 {
       color: white;
       font-weight: bold;
@@ -43,7 +40,6 @@
       visibility: hidden;
       margin-top: 0.5rem;
     }
-
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
@@ -51,49 +47,12 @@
       padding: 0.5rem;
       border-radius: 5px;
     }
-
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
       color: white;
       font-weight: bold;
     }
-
-    /* 💬 Motivational Quote Styling */
-    #quote-container {
-      text-align: center;
-      font-style: italic;
-      margin: 20px auto;
-      max-width: 600px;
-      padding: 20px;
-      border-left: 6px solid #845EC2;
-      background: linear-gradient(135deg, #FDEBED, #EDE7F6);
-      color: #4A4A4A;
-      font-size: 1.2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      animation: quotePulse 2s ease-in-out;
-      transition: transform 0.3s ease;
-    }
-
-    #quote-container:hover {
-      transform: scale(1.02);
-    }
-
-    #quote-container .author {
-      display: block;
-      font-size: 1rem;
-      margin-top: 0.75rem;
-      font-weight: bold;
-      color: #845EC2;
-    }
-
-    @keyframes quotePulse {
-      0% { opacity: 0; transform: translateY(-10px); }
-      50% { opacity: 1; transform: translateY(5px); }
-      100% { transform: translateY(0); }
-    }
-
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -107,13 +66,11 @@
       font-size: 1.1rem;
       position: relative;
     }
-
     input[type="text"] {
       width: 80%;
       padding: 0.5rem;
       margin-top: 1rem;
     }
-
     button {
       margin-top: 1rem;
       padding: 0.5rem 1rem;
@@ -124,7 +81,6 @@
       cursor: pointer;
       font-size: 1rem;
     }
-
     .delete-btn {
       margin-left: auto;
       background: none;
@@ -133,13 +89,11 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
-
     .celebration {
       margin-left: 5px;
       font-size: 1.5rem;
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
-
     @keyframes emojiPopBounce {
       0% {
         transform: scale(0.4) rotate(-10deg);
@@ -183,14 +137,20 @@
     <a href="?day=Sunday">Sun</a>
   </div>
 
- <!-- 🧠 Motivational Quote -->
-  <div id="quote-container">Loading quote...</div>
-
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
   <script type="module" src="main.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const title = document.getElementById('page-title');
+      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      title.textContent = `Tasks for ${day}`;
+      title.style.visibility = 'visible';
+    });
+  </script>
 </body>
 </html>
+
