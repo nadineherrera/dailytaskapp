@@ -1,12 +1,12 @@
 {
   "name": "Daily Task App",
-  "short_name": "Daily Tasks",
+  "short_name": "DailyTasks",
   "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#66B032",
-  "description": "A cross-device daily task checklist that syncs with Firebase",
+  "description": "A motivating, cross-device daily checklist that syncs with Firebase and features dynamic quotes.",
   "icons": [
     {
       "src": "icon-192.png",
@@ -23,5 +23,8 @@
       "sizes": "180x180",
       "type": "image/png"
     }
-  ]
+  ],
+  "categories": ["productivity", "wellness", "organization"],
+  "lang": "en-US",
+  "dir": "ltr"
 }
