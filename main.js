@@ -139,52 +139,38 @@ async function initTaskApp() {
   renderTasks();
 }
 
-function getDefaultTasksForDay(day) {
-  const baseTasks = [
-    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
-    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
-    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
-    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
-    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
-  ];
-  const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans", "Work for 5 Hours at Apple"],
-    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
-    Sunday: [...baseTasks, "CSU Homework"]
-  };
-  return extended[day] || baseTasks;
-}
-
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
-  if (!quoteContainer) return;
+  if (!quoteContainer) {
+    console.warn("🚫 No element with ID 'quote-container' found in HTML.");
+    return;
+  }
 
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
-    const quotes = snapshot.docs.map(doc => doc.data()).filter(q => q.text && q.author);
+    const quotes = snapshot.docs
+      .map(doc => doc.data())
+      .filter(q => typeof q.text === 'string' && typeof q.author === 'string');
 
     if (quotes.length > 0) {
       const { text, author } = quotes[Math.floor(Math.random() * quotes.length)];
+
       quoteContainer.innerHTML = `
-        <div style="font-size: 1.2rem; color: #333; font-weight: 500;">“${text}”</div>
-        <div style="margin-top: 0.5rem; font-size: 0.95rem; color: #666;">– ${author}</div>
+        “${text}”
+        <span class="author">– ${author}</span>
       `;
     } else {
+      console.warn("⚠️ No valid quotes with 'text' and 'author' found.");
       quoteContainer.innerHTML = `
-        <div style="font-size: 1.2rem;">“Keep going. Your effort matters.”</div>
-        <div style="font-size: 0.9rem;">– Daily Task App</div>
+        “You are strong. Trust the process.”
+        <span class="author">– Daily Task App</span>
       `;
     }
   } catch (error) {
-    console.error("🔥 Error fetching quote:", error);
+    console.error("🔥 Error fetching quotes from Firestore:", error);
     quoteContainer.innerHTML = `
-      <div style="font-size: 1.2rem;">“You're doing great. Just keep showing up.”</div>
-      <div style="font-size: 0.9rem;">– Daily Task App</div>
+      “You're doing great. Just keep showing up.”
+      <span class="author">– Daily Task App</span>
     `;
   }
 }
