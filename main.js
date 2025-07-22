@@ -20,8 +20,9 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
+// ✅ Run both only after the page fully loads
 window.addEventListener('DOMContentLoaded', () => {
-  displayDailyQuote(); // ✅ Now waits for DOM to load
+  displayDailyQuote();
   initializeAllDays();
 });
 
