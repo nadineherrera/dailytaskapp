@@ -172,20 +172,5 @@
     });
   </script>
 
-  <script>
-  import('./main.js').then(module => {
-    if (module.displayDailyQuote) {
-      module.displayDailyQuote();
-    }
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const title = document.getElementById('page-title');
-    const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    title.textContent = `Tasks for ${day}`;
-    title.style.visibility = 'visible';
-  });
-</script>
-
 </body>
 </html>
