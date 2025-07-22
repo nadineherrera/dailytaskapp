@@ -158,7 +158,7 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// ✅ Fetch and display motivational quote from Firestore
+// Fetch and display motivational quote from Firestore
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
@@ -170,7 +170,10 @@ async function displayDailyQuote() {
     if (quotes.length > 0) {
       const randomIndex = Math.floor(Math.random() * quotes.length);
       const { text, author } = quotes[randomIndex];
-      quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
+      quoteContainer.innerHTML = `
+        <div style="font-size: 1.2rem; font-weight: 500;">"${text}"</div>
+        <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #666;">– ${author}</div>
+      `;
     } else {
       quoteContainer.textContent = "Keep going. Your effort matters.";
     }
