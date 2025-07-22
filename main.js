@@ -1,5 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import {
+  getFirestore, doc, getDoc, setDoc, collection, getDocs
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
@@ -20,8 +22,8 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-displayDailyQuote(); // Fetch a motivational quote
-initializeAllDays();
+// === Main Task App Initialization ===
+initializeAllDays().then(initTaskApp).then(displayDailyQuote);
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -39,8 +41,6 @@ async function initializeAllDays() {
       await saveTasksForDay(day, defaultTasks);
     }
   }
-
-  initTaskApp();
 }
 
 async function saveTasks(tasks) {
@@ -80,7 +80,7 @@ async function initTaskApp() {
         saveTasks(tasks);
 
         if (checkbox.checked) {
-          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
+          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐', '🎊', '💯', '👍'];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -146,19 +146,21 @@ function getDefaultTasksForDay(day) {
     "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
     "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
   ];
+
   const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
     Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Thursday: [...baseTasks, "Work for 5 Hours at Apple"],
+    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple"],
     Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
     Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
   };
+
   return extended[day] || baseTasks;
 }
 
-// Fetch and display motivational quote from Firestore
+// === Display Daily Motivational Quote ===
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
@@ -182,5 +184,3 @@ async function displayDailyQuote() {
     quoteContainer.textContent = "You’re doing great. Just keep showing up.";
   }
 }
-
-
