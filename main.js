@@ -15,12 +15,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
+
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// ✅ Run both only after the page fully loads
 window.addEventListener('DOMContentLoaded', () => {
   displayDailyQuote();
   initializeAllDays();
@@ -150,56 +149,42 @@ function getDefaultTasksForDay(day) {
     "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
   ];
   const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
     Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Thursday: [...baseTasks, "Work for 5 Hours at Apple"],
+    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans", "Work for 5 Hours at Apple"],
     Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
-    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
+    Sunday: [...baseTasks, "CSU Homework"]
   };
   return extended[day] || baseTasks;
 }
 
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
-  if (!quoteContainer) {
-    console.warn("No quote container found in HTML.");
-    return;
-  }
+  if (!quoteContainer) return;
 
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
-    const quotes = snapshot.docs.map(doc => doc.data());
+    const quotes = snapshot.docs.map(doc => doc.data()).filter(q => q.text && q.author);
 
     if (quotes.length > 0) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      const { text, author } = quotes[randomIndex];
-
-      if (text && author) {
-        quoteContainer.innerHTML = `
-          “${text}”
-          <span class="author">– ${author}</span>
-        `;
-      } else {
-        console.warn("❗ A quote is missing 'text' or 'author'.");
-        quoteContainer.innerHTML = `
-          “You are strong. Trust the process.”
-          <span class="author">– Daily Task App</span>
-        `;
-      }
-    } else {
-      console.warn("❗ No quotes found in Firestore.");
+      const { text, author } = quotes[Math.floor(Math.random() * quotes.length)];
       quoteContainer.innerHTML = `
-        “Keep going. Your effort matters.”
-        <span class="author">– Daily Task App</span>
+        <div style="font-size: 1.2rem; color: #333; font-weight: 500;">“${text}”</div>
+        <div style="margin-top: 0.5rem; font-size: 0.95rem; color: #666;">– ${author}</div>
+      `;
+    } else {
+      quoteContainer.innerHTML = `
+        <div style="font-size: 1.2rem;">“Keep going. Your effort matters.”</div>
+        <div style="font-size: 0.9rem;">– Daily Task App</div>
       `;
     }
   } catch (error) {
     console.error("🔥 Error fetching quote:", error);
     quoteContainer.innerHTML = `
-      “You're doing great. Just keep showing up.”
-      <span class="author">– Daily Task App</span>
+      <div style="font-size: 1.2rem;">“You're doing great. Just keep showing up.”</div>
+      <div style="font-size: 0.9rem;">– Daily Task App</div>
     `;
   }
 }
