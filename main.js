@@ -20,8 +20,10 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-displayDailyQuote(); // Fetch a motivational quote
-initializeAllDays();
+window.addEventListener('DOMContentLoaded', () => {
+  displayDailyQuote(); // ✅ Now waits for DOM to load
+  initializeAllDays();
+});
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -169,7 +171,7 @@ async function displayDailyQuote() {
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
     const quotes = snapshot.docs.map(doc => doc.data());
-    console.log(`✅ Quotes fetched: ${quotes.length}`, quotes); // ← debug output
+    console.log(`✅ Quotes fetched: ${quotes.length}`, quotes);
 
     if (quotes.length > 0) {
       const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -178,11 +180,11 @@ async function displayDailyQuote() {
       if (text && author) {
         quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
       } else {
-        console.warn("❗ One of the quotes is missing 'text' or 'author' fields.");
+        console.warn("❗ A quote is missing 'text' or 'author'.");
         quoteContainer.textContent = "You are strong. Trust the process.";
       }
     } else {
-      console.warn("❗ No quotes found in Firestore collection.");
+      console.warn("❗ No quotes found in Firestore.");
       quoteContainer.textContent = "Keep going. Your effort matters.";
     }
   } catch (error) {
