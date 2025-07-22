@@ -162,7 +162,10 @@
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
+  <!-- ✅ Load main logic -->
   <script type="module" src="main.js"></script>
+
+  <!-- ✅ Set the page title -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const title = document.getElementById('page-title');
@@ -171,6 +174,5 @@
       title.style.visibility = 'visible';
     });
   </script>
-
 </body>
 </html>
