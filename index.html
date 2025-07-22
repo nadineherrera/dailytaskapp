@@ -53,6 +53,13 @@
       color: white;
       font-weight: bold;
     }
+    #quote-container {
+      text-align: center;
+      font-style: italic;
+      margin: 1rem auto 1.5rem;
+      font-size: 1.1rem;
+      color: #424242;
+    }
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -137,28 +144,25 @@
     <a href="?day=Sunday">Sun</a>
   </div>
 
+  <!-- ✅ Quote container now appears before the script loads -->
+  <div id="quote-container">
+    You’re doing great. Just keep showing up.
+  </div>
+
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
-  <div id="quote-container" style="
-  text-align: center;
-  font-style: italic;
-  margin: 1rem auto 1.5rem;
-  font-size: 1.1rem;
-  color: #424242;">
-  </div>
-
   <script type="module" src="main.js"></script>
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const title = document.getElementById('page-title');
-      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      const day = new URLSearchParams(window.location.search).get('day') ||
+        new Date().toLocaleDateString('en-US', { weekday: 'long' });
       title.textContent = `Tasks for ${day}`;
       title.style.visibility = 'visible';
     });
   </script>
 </body>
 </html>
-
