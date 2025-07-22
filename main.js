@@ -2,7 +2,9 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getFirestore, doc, getDoc, setDoc, collection, getDocs
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -17,19 +19,33 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
-const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// === Main Task App Initialization ===
-initializeAllDays().then(initTaskApp).then(displayDailyQuote);
+// === Sign in anonymously ===
+signInAnonymously(auth)
+  .then(() => {
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        const userId = user.uid;
+        initializeAllDays(userId).then(() => {
+          initTaskApp(userId);
+          displayDailyQuote();
+        });
+      }
+    });
+  })
+  .catch(error => {
+    console.error("Anonymous login error:", error.message);
+  });
 
-async function saveTasksForDay(day, tasks) {
+// === Firestore Logic ===
+
+async function saveTasksForDay(userId, day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
 
-async function initializeAllDays() {
+async function initializeAllDays(userId) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
@@ -38,21 +54,9 @@ async function initializeAllDays() {
 
     if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
-      await saveTasksForDay(day, defaultTasks);
+      await saveTasksForDay(userId, day, defaultTasks);
     }
   }
-}
-
-async function saveTasks(tasks) {
-  const day = getCurrentDay();
-  await saveTasksForDay(day, tasks);
-}
-
-async function loadTasks() {
-  const day = getCurrentDay();
-  const docRef = doc(db, 'users', userId, day, 'default');
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? docSnap.data().tasks : [];
 }
 
 function getCurrentDay() {
@@ -60,10 +64,17 @@ function getCurrentDay() {
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-async function initTaskApp() {
+async function loadTasks(userId) {
+  const day = getCurrentDay();
+  const docRef = doc(db, 'users', userId, day, 'default');
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? docSnap.data().tasks : [];
+}
+
+async function initTaskApp(userId) {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
-  let tasks = await loadTasks();
+  let tasks = await loadTasks(userId);
 
   function renderTasks() {
     taskList.innerHTML = '';
@@ -77,7 +88,7 @@ async function initTaskApp() {
 
       checkbox.onchange = () => {
         tasks[index].done = checkbox.checked;
-        saveTasks(tasks);
+        saveTasksForDay(userId, getCurrentDay(), tasks);
 
         if (checkbox.checked) {
           const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐', '🎊', '💯', '👍'];
@@ -108,7 +119,7 @@ async function initTaskApp() {
         deleteBtn.className = 'delete-btn';
         deleteBtn.onclick = () => {
           tasks.splice(index, 1);
-          saveTasks(tasks);
+          saveTasksForDay(userId, getCurrentDay(), tasks);
           renderTasks();
         };
         h2.appendChild(deleteBtn);
@@ -122,7 +133,7 @@ async function initTaskApp() {
     const text = newTaskInput.value.trim();
     if (text) {
       tasks.push({ text, done: false, manual: true });
-      saveTasks(tasks);
+      saveTasksForDay(userId, getCurrentDay(), tasks);
       newTaskInput.value = '';
       renderTasks();
     }
@@ -130,7 +141,7 @@ async function initTaskApp() {
 
   window.resetTasks = function () {
     tasks = tasks.map(task => ({ ...task, done: false }));
-    saveTasks(tasks);
+    saveTasksForDay(userId, getCurrentDay(), tasks);
     renderTasks();
   };
 
@@ -160,7 +171,7 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// === Display Daily Motivational Quote ===
+// === Daily Motivational Quote ===
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
