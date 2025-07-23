@@ -77,6 +77,12 @@ async function loadJournalEntries() {
     dailyField.value = data.daily || '';
   } catch (err) {
     console.error("Failed to load journal:", err);
+
+     // ✅ Fade in after Firebase data loads
+    document.getElementById('journals').classList.add('visible');
+
+  } catch (err) {
+    console.error("Failed to load journal:", err);
   }
 }
 
