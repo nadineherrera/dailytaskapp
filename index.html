@@ -142,14 +142,13 @@
     footer#quote-footer {
     background-color: #845EC2;
     padding: 1.5rem;
-    margin: 2rem auto 0;
+    margin: 2rem -1rem 0 -1rem; /* matches your header's negative margins */
     text-align: center;
     color: #fff;
     font-style: italic;
     font-size: 1rem;
-    border-radius: 12px;
-    max-width: 600px;
-    width: 95%;
+    border-radius: 0px;
+    width: calc(100% + 2rem); /* ensures full bleed like header */
     box-sizing: border-box;
     }
     #quote-box {
