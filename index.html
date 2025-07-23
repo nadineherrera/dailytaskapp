@@ -3,19 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Task App</title>
-
-  <!-- Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
-  <meta name="theme-color" content="#66B032" />
 
-  <!-- Icons & Manifest -->
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <title>Daily Task App</title>
 
   <style>
     body {
@@ -24,21 +21,18 @@
       padding: 1rem;
       background: white;
     }
-
     header {
       text-align: center;
       background-color: #FFD966;
       padding: 1rem;
       margin: -1rem -1rem 1rem -1rem;
     }
-
     header img {
       max-width: 100px;
       height: auto;
       display: block;
       margin: 0 auto;
     }
-
     h1 {
       color: white;
       font-weight: bold;
@@ -46,7 +40,6 @@
       visibility: hidden;
       margin-top: 0.5rem;
     }
-
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
@@ -54,41 +47,12 @@
       padding: 0.5rem;
       border-radius: 5px;
     }
-
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
       color: white;
       font-weight: bold;
     }
-
-    #quote-container {
-      margin: 1.5rem 0;
-      padding: 1.2rem;
-      background-color: #F5F0FF;
-      border: 2px solid #845EC2;
-      border-radius: 5px;
-      box-shadow: 0 2px 8px rgba(132, 94, 194, 0.15);
-      color: #4D3A78;
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: 500;
-      font-style: italic;
-      transition: opacity 0.6s ease;
-      opacity: 0;
-    }
-
-    #quote-container.loaded {
-      opacity: 1;
-    }
-
-    @media (max-width: 600px) {
-      #quote-container {
-        font-size: 1.05rem;
-        padding: 1rem;
-      }
-    }
-
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -102,13 +66,11 @@
       font-size: 1.1rem;
       position: relative;
     }
-
     input[type="text"] {
       width: 80%;
       padding: 0.5rem;
       margin-top: 1rem;
     }
-
     button {
       margin-top: 1rem;
       padding: 0.5rem 1rem;
@@ -119,7 +81,6 @@
       cursor: pointer;
       font-size: 1rem;
     }
-
     .delete-btn {
       margin-left: auto;
       background: none;
@@ -128,13 +89,11 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
-
     .celebration {
       margin-left: 5px;
       font-size: 1.5rem;
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
-
     @keyframes emojiPopBounce {
       0% {
         transform: scale(0.4) rotate(-10deg);
@@ -178,10 +137,6 @@
     <a href="?day=Sunday">Sun</a>
   </div>
 
-  <!-- Unified quote + affirmation -->
-  <div id="quote-container"></div>
-
-  <!-- Task list -->
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
@@ -191,11 +146,11 @@
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const title = document.getElementById('page-title');
-      const day = new URLSearchParams(window.location.search).get('day') ||
-        new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
       title.textContent = `Tasks for ${day}`;
       title.style.visibility = 'visible';
     });
   </script>
 </body>
 </html>
+
