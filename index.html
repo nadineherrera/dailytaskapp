@@ -202,8 +202,43 @@
       font-weight: bold;
       color: #4b7b2f;
       margin-bottom: 1.5rem;
-    }
+    }  
   </style>
+  <style>
+  /* your existing styles */
+
+  #progress-text {
+    text-align: center;
+    font-weight: bold;
+    color: #4b7b2f;
+    margin-bottom: 1.5rem;
+  }
+
+  /* 🎉 Celebration emoji animation */
+  .celebration-emoji {
+    animation: pop-fade 2s ease forwards;
+    font-size: 1.5rem;
+  }
+
+  @keyframes pop-fade {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    30% {
+      transform: scale(1.8);
+      opacity: 1;
+    }
+    70% {
+      transform: scale(1.2);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+  }
+</style>
 </head>
 <body>
   <header>
