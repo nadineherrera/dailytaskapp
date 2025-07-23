@@ -29,7 +29,7 @@ signInAnonymously(auth)
         const userId = user.uid;
         initializeAllDays(userId).then(() => {
           initTaskApp(userId);
-          displayDailyCard(); // 🚀 NEW
+          displayDailyCard();
         });
       }
     });
@@ -37,6 +37,19 @@ signInAnonymously(auth)
   .catch(error => {
     console.error("Anonymous login error:", error.message);
   });
+
+function getDefaultTasksForDay(day) {
+  const defaults = {
+    Monday: ["Plan my week", "Tidy up", "Set intentions"],
+    Tuesday: ["Follow up on emails", "Focus time block", "Hydrate!"],
+    Wednesday: ["Midweek review", "Do something creative", "Gratitude check-in"],
+    Thursday: ["Finish open tasks", "Read something inspiring", "Reflect"],
+    Friday: ["Celebrate wins", "Clear workspace", "Plan weekend"],
+    Saturday: ["Self-care ritual", "Family/friends time", "Outdoor activity"],
+    Sunday: ["Meal prep", "Laundry/reset", "Reflect & rest"]
+  };
+  return defaults[day] || ["Do something meaningful"];
+}
 
 async function saveTasksForDay(userId, day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -144,7 +157,6 @@ async function initTaskApp(userId) {
   renderTasks();
 }
 
-// 🧠 Minimal quote + affirmation in one card
 async function displayDailyCard() {
   const container = document.getElementById('quote-container');
   if (!container) return;
