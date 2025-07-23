@@ -432,6 +432,42 @@
 <div style="text-align: center; margin-bottom: 2rem;">
   <button onclick="startBreathwork()">🧘🏽 Take a Breath</button>
 </div>
+<script>
+let breathInterval, countdownInterval;
 
+function startBreathwork() {
+  const modal = document.getElementById('breath-modal');
+  const timer = document.getElementById('breath-timer');
+  const text = document.getElementById('breath-text');
+
+  modal.style.display = 'flex';
+  let timeLeft = 120; // 2 minutes
+
+  breathInterval = setInterval(() => {
+    text.textContent = text.textContent === 'Inhale' ? 'Exhale' : 'Inhale';
+  }, 4000); // 4-second cycle
+
+  countdownInterval = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    timer.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    if (timeLeft <= 0) {
+      clearInterval(breathInterval);
+      clearInterval(countdownInterval);
+      text.textContent = "Done ✨";
+    }
+  }, 1000);
+}
+
+function closeBreathModal() {
+  document.getElementById('breath-modal').style.display = 'none';
+  clearInterval(breathInterval);
+  clearInterval(countdownInterval);
+  document.getElementById('breath-text').textContent = "Inhale";
+  document.getElementById('breath-timer').textContent = "2:00";
+}
+</script>
+  
 </body>
 </html>
