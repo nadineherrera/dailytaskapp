@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Task App</title>
+
+  <!-- Web App Meta -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <meta name="theme-color" content="#66B032" />
 
+  <!-- Icons & Manifest -->
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-
-  <title>Daily Task App</title>
 
   <style>
     body {
@@ -59,7 +62,6 @@
       font-weight: bold;
     }
 
-    /* ✅ Unified card for daily affirmation */
     #quote-container {
       margin: 1.5rem 0;
       padding: 1.2rem;
@@ -176,9 +178,10 @@
     <a href="?day=Sunday">Sun</a>
   </div>
 
-  <!-- ✅ Unified card for quote or affirmation -->
+  <!-- Unified quote + affirmation -->
   <div id="quote-container"></div>
 
+  <!-- Task list -->
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
