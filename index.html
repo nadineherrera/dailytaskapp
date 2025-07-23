@@ -239,11 +239,6 @@
     }
   }
 </style>
-<head>
-  ...
-  <style>
-    /* existing styles here */
-  </style>
 
   <style>
     /* 🌬️ Modal Styling */
@@ -325,10 +320,16 @@
         <option value="😴">Tired</option>
         <option value="😌">Peaceful</option>
       </select>
-    </section>
-  </div>
+    
+  </section>
+</div>
 
-  <h2 class="section-label">🌱 Today's Tasks</h2>
+<!-- 🧘🏽 Breath Button -->
+<div style="text-align: center; margin: 2rem 0;">
+  <button class="breath-btn" onclick="startBreathwork()">🧘🏽 Take a Breath</button>
+</div>
+
+<h2 class="section-label">🌱 Today's Tasks</h2>
 
   <!-- 🌿 Progress Bar -->
   <div id="progress-container">
@@ -417,6 +418,7 @@
       observer.observe(taskList, { childList: true, subtree: true });
     });
   </script>
+  
 <!-- 🌬️ Breathwork Modal -->
 <div id="breath-modal" class="modal">
   <div class="modal-content">
@@ -428,10 +430,6 @@
   </div>
 </div>
 
-<!-- 🧘🏽 Breath Button -->
-<div style="text-align: center; margin-bottom: 2rem;">
-  <button onclick="startBreathwork()">🧘🏽 Take a Breath</button>
-</div>
 <script>
 let breathInterval, countdownInterval;
 
