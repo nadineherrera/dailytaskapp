@@ -16,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const userId = 'oKHYaS8SYxS0bm4iXy9kF9IKNHp2';
+const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
