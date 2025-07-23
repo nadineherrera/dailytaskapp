@@ -171,13 +171,21 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// === Daily Motivational Quote ===
+// === Daily Motivational Quote with Per-Day Persistence ===
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
 
-  quoteContainer.innerHTML = ''; // Clear fallback or loading message
-  quoteContainer.classList.remove('loaded'); // reset state if reloaded
+  quoteContainer.innerHTML = '';
+  quoteContainer.classList.remove('loaded');
+
+  const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-23"
+  const savedQuote = JSON.parse(localStorage.getItem('dailyQuote') || '{}');
+
+  if (savedQuote.date === today && savedQuote.text && savedQuote.author !== undefined) {
+    renderQuote(savedQuote.text, savedQuote.author);
+    return;
+  }
 
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
@@ -186,18 +194,22 @@ async function displayDailyQuote() {
     if (quotes.length > 0) {
       const randomIndex = Math.floor(Math.random() * quotes.length);
       const { text, author } = quotes[randomIndex];
-      quoteContainer.innerHTML = `
-        <div style="font-size: 1.2rem; font-weight: 500;">"${text}"</div>
-        <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #666;">– ${author}</div>
-      `;
-    } else {
-      quoteContainer.textContent = "Keep going. Your effort matters.";
-    }
 
-    quoteContainer.classList.add('loaded'); // Fade in
+      localStorage.setItem('dailyQuote', JSON.stringify({ text, author, date: today }));
+      renderQuote(text, author);
+    } else {
+      renderQuote("Keep going. Your effort matters.", "");
+    }
   } catch (error) {
     console.error("Error fetching quote:", error);
-    quoteContainer.textContent = "You’re doing great. Just keep showing up.";
+    renderQuote("You’re doing great. Just keep showing up.", "");
+  }
+
+  function renderQuote(text, author) {
+    quoteContainer.innerHTML = `
+      <div style="font-size: 1.2rem; font-weight: 500;">"${text}"</div>
+      ${author ? `<div style="font-size: 0.9rem; margin-top: 0.5rem; color: #666;">– ${author}</div>` : ""}
+    `;
     quoteContainer.classList.add('loaded');
   }
 }
