@@ -40,6 +40,17 @@
       visibility: hidden;
       margin-top: 0.5rem;
     }
+    #affirmation-box {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-style: italic;
+      color: #666;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    #affirmation-box.visible {
+      opacity: 1;
+    }
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
@@ -94,28 +105,25 @@
       font-size: 1.5rem;
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
-    #quote-box {
-      text-align: center;
+
+    footer#quote-footer {
+      background-color: #845EC2;
+      padding: 1rem;
       margin-top: 2rem;
+      text-align: center;
+      color: #fff;
       font-style: italic;
-      color: #444;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+    #quote-box {
       opacity: 0;
       transition: opacity 1.2s ease-in-out;
     }
     #quote-box.visible {
       opacity: 1;
     }
-    #affirmation-box {
-      text-align: center;
-      margin-top: 0.75rem;
-      font-style: italic;
-      color: #666;
-      opacity: 0;
-      transition: opacity 1.2s ease-in-out;
-    }
-    #affirmation-box.visible {
-      opacity: 1;
-    }
+
     @keyframes emojiPopBounce {
       0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
       20% { transform: scale(1.6) rotate(10deg); opacity: 1; }
@@ -124,35 +132,13 @@
       85% { transform: scale(1.6); }
       100% { transform: scale(0.9); opacity: 0; }
     }
-
-  #quote-footer {
-  background-color: #845EC2; /* soft purple, change to teal or gold if you prefer */
-  padding: 1rem;
-  margin-top: 2rem;
-  text-align: center;
-  color: #fff;
-  font-style: italic;
-  font-size: 1rem;
-  position: relative;
-  border-radius: 8px;
-}
-
-#quote-box {
-  opacity: 0;
-  transition: opacity 1.2s ease-in-out;
-}
-
-#quote-box.visible {
-  opacity: 1;
-}
-    
   </style>
 </head>
 <body>
   <header>
     <img src="apple-touch-icon.png" alt="App Logo">
     <h1 id="page-title">Daily Tasks</h1>
-    <div id="affirmation-box"></div> <!-- ✅ Affirmation shown below title -->
+    <div id="affirmation-box"></div>
   </header>
 
   <div class="day-nav">
@@ -170,7 +156,10 @@
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
-  <div id="quote-box"></div> <!-- ✅ Quote stays at bottom -->
+  <!-- ✅ Colorful footer for the quote -->
+  <footer id="quote-footer">
+    <p id="quote-box">Loading quote...</p>
+  </footer>
 
   <script type="module" src="main.js"></script>
   <script>
