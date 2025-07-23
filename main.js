@@ -20,30 +20,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
 let userId = null;
+
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// 🔐 Sign in anonymously if not already signed in
+// 🔐 Auth (Anonymous)
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     userId = user.uid;
     displayDailyQuote();
     await initializeAllDays();
   } else {
-    try {
-      const result = await signInAnonymously(auth);
-      userId = result.user.uid;
-      displayDailyQuote();
-      await initializeAllDays();
-    } catch (error) {
-      console.error("Anonymous sign-in failed:", error);
-    }
+    const result = await signInAnonymously(auth);
+    userId = result.user.uid;
+    displayDailyQuote();
+    await initializeAllDays();
   }
 });
 
-// 🧠 Default tasks by day
+// 🧠 Default Tasks
 function getDefaultTasksForDay(day) {
   const baseTasks = [
     "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
@@ -67,13 +63,13 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// 📅 Get day from URL or system
+// 📅 Day Helper
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-// 🗂️ Create default tasks in Firestore if not present
+// 🧱 Create Tasks
 async function initializeAllDays() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -93,7 +89,7 @@ async function initializeAllDays() {
   initTaskApp();
 }
 
-// 💾 Save tasks
+// 📥 Load & Save
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
@@ -103,15 +99,15 @@ async function saveTasks(tasks) {
   await saveTasksForDay(day, tasks);
 }
 
-// 📥 Load tasks
 async function loadTasks() {
   const day = getCurrentDay();
   const docRef = doc(db, 'users', userId, day, 'default');
   const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? docSnap.data().tasks : [];
+  const data = docSnap.exists() ? docSnap.data() : {};
+  return data.tasks || [];
 }
 
-// 🧠 Render task app
+// 🧠 Main UI
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
@@ -170,7 +166,7 @@ async function initTaskApp() {
     });
   }
 
-  // ➕ Add new task
+  // ➕ Add Task
   window.addTask = function () {
     const text = newTaskInput.value.trim();
     if (text) {
@@ -181,17 +177,33 @@ async function initTaskApp() {
     }
   };
 
-  // 🔄 Reset all tasks
+  // 🔁 Reset Today’s Tasks
   window.resetTasks = function () {
     tasks = tasks.map(task => ({ ...task, done: false }));
     saveTasks(tasks);
     renderTasks();
   };
 
+  // 🔧 Force Reset All Tasks to Undone (even completed)
+  window.forceResetDone = async function () {
+    const day = getCurrentDay();
+    const docRef = doc(db, 'users', userId, day, 'default');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const updated = data.tasks.map(task => ({ ...task, done: false }));
+      await setDoc(docRef, { tasks: updated });
+      alert(`Tasks for ${day} have been reset to undone.`);
+      tasks = updated;
+      renderTasks();
+    }
+  };
+
   renderTasks();
 }
 
-// ✨ Show quote from Firestore
+// ✨ Daily Quote
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
