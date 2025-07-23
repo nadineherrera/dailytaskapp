@@ -271,13 +271,23 @@ function playChime() {
 let isInhale = true;
 let breathingInterval;
 
+function playChime() {
+  const chimeSound = document.getElementById('chime-sound');
+  if (chimeSound) {
+    chimeSound.currentTime = 0;
+    chimeSound.volume = 1.0;
+    chimeSound.muted = false;
+    chimeSound.play().catch((e) => console.warn("Chime blocked:", e));
+  }
+}
+
 function updateBreathingText() {
   const breathText = document.getElementById('breath-text');
   isInhale = !isInhale;
   if (breathText) {
     breathText.textContent = isInhale ? "Inhale" : "Exhale";
   }
-  playChime();
+  playChime(); // Play on every phase change
 }
 
 // ✅ Modal Trigger Logic
@@ -290,7 +300,16 @@ if (openModalBtn && modal && closeModalBtn) {
     modal.style.display = 'flex';
     document.getElementById('breath-text').textContent = "Inhale";
     isInhale = true;
-    playChime();
+
+    // ✅ Play chime immediately (first user interaction)
+    const chimeSound = document.getElementById('chime-sound');
+    if (chimeSound) {
+      chimeSound.currentTime = 0;
+      chimeSound.volume = 1.0;
+      chimeSound.muted = false;
+      chimeSound.play().catch((e) => console.warn("Chime blocked on open:", e));
+    }
+
     breathingInterval = setInterval(updateBreathingText, 4000); // every 4 seconds
   });
 
