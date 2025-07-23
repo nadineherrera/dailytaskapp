@@ -1,10 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {
-  getFirestore, doc, getDoc, setDoc, collection, getDocs
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {
-  getAuth, signInAnonymously, onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -19,53 +15,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-signInAnonymously(auth)
-  .then(() => {
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        const userId = user.uid;
-        initializeAllDays(userId).then(() => {
-          initTaskApp(userId);
-          displayDailyCard();
-        });
-      }
-    });
-  })
-  .catch(error => {
-    console.error("Anonymous login error:", error.message);
-  });
+displayDailyQuote(); // Fetch a motivational quote
+initializeAllDays();
 
-function getDefaultTasksForDay(day) {
-  const defaults = {
-    Monday: ["Plan my week", "Tidy up", "Set intentions"],
-    Tuesday: ["Follow up on emails", "Focus time block", "Hydrate!"],
-    Wednesday: ["Midweek review", "Do something creative", "Gratitude check-in"],
-    Thursday: ["Finish open tasks", "Read something inspiring", "Reflect"],
-    Friday: ["Celebrate wins", "Clear workspace", "Plan weekend"],
-    Saturday: ["Self-care ritual", "Family/friends time", "Outdoor activity"],
-    Sunday: ["Meal prep", "Laundry/reset", "Reflect & rest"]
-  };
-  return defaults[day] || ["Do something meaningful"];
-}
-
-async function saveTasksForDay(userId, day, tasks) {
+async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
 
-async function initializeAllDays(userId) {
+async function initializeAllDays() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
     const data = docSnap.exists() ? docSnap.data() : {};
+
     if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
-      await saveTasksForDay(userId, day, defaultTasks);
+      await saveTasksForDay(day, defaultTasks);
     }
   }
+
+  initTaskApp();
+}
+
+async function saveTasks(tasks) {
+  const day = getCurrentDay();
+  await saveTasksForDay(day, tasks);
+}
+
+async function loadTasks() {
+  const day = getCurrentDay();
+  const docRef = doc(db, 'users', userId, day, 'default');
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? docSnap.data().tasks : [];
 }
 
 function getCurrentDay() {
@@ -73,17 +60,10 @@ function getCurrentDay() {
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-async function loadTasks(userId) {
-  const day = getCurrentDay();
-  const docRef = doc(db, 'users', userId, day, 'default');
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? docSnap.data().tasks : [];
-}
-
-async function initTaskApp(userId) {
+async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
-  let tasks = await loadTasks(userId);
+  let tasks = await loadTasks();
 
   function renderTasks() {
     taskList.innerHTML = '';
@@ -97,10 +77,10 @@ async function initTaskApp(userId) {
 
       checkbox.onchange = () => {
         tasks[index].done = checkbox.checked;
-        saveTasksForDay(userId, getCurrentDay(), tasks);
+        saveTasks(tasks);
 
         if (checkbox.checked) {
-          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐', '🎊', '💯', '👍'];
+          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -128,7 +108,7 @@ async function initTaskApp(userId) {
         deleteBtn.className = 'delete-btn';
         deleteBtn.onclick = () => {
           tasks.splice(index, 1);
-          saveTasksForDay(userId, getCurrentDay(), tasks);
+          saveTasks(tasks);
           renderTasks();
         };
         h2.appendChild(deleteBtn);
@@ -142,7 +122,7 @@ async function initTaskApp(userId) {
     const text = newTaskInput.value.trim();
     if (text) {
       tasks.push({ text, done: false, manual: true });
-      saveTasksForDay(userId, getCurrentDay(), tasks);
+      saveTasks(tasks);
       newTaskInput.value = '';
       renderTasks();
     }
@@ -150,50 +130,54 @@ async function initTaskApp(userId) {
 
   window.resetTasks = function () {
     tasks = tasks.map(task => ({ ...task, done: false }));
-    saveTasksForDay(userId, getCurrentDay(), tasks);
+    saveTasks(tasks);
     renderTasks();
   };
 
   renderTasks();
 }
 
-async function displayDailyCard() {
-  const container = document.getElementById('quote-container');
-  if (!container) return;
+function getDefaultTasksForDay(day) {
+  const baseTasks = [
+    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
+    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
+    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
+    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
+    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
+    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
+  ];
+  const extended = {
+    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
+    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
+    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
+  };
+  return extended[day] || baseTasks;
+}
 
-  container.innerHTML = '';
-  container.classList.remove('loaded');
-
-  const today = new Date().toISOString().split('T')[0];
-  const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-
-  const saved = JSON.parse(localStorage.getItem('dailyCard') || '{}');
-  if (saved.date === today && saved.quote && saved.affirmation) {
-    renderCard(saved.quote, saved.author, saved.affirmation);
-    return;
-  }
+// ✅ Fetch and display motivational quote from Firestore
+async function displayDailyQuote() {
+  const quoteContainer = document.getElementById('quote-container');
+  if (!quoteContainer) return;
 
   try {
-    const quoteSnap = await getDocs(collection(db, 'quotes'));
-    const quoteList = quoteSnap.docs.map(doc => doc.data());
-    const { text: quote, author } = quoteList[Math.floor(Math.random() * quoteList.length)];
+    const snapshot = await getDocs(collection(db, 'quotes'));
+    const quotes = snapshot.docs.map(doc => doc.data());
 
-    const affirmationSnap = await getDoc(doc(db, 'affirmations', dayName));
-    const affirmation = affirmationSnap.exists() ? affirmationSnap.data().text : "";
-
-    localStorage.setItem('dailyCard', JSON.stringify({ date: today, quote, author, affirmation }));
-    renderCard(quote, author, affirmation);
-  } catch (err) {
-    console.error("Card fetch error:", err);
-    renderCard("You’re doing great. Just keep showing up.", "", "I am enough. I am doing my best.");
-  }
-
-  function renderCard(quote, author, affirmation) {
-    container.innerHTML = `
-      <div style="font-size: 1.15rem; font-weight: 500; margin-bottom: 0.5rem;">"${quote}"</div>
-      ${author ? `<div style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">– ${author}</div>` : ""}
-      <div style="font-size: 1rem; font-weight: 400; font-style: normal; color: #845EC2;">${affirmation}</div>
-    `;
-    container.classList.add('loaded');
+    if (quotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      const { text, author } = quotes[randomIndex];
+      quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
+    } else {
+      quoteContainer.textContent = "Keep going. Your effort matters.";
+    }
+  } catch (error) {
+    console.error("Error fetching quote:", error);
+    quoteContainer.textContent = "You’re doing great. Just keep showing up.";
   }
 }
+
+
