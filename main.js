@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc
+  getFirestore, doc, getDoc, setDoc, collection, getDocs
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -15,15 +15,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// ✅ Hardcoded User ID (with "d" at start)
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
-
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// ✅ Load everything
 initializeAllDays();
+loadRandomQuote();
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -158,4 +155,25 @@ function getDefaultTasksForDay(day) {
     Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
   };
   return extended[day] || baseTasks;
+}
+
+// ✅ Load a random motivational quote
+async function loadRandomQuote() {
+  const quoteBox = document.getElementById('quote-box');
+  if (!quoteBox) return;
+
+  try {
+    const snapshot = await getDocs(collection(db, 'quotes'));
+    const quotes = snapshot.docs.map(doc => doc.data());
+    if (quotes.length === 0) {
+      quoteBox.textContent = "Stay motivated.";
+      return;
+    }
+
+    const random = quotes[Math.floor(Math.random() * quotes.length)];
+    quoteBox.textContent = `"${random.text}" — ${random.author || 'Unknown'}`;
+  } catch (error) {
+    console.error('Error loading quotes:', error);
+    quoteBox.textContent = "Couldn't load quote.";
+  }
 }
