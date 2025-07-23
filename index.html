@@ -466,13 +466,15 @@ function startBreathwork() {
   const modal = document.getElementById('breath-modal');
   const timer = document.getElementById('breath-timer');
   const text = document.getElementById('breath-text');
+  const chime = document.getElementById('chime-sound');
 
   modal.style.display = 'flex';
   let timeLeft = 120; // 2 minutes
 
   breathInterval = setInterval(() => {
     text.textContent = text.textContent === 'Inhale' ? 'Exhale' : 'Inhale';
-  }, 4000); // 4-second cycle
+    chime.play();
+  }, 4000); // every 4 seconds
 
   countdownInterval = setInterval(() => {
     timeLeft--;
@@ -486,15 +488,8 @@ function startBreathwork() {
     }
   }, 1000);
 }
-
-function closeBreathModal() {
-  document.getElementById('breath-modal').style.display = 'none';
-  clearInterval(breathInterval);
-  clearInterval(countdownInterval);
-  document.getElementById('breath-text').textContent = "Inhale";
-  document.getElementById('breath-timer').textContent = "2:00";
-}
 </script>
+
   
 </body>
 </html>
