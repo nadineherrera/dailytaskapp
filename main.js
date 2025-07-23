@@ -25,7 +25,7 @@ async function setupApp() {
   await initTaskApp();
   loadRandomQuote();
   loadDailyAffirmation();
-  loadJournalEntries();
+  await loadJournalEntries();
 
   const saveBtn = document.getElementById('save-journal-btn');
   if (saveBtn) {
@@ -33,7 +33,6 @@ async function setupApp() {
   }
 }
 
-// 🗓️ Date Helpers
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
@@ -43,7 +42,6 @@ function getTodayDate() {
   return new Date().toISOString().split('T')[0];
 }
 
-// 📝 Journal Functions
 async function saveJournalEntries() {
   const dayFromUrl = new URLSearchParams(window.location.search).get('day');
   const date = dayFromUrl || getTodayDate();
@@ -52,20 +50,11 @@ async function saveJournalEntries() {
   const dream = dreamInput?.value?.trim() || '';
   const daily = dailyInput?.value?.trim() || '';
 
-  const entry = { ...(dream && { dream }), ...(daily && { daily }) };
-  if (!dream && !daily) {
-    alert("Please enter something to save.");
-    return;
-  }
+  const entry = { dream, daily };
 
   try {
     const ref = doc(db, 'users', userId, 'journals', date);
     await setDoc(ref, entry, { merge: true });
-
-    // ✅ Clear the journal fields only for the day currently selected
-    if (dreamInput) dreamInput.value = '';
-    if (dailyInput) dailyInput.value = '';
-
     alert("Journal entry saved!");
   } catch (err) {
     console.error("Error saving journal:", err);
@@ -90,7 +79,6 @@ async function loadJournalEntries() {
     console.error("Failed to load journal:", err);
   }
 }
-
 
 // ✅ Tasks
 async function ensureAllDaysInitialized() {
