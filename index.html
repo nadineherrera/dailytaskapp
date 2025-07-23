@@ -105,30 +105,24 @@
     #quote-box.visible {
       opacity: 1;
     }
+    #affirmation-box {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-style: italic;
+      color: #666;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    #affirmation-box.visible {
+      opacity: 1;
+    }
     @keyframes emojiPopBounce {
-      0% {
-        transform: scale(0.4) rotate(-10deg);
-        opacity: 0;
-      }
-      20% {
-        transform: scale(1.6) rotate(10deg);
-        opacity: 1;
-      }
-      40% {
-        transform: scale(2.4) rotate(0deg);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(1.4);
-        opacity: 1;
-      }
-      85% {
-        transform: scale(1.6);
-      }
-      100% {
-        transform: scale(0.9);
-        opacity: 0;
-      }
+      0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
+      20% { transform: scale(1.6) rotate(10deg); opacity: 1; }
+      40% { transform: scale(2.4) rotate(0deg); opacity: 1; }
+      70% { transform: scale(1.4); opacity: 1; }
+      85% { transform: scale(1.6); }
+      100% { transform: scale(0.9); opacity: 0; }
     }
   </style>
 </head>
@@ -136,6 +130,7 @@
   <header>
     <img src="apple-touch-icon.png" alt="App Logo">
     <h1 id="page-title">Daily Tasks</h1>
+    <div id="affirmation-box"></div> <!-- ✅ Affirmation shown below title -->
   </header>
 
   <div class="day-nav">
@@ -153,8 +148,7 @@
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
-  <!-- ✅ Motivational Quote at the bottom -->
-  <div id="quote-box"></div>
+  <div id="quote-box"></div> <!-- ✅ Quote stays at bottom -->
 
   <script type="module" src="main.js"></script>
   <script>
