@@ -1,6 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, setDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
@@ -14,26 +15,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-let userId = 'djUVi4KmRVfQohInCiM6oVmbYx92'; // Email/password user
+// ✅ Hardcoded User ID (with "d" at start)
+const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// If using auth flow, uncomment below
-/*
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    userId = user.uid;
-    await initializeAllDays();
-  } else {
-    console.warn("You're not signed in.");
-  }
-});
-*/
-
-initializeAllDays(); // Directly initialize if user ID is fixed
+// ✅ Load everything
+initializeAllDays();
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
