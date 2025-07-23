@@ -42,14 +42,11 @@ function getTodayDate() {
   return new Date().toISOString().split('T')[0];
 }
 
+// ✅ Journal
 async function saveJournalEntries() {
-  const dayFromUrl = new URLSearchParams(window.location.search).get('day');
-  const date = dayFromUrl || getTodayDate();
-  const dreamInput = document.getElementById('dream-journal');
-  const dailyInput = document.getElementById('daily-journal');
-  const dream = dreamInput?.value?.trim() || '';
-  const daily = dailyInput?.value?.trim() || '';
-
+  const date = getCurrentDay();
+  const dream = document.getElementById('dream-journal')?.value.trim() || '';
+  const daily = document.getElementById('daily-journal')?.value.trim() || '';
   const entry = { dream, daily };
 
   try {
@@ -63,8 +60,7 @@ async function saveJournalEntries() {
 }
 
 async function loadJournalEntries() {
-  const dayFromUrl = new URLSearchParams(window.location.search).get('day');
-  const date = dayFromUrl || getTodayDate();
+  const date = getCurrentDay();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
@@ -80,37 +76,69 @@ async function loadJournalEntries() {
   }
 }
 
-// ✅ Tasks
+// ✅ Task Defaults
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
     const ref = doc(db, 'users', userId, day, 'default');
     const snap = await getDoc(ref);
-    const data = snap.exists() ? snap.data() : {};
-    if (!Array.isArray(data.tasks) || data.tasks.length === 0) {
+    if (!snap.exists() || !Array.isArray(snap.data().tasks)) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await setDoc(ref, { tasks: defaults });
     }
   }
 }
 
-async function loadTasks() {
-  const day = getCurrentDay();
-  const ref = doc(db, 'users', userId, day, 'default');
-  const snap = await getDoc(ref);
-  return snap.exists() ? snap.data().tasks : [];
+function getDefaultTasksForDay(day) {
+  const base = [
+    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
+    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
+    "Spend Time With Family", "15-Minute Clean Up", "Learn Spanish",
+    "Check Email", "Check Social Media", "Strength Train", "Read", "Journal",
+    "Drink Water", "Update Tasks"
+  ];
+  const addOns = {
+    Monday: ["Work for 5 Hours at Apple"],
+    Tuesday: ["Work for 5 Hours at Apple"],
+    Wednesday: ["2 PM Therapy Session"],
+    Thursday: ["Work on Alchemy Body Werks"],
+    Friday: ["Pay Bills", "Call IRS"],
+    Saturday: ["Deep Clean", "Laundry"],
+    Sunday: ["CSU Homework"]
+  };
+  return [...base, ...(addOns[day] || [])];
 }
 
+// ✅ Tasks + Progress Bar
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
   let tasks = await loadTasks();
 
+  function updateProgressBar() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.done).length;
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+    const bar = document.getElementById('progress-bar');
+    const text = document.getElementById('progress-text');
+    if (bar) bar.style.width = `${percent}%`;
+    if (text) text.textContent = `${percent}% Complete`;
+  }
+
   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, i) => {
-      if (task.done) return;
       const h2 = document.createElement('h2');
+
+      if (task.done) {
+        h2.style.opacity = '0';
+        h2.style.height = '0';
+        h2.style.overflow = 'hidden';
+        h2.style.margin = '0';
+        h2.style.padding = '0';
+        h2.style.border = 'none';
+      }
+
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
@@ -123,7 +151,10 @@ async function initTaskApp() {
           h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
-          setTimeout(() => { emoji.remove(); renderTasks(); }, 2000);
+          setTimeout(() => {
+            emoji.remove();
+            renderTasks();
+          }, 2000);
         } else {
           renderTasks();
         }
@@ -147,6 +178,8 @@ async function initTaskApp() {
 
       taskList.appendChild(h2);
     });
+
+    updateProgressBar();
   }
 
   window.addTask = () => {
@@ -168,33 +201,20 @@ async function initTaskApp() {
   renderTasks();
 }
 
+async function loadTasks() {
+  const day = getCurrentDay();
+  const ref = doc(db, 'users', userId, day, 'default');
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().tasks : [];
+}
+
 async function saveTasks(tasks) {
   const day = getCurrentDay();
   const ref = doc(db, 'users', userId, day, 'default');
   await setDoc(ref, { tasks });
 }
 
-function getDefaultTasksForDay(day) {
-  const base = [
-    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
-    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family", "15-Minute Clean Up", "Learn Spanish",
-    "Check Email", "Check Social Media", "Strength Train", "Read", "Journal",
-    "Drink Water", "Update Tasks"
-  ];
-  const addOns = {
-    Monday: ["Work for 5 Hours at Apple"],
-    Tuesday: ["Work for 5 Hours at Apple"],
-    Wednesday: ["2 PM Therapy Session"],
-    Thursday: ["Work on Alchemy Body Werks"],
-    Friday: ["Pay Bills", "Call IRS"],
-    Saturday: ["Deep Clean", "Laundry"],
-    Sunday: ["CSU Homework"]
-  };
-  return [...base, ...(addOns[day] || [])];
-}
-
-// ✅ Quotes
+// ✅ Quotes + Affirmations
 async function loadRandomQuote() {
   const box = document.getElementById('quote-box');
   if (!box) return;
@@ -230,4 +250,3 @@ async function loadDailyAffirmation() {
     box.textContent = "🌿  Unable to load affirmation.";
   }
 }
-
