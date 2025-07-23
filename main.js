@@ -27,48 +27,56 @@ async function setupApp() {
   loadRandomQuote();
   loadDailyAffirmation();
   loadJournalEntries();
+
+  const saveBtn = document.getElementById('save-journal-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveJournalEntries);
+  }
 }
 
-// ✅ JOURNAL LOGIC
-
+// ✅ Get current day name
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
+// ✅ Get today’s full date string
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+}
+
+// ✅ Save Journal Entries
 async function saveJournalEntries() {
-  const day = getCurrentDay();
+  const date = getTodayDate();
   const dream = document.getElementById('dream-journal')?.value || '';
   const daily = document.getElementById('daily-journal')?.value || '';
 
-  const entryRef = doc(db, 'users', userId, 'journal', 'entries');
-  const existing = await getDoc(entryRef);
-  const data = existing.exists() ? existing.data() : {};
+  const journalRef = doc(db, 'users', userId, 'journals', date);
+  const entry = {};
+  if (dream) entry.dream = dream;
+  if (daily) entry.daily = daily;
 
-  data[`${day}_dream`] = dream;
-  data[`${day}_daily`] = daily;
-
-  await setDoc(entryRef, data);
-  alert('Journal saved!');
+  await setDoc(journalRef, entry, { merge: true });
+  alert('Journal entry saved!');
 }
 
+// ✅ Load Journal Entries
 async function loadJournalEntries() {
-  const day = getCurrentDay();
+  const date = getTodayDate();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
 
   if (!dreamField || !dailyField) return;
 
-  const entryRef = doc(db, 'users', userId, 'journal', 'entries');
-  const existing = await getDoc(entryRef);
-  const data = existing.exists() ? existing.data() : {};
+  const entryRef = doc(db, 'users', userId, 'journals', date);
+  const snapshot = await getDoc(entryRef);
+  const data = snapshot.exists() ? snapshot.data() : {};
 
-  dreamField.value = data[`${day}_dream`] || '';
-  dailyField.value = data[`${day}_daily`] || '';
+  dreamField.value = data.dream || '';
+  dailyField.value = data.daily || '';
 }
 
-// ✅ TASK APP
-
+// ✅ Task Management
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
@@ -193,8 +201,7 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// ✅ QUOTES
-
+// ✅ Load Quotes
 async function loadRandomQuote() {
   const quoteBox = document.getElementById('quote-box');
   if (!quoteBox) return;
@@ -216,8 +223,7 @@ async function loadRandomQuote() {
   }
 }
 
-// ✅ AFFIRMATIONS
-
+// ✅ Load Daily Affirmation
 async function loadDailyAffirmation() {
   const affirmationBox = document.getElementById('affirmation-box');
   if (!affirmationBox) return;
