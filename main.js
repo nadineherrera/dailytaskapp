@@ -19,13 +19,13 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// ✅ Run everything
 setupApp();
 
 async function setupApp() {
   await ensureAllDaysInitialized();
-  await initTaskApp();         // Wait until tasks show up
-  loadRandomQuote();           // Then fade in the quote
+  await initTaskApp();
+  loadRandomQuote();
+  loadDailyAffirmation();
 }
 
 async function ensureAllDaysInitialized() {
@@ -146,13 +146,13 @@ function getDefaultTasksForDay(day) {
     "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
   ];
   const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
-    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
-    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
-    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
+    Monday: [...baseTasks, "Work for 5 Hours at Apple"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
+    Wednesday: [...baseTasks, "2 PM Therapy Session"],
+    Thursday: [...baseTasks, "Work on Alchemy Body Werks"],
+    Friday: [...baseTasks, "Pay Bills", "Call IRS to Setup Payment Plan"],
+    Saturday: [...baseTasks, "Deep Clean House", "Laundry"],
+    Sunday: [...baseTasks, "CSU Homework"]
   };
   return extended[day] || baseTasks;
 }
@@ -175,5 +175,29 @@ async function loadRandomQuote() {
     console.error('Error loading quotes:', error);
     quoteBox.textContent = "Couldn't load quote.";
     quoteBox.classList.add('visible');
+  }
+}
+
+async function loadDailyAffirmation() {
+  const affirmationBox = document.getElementById('affirmation-box');
+  if (!affirmationBox) return;
+
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+
+  try {
+    const docRef = doc(db, 'affirmations', today);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      affirmationBox.textContent = `🌿 Affirmation: ${data.text}`;
+    } else {
+      affirmationBox.textContent = "🌿 No affirmation set for today.";
+    }
+    affirmationBox.classList.add('visible');
+  } catch (error) {
+    console.error("Error loading affirmation:", error);
+    affirmationBox.textContent = "🌿 Unable to load affirmation.";
+    affirmationBox.classList.add('visible');
   }
 }
