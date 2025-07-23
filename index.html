@@ -368,5 +368,21 @@
       observer.observe(taskList, { childList: true, subtree: true });
     });
   </script>
+<!-- 🌬️ Breathwork Modal -->
+<div id="breath-modal" class="modal">
+  <div class="modal-content">
+    <h2>Take a Breath</h2>
+    <div id="circle-animation"></div>
+    <p id="breath-text">Inhale</p>
+    <p id="breath-timer">2:00</p>
+    <button onclick="closeBreathModal()">Close</button>
+  </div>
+</div>
+
+<!-- 🧘🏽 Breath Button -->
+<div style="text-align: center; margin-bottom: 2rem;">
+  <button onclick="startBreathwork()">🧘🏽 Take a Breath</button>
+</div>
+
 </body>
 </html>
