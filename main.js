@@ -211,19 +211,23 @@ async function loadRandomQuote() {
   }
 }
 
-// ✅ Affirmation
 async function loadDailyAffirmation() {
   const box = document.getElementById('affirmation-box');
   if (!box) return;
 
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+  const urlDay = new URLSearchParams(window.location.search).get('day');
+  const today = (urlDay || new Date().toLocaleDateString('en-US', { weekday: 'long' })).toLowerCase();
+
   try {
     const ref = doc(db, 'affirmations', today);
     const snap = await getDoc(ref);
-    box.textContent = snap.exists() ? `🌿 Affirmation: ${snap.data().text}` : "🌿 No affirmation for today.";
+    box.textContent = snap.exists()
+      ? `🌿  Affirmation: ${snap.data().text}`
+      : "🌿  No affirmation for today.";
     box.classList.add('visible');
   } catch (e) {
     console.error(e);
-    box.textContent = "🌿 Unable to load affirmation.";
+    box.textContent = "🌿  Unable to load affirmation.";
   }
 }
+
