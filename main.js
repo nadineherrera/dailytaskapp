@@ -1,12 +1,12 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
   authDomain: "my-daily-tasks-5a313.firebaseapp.com",
   projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
+  storageBucket: "my-daily-tasks-5a313.appspot.com",
   messagingSenderId: "676679892031",
   appId: "1:676679892031:web:4746c594d8415697394c8a",
   measurementId: "G-7DEQC4CWQH"
@@ -16,12 +16,20 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
+let userId = null;
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-displayDailyQuote(); // Fetch a motivational quote
-initializeAllDays();
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    userId = user.uid;
+    await initializeAllDays();
+    displayDailyQuote();
+  } else {
+    alert("You're not signed in. Please log in to view your tasks.");
+    // Optional redirect: window.location.href = "login.html";
+  }
+});
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -158,7 +166,6 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// ✅ Fetch and display motivational quote from Firestore
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
@@ -179,5 +186,3 @@ async function displayDailyQuote() {
     quoteContainer.textContent = "You’re doing great. Just keep showing up.";
   }
 }
-
-
