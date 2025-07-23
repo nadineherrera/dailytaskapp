@@ -26,7 +26,48 @@ async function setupApp() {
   await initTaskApp();
   loadRandomQuote();
   loadDailyAffirmation();
+  loadJournalEntries();
 }
+
+// ✅ JOURNAL LOGIC
+
+function getCurrentDay() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+}
+
+async function saveJournalEntries() {
+  const day = getCurrentDay();
+  const dream = document.getElementById('dream-journal')?.value || '';
+  const daily = document.getElementById('daily-journal')?.value || '';
+
+  const entryRef = doc(db, 'users', userId, 'journal', 'entries');
+  const existing = await getDoc(entryRef);
+  const data = existing.exists() ? existing.data() : {};
+
+  data[`${day}_dream`] = dream;
+  data[`${day}_daily`] = daily;
+
+  await setDoc(entryRef, data);
+  alert('Journal saved!');
+}
+
+async function loadJournalEntries() {
+  const day = getCurrentDay();
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+
+  if (!dreamField || !dailyField) return;
+
+  const entryRef = doc(db, 'users', userId, 'journal', 'entries');
+  const existing = await getDoc(entryRef);
+  const data = existing.exists() ? existing.data() : {};
+
+  dreamField.value = data[`${day}_dream`] || '';
+  dailyField.value = data[`${day}_daily`] || '';
+}
+
+// ✅ TASK APP
 
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -47,11 +88,6 @@ async function loadTasks() {
   const docRef = doc(db, 'users', userId, day, 'default');
   const docSnap = await getDoc(docRef);
   return docSnap.exists() ? docSnap.data().tasks : [];
-}
-
-function getCurrentDay() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
 async function initTaskApp() {
@@ -157,6 +193,8 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
+// ✅ QUOTES
+
 async function loadRandomQuote() {
   const quoteBox = document.getElementById('quote-box');
   if (!quoteBox) return;
@@ -177,6 +215,8 @@ async function loadRandomQuote() {
     quoteBox.classList.add('visible');
   }
 }
+
+// ✅ AFFIRMATIONS
 
 async function loadDailyAffirmation() {
   const affirmationBox = document.getElementById('affirmation-box');
