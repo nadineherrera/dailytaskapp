@@ -21,18 +21,21 @@
       padding: 1rem;
       background: white;
     }
+
     header {
       text-align: center;
       background-color: #FFD966;
       padding: 1rem;
       margin: -1rem -1rem 1rem -1rem;
     }
+
     header img {
       max-width: 100px;
       height: auto;
       display: block;
       margin: 0 auto;
     }
+
     h1 {
       color: white;
       font-weight: bold;
@@ -40,6 +43,7 @@
       visibility: hidden;
       margin-top: 0.5rem;
     }
+
     #affirmation-box {
       text-align: center;
       margin-top: 0.75rem;
@@ -48,9 +52,11 @@
       opacity: 0;
       transition: opacity 1.2s ease-in-out;
     }
+
     #affirmation-box.visible {
       opacity: 1;
     }
+
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
@@ -58,12 +64,18 @@
       padding: 0.5rem;
       border-radius: 5px;
     }
+
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
       color: white;
       font-weight: bold;
     }
+
+    #task-list {
+      margin-bottom: 2rem;
+    }
+
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -77,21 +89,35 @@
       font-size: 1.1rem;
       position: relative;
     }
-    input[type="text"] {
-      width: 80%;
-      padding: 0.5rem;
-      margin-top: 1rem;
+
+    .task-input-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
     }
+
+    #new-task {
+      width: 70%;
+      max-width: 400px;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
     button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 5px;
       background-color: #66B032;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      font-size: 1rem;
     }
+
     .delete-btn {
       margin-left: auto;
       background: none;
@@ -100,61 +126,75 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
+
     .celebration {
       margin-left: 5px;
       font-size: 1.5rem;
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
 
+    section#journals {
+      background: #CBC3E3;
+      margin-top: 3rem;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     section#journals h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #845EC2;
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #845EC2;
     }
 
     section#journals textarea {
-    width: 100%;
-    height: 120px;
-    padding: 12px;
-    margin-bottom: 2rem;
-    font-family: Arial, sans-serif;
-    font-size: 1rem;
-    border-radius: 10px;
-    border: 1px solid #bcaecf;
-    box-sizing: border-box;
-    resize: vertical;
-    background: #fff;
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      margin-bottom: 2rem;
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #bcaecf;
+      box-sizing: border-box;
+      resize: vertical;
+      background: #fff;
     }
 
     section#journals button {
-    display: block;
-    margin: 0 auto;
-    padding: 0.7rem 1.5rem;
-    background-color: #845EC2;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      padding: 0.7rem 1.5rem;
+      background-color: #845EC2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
     }
 
     footer#quote-footer {
-    background-color: #845EC2;
-    padding: 1.5rem;
-    margin: 2rem -1rem 0 -1rem; /* matches your header's negative margins */
-    text-align: center;
-    color: #fff;
-    font-style: italic;
-    font-size: 1rem;
-    border-radius: 0px;
-    width: calc(100% + 2rem); /* ensures full bleed like header */
-    box-sizing: border-box;
+      background-color: #845EC2;
+      padding: 1.5rem;
+      margin: 2rem -1rem 0 -1rem;
+      text-align: center;
+      color: #fff;
+      font-style: italic;
+      font-size: 1rem;
+      border-radius: 0px;
+      width: calc(100% + 2rem);
+      box-sizing: border-box;
     }
+
     #quote-box {
       opacity: 0;
       transition: opacity 1.2s ease-in-out;
     }
+
     #quote-box.visible {
       opacity: 1;
     }
@@ -187,28 +227,24 @@
   </div>
 
   <div id="task-list"></div>
-  <input type="text" id="new-task" placeholder="Add new task">
-  <button onclick="addTask()">Add Task</button>
-  <button onclick="resetTasks()">Reset All Tasks</button>
 
- <!-- ✅ Journal Area with Dream Image & Styles -->
-<section id="journals" style="margin-top: 2rem; background: #CBC3E3; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
-  <div style="text-align: center; margin-bottom: 1rem;">
+  <div class="task-input-group">
+    <input type="text" id="new-task" placeholder="Add new task">
+    <button onclick="addTask()">Add Task</button>
+    <button onclick="resetTasks()">Reset All Tasks</button>
   </div>
 
-  <h2 style="color: #845EC2;">Dream Journal</h2>
-  <textarea id="dreamJournal" placeholder="Dream Journal" style="width: 100%; height: 100px; border-radius: 8px; border: 1px solid #bcaecf; padding: 10px; font-family: inherit; resize: vertical;"></textarea>
+  <!-- ✅ Journal Section -->
+  <section id="journals">
+    <h2>Dream Journal</h2>
+    <textarea id="dreamJournal" placeholder="What did you dream about?"></textarea>
 
-  <h2 style="margin-top: 2rem; color: #845EC2;">Daily Journal</h2>
-  <textarea id="dailyJournal" placeholder="How are you feeling today?" style="width: 100%; height: 100px; border-radius: 8px; border: 1px solid #bcaecf; padding: 10px; font-family: inherit; resize: vertical;"></textarea>
-  
-  <div style="text-align: center;">
-    <button onclick="saveJournals()" style="margin-top: 1rem; padding: 0.6rem 1.2rem; background-color: #845EC2; color: white; border: none; border-radius: 8px; font-size: 1rem;">Save Journals</button>
-  </div>
-</section>
+    <h2>Daily Journal</h2>
+    <textarea id="dailyJournal" placeholder="How are you feeling today?"></textarea>
 
+    <button onclick="saveJournals()">Save Journals</button>
+  </section>
 
-  <!-- ✅ Colorful footer for the quote -->
   <footer id="quote-footer">
     <p id="quote-box">Loading quote...</p>
   </footer>
@@ -234,6 +270,11 @@
       alert("Daily journal entry saved!");
     }
 
+    function saveJournals() {
+      saveDreamJournal();
+      saveDailyJournal();
+    }
+
     function loadJournals() {
       const savedDream = localStorage.getItem('dreamJournal');
       const savedDaily = localStorage.getItem('dailyJournal');
@@ -243,14 +284,5 @@
 
     window.addEventListener('load', loadJournals);
   </script>
-  <script>
-  // (your existing code...)
-
-  function saveJournals() {
-    saveDreamJournal();
-    saveDailyJournal();
-  }
-</script>
-
 </body>
 </html>
