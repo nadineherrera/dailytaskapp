@@ -53,12 +53,6 @@
       color: white;
       font-weight: bold;
     }
-    #quote-box {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-style: italic;
-      color: #444;
-    }
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -100,6 +94,12 @@
       font-size: 1.5rem;
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
+    #quote-box {
+      text-align: center;
+      margin-top: 2rem;
+      font-style: italic;
+      color: #444;
+    }
     @keyframes emojiPopBounce {
       0% {
         transform: scale(0.4) rotate(-10deg);
@@ -133,8 +133,6 @@
     <h1 id="page-title">Daily Tasks</h1>
   </header>
 
-  <div id="quote-box">Loading motivation...</div>
-
   <div class="day-nav">
     <a href="?day=Monday">Mon</a>
     <a href="?day=Tuesday">Tue</a>
@@ -149,6 +147,9 @@
   <input type="text" id="new-task" placeholder="Add new task">
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
+
+  <!-- ✅ Motivational Quote at the bottom -->
+  <div id="quote-box">Loading motivation...</div>
 
   <script type="module" src="main.js"></script>
   <script>
