@@ -1,17 +1,12 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {
-  getFirestore, doc, getDoc, setDoc, collection, getDocs
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import {
-  getAuth, signInAnonymously, onAuthStateChanged
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-// 🔧 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
   authDomain: "my-daily-tasks-5a313.firebaseapp.com",
   projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.appspot.com",
+  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
   messagingSenderId: "676679892031",
   appId: "1:676679892031:web:4746c594d8415697394c8a",
   measurementId: "G-7DEQC4CWQH"
@@ -20,78 +15,32 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-let userId = null;
 
+const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// 🔐 Auth (Anonymous)
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    userId = user.uid;
-    displayDailyQuote();
-    await initializeAllDays();
-  } else {
-    const result = await signInAnonymously(auth);
-    userId = result.user.uid;
-    displayDailyQuote();
-    await initializeAllDays();
-  }
-});
+displayDailyQuote(); // Fetch a motivational quote
+initializeAllDays();
 
-// 🧠 Default Tasks
-function getDefaultTasksForDay(day) {
-  const baseTasks = [
-    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
-    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
-    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
-    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
-    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
-  ];
-
-  const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple"],
-    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
-    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
-  };
-
-  return extended[day] || baseTasks;
+async function saveTasksForDay(day, tasks) {
+  await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
 
-// 📅 Day Helper
-function getCurrentDay() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-}
-
-// 🧱 Create Tasks
 async function initializeAllDays() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
     const data = docSnap.exists() ? docSnap.data() : {};
 
-    if (!Array.isArray(data.tasks) || typeof data.tasks[0]?.text !== 'string') {
-      const defaultTasks = getDefaultTasksForDay(day).map(text => ({
-        text, done: false, manual: false
-      }));
-      await setDoc(docRef, { tasks: defaultTasks });
+    if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
+      const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+      await saveTasksForDay(day, defaultTasks);
     }
   }
 
   initTaskApp();
-}
-
-// 📥 Load & Save
-async function saveTasksForDay(day, tasks) {
-  await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
 
 async function saveTasks(tasks) {
@@ -103,11 +52,14 @@ async function loadTasks() {
   const day = getCurrentDay();
   const docRef = doc(db, 'users', userId, day, 'default');
   const docSnap = await getDoc(docRef);
-  const data = docSnap.exists() ? docSnap.data() : {};
-  return data.tasks || [];
+  return docSnap.exists() ? docSnap.data().tasks : [];
 }
 
-// 🧠 Main UI
+function getCurrentDay() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+}
+
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
@@ -128,7 +80,7 @@ async function initTaskApp() {
         saveTasks(tasks);
 
         if (checkbox.checked) {
-          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐', '🎊', '💯', '👍'];
+          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
           const emoji = document.createElement('span');
           emoji.className = 'celebration';
           emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -166,7 +118,6 @@ async function initTaskApp() {
     });
   }
 
-  // ➕ Add Task
   window.addTask = function () {
     const text = newTaskInput.value.trim();
     if (text) {
@@ -177,33 +128,37 @@ async function initTaskApp() {
     }
   };
 
-  // 🔁 Reset Today’s Tasks
   window.resetTasks = function () {
     tasks = tasks.map(task => ({ ...task, done: false }));
     saveTasks(tasks);
     renderTasks();
   };
 
-  // 🔧 Force Reset All Tasks to Undone (even completed)
-  window.forceResetDone = async function () {
-    const day = getCurrentDay();
-    const docRef = doc(db, 'users', userId, day, 'default');
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const updated = data.tasks.map(task => ({ ...task, done: false }));
-      await setDoc(docRef, { tasks: updated });
-      alert(`Tasks for ${day} have been reset to undone.`);
-      tasks = updated;
-      renderTasks();
-    }
-  };
-
   renderTasks();
 }
 
-// ✨ Daily Quote
+function getDefaultTasksForDay(day) {
+  const baseTasks = [
+    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
+    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
+    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
+    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
+    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
+    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
+  ];
+  const extended = {
+    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan", "5 Hour Work Day at Apple"],
+    Tuesday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
+    Thursday: [...baseTasks, "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple", "5 Hour Work Day at Apple"],
+    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
+    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
+  };
+  return extended[day] || baseTasks;
+}
+
+// ✅ Fetch and display motivational quote from Firestore
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
@@ -213,7 +168,8 @@ async function displayDailyQuote() {
     const quotes = snapshot.docs.map(doc => doc.data());
 
     if (quotes.length > 0) {
-      const { text, author } = quotes[Math.floor(Math.random() * quotes.length)];
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      const { text, author } = quotes[randomIndex];
       quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
     } else {
       quoteContainer.textContent = "Keep going. Your effort matters.";
@@ -223,3 +179,5 @@ async function displayDailyQuote() {
     quoteContainer.textContent = "You’re doing great. Just keep showing up.";
   }
 }
+
+
