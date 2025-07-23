@@ -45,7 +45,8 @@ function getTodayDate() {
 
 // 📝 Journal Functions
 async function saveJournalEntries() {
-  const date = getTodayDate();
+  const dayFromUrl = new URLSearchParams(window.location.search).get('day');
+  const date = dayFromUrl || getTodayDate();
   const dreamInput = document.getElementById('dream-journal');
   const dailyInput = document.getElementById('daily-journal');
   const dream = dreamInput?.value?.trim() || '';
@@ -61,7 +62,7 @@ async function saveJournalEntries() {
     const ref = doc(db, 'users', userId, 'journals', date);
     await setDoc(ref, entry, { merge: true });
 
-    // ✅ Clear fields after save
+    // ✅ Clear the journal fields only for the day currently selected
     if (dreamInput) dreamInput.value = '';
     if (dailyInput) dailyInput.value = '';
 
@@ -73,7 +74,8 @@ async function saveJournalEntries() {
 }
 
 async function loadJournalEntries() {
-  const date = getTodayDate();
+  const dayFromUrl = new URLSearchParams(window.location.search).get('day');
+  const date = dayFromUrl || getTodayDate();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
@@ -88,6 +90,7 @@ async function loadJournalEntries() {
     console.error("Failed to load journal:", err);
   }
 }
+
 
 // ✅ Tasks
 async function ensureAllDaysInitialized() {
