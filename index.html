@@ -239,77 +239,6 @@
     }
   }
 </style>
-
-<style>
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal-content {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    width: 90%;
-    max-width: 360px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.4s ease;
-  }
-
- #circle-animation {
-  width: 120px;
-  height: 120px;
-  margin: 3rem auto 3rem;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #4A90E2, #357ABD);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  animation: breathe 4s ease-in-out infinite;
-}
-
-  @keyframes breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.4); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
- #breath-text {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #4A4A4A;
-  margin-top: 1rem; /* 👈 Creates space after the circle */
-}
-
-  #breath-timer {
-    font-size: 1.1rem;
-    margin: 0.5rem 0 1.5rem;
-    color: #333;
-  }
-
-  .modal-content button {
-    background-color: #845EC2;
-    color: white;
-    padding: 0.6rem 1.4rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-</style>
-
-  
 </head>
 <body>
   <header>
@@ -347,16 +276,10 @@
         <option value="😴">Tired</option>
         <option value="😌">Peaceful</option>
       </select>
-    
-  </section>
-</div>
+    </section>
+  </div>
 
-<!-- 🧘🏽 Breath Button -->
-<div style="text-align: center; margin: 2rem 0;">
-  <button class="breath-btn" onclick="startBreathwork()">🧘🏽 Take a Breath</button>
-</div>
-
-<h2 class="section-label">🌱 Today's Tasks</h2>
+  <h2 class="section-label">🌱 Today's Tasks</h2>
 
   <!-- 🌿 Progress Bar -->
   <div id="progress-container">
@@ -445,51 +368,5 @@
       observer.observe(taskList, { childList: true, subtree: true });
     });
   </script>
-  
-<!-- 🌬️ Breathwork Modal -->
-<div id="breath-modal" class="modal">
-  <div class="modal-content">
-    <h2>Take a Breath</h2>
-    <div id="circle-animation"></div>
-    <p id="breath-text">Inhale</p>
-    <p id="breath-timer">2:00</p>
-    <button onclick="closeBreathModal()">Close</button>
-  </div>
-</div>
-  
-<audio id="chime-sound" src="chime-74910.mp3" preload="auto"></audio>
-  
-<script>
-let breathInterval, countdownInterval;
-
-function startBreathwork() {
-  const modal = document.getElementById('breath-modal');
-  const timer = document.getElementById('breath-timer');
-  const text = document.getElementById('breath-text');
-  const chime = document.getElementById('chime-sound');
-
-  modal.style.display = 'flex';
-  let timeLeft = 120; // 2 minutes
-
-  breathInterval = setInterval(() => {
-    text.textContent = text.textContent === 'Inhale' ? 'Exhale' : 'Inhale';
-    chime.play();
-  }, 4000); // every 4 seconds
-
-  countdownInterval = setInterval(() => {
-    timeLeft--;
-    const mins = Math.floor(timeLeft / 60);
-    const secs = timeLeft % 60;
-    timer.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-    if (timeLeft <= 0) {
-      clearInterval(breathInterval);
-      clearInterval(countdownInterval);
-      text.textContent = "Done ✨";
-    }
-  }, 1000);
-}
-</script>
-
-  
 </body>
 </html>
