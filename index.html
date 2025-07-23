@@ -99,6 +99,11 @@
       margin-top: 2rem;
       font-style: italic;
       color: #444;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    #quote-box.visible {
+      opacity: 1;
     }
     @keyframes emojiPopBounce {
       0% {
@@ -149,7 +154,7 @@
   <button onclick="resetTasks()">Reset All Tasks</button>
 
   <!-- ✅ Motivational Quote at the bottom -->
-  <div id="quote-box">Loading motivation...</div>
+  <div id="quote-box"></div>
 
   <script type="module" src="main.js"></script>
   <script>
