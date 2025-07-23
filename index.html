@@ -3,43 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <title>Daily Tasks</title>
+
+  <!-- ✅ Favicon & App Icon -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <title>Daily Task App</title>
+
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: white;
+      margin: 0;
+      padding: 1rem;
+      background-color: #fff3b0;
     }
 
     header {
-      background-color: #FFD966;
-      color: #333;
       text-align: center;
       padding: 1rem;
     }
 
-    .affirmation {
-      font-size: 1.1rem;
-      color: #444;
-      font-style: italic;
-      margin-top: 0.5rem;
-    }
-
-    .main-content {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 1rem;
+    .logo {
+      width: 100px;
+      height: auto;
+      margin-bottom: 1rem;
     }
 
     h1 {
-      margin-bottom: 0.5rem;
+      margin: 0;
+      font-size: 2rem;
+      color: #333;
+    }
+
+    #affirmation {
+      font-style: italic;
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      color: #444;
     }
 
     .day-nav {
@@ -50,37 +51,38 @@
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
-      font-weight: bold;
-      color: #4b7eb4;
+      color: #fff;
+      background-color: #4b7eb4;
+      padding: 5px 10px;
+      border-radius: 5px;
     }
 
-    #task-list h2 {
+    #task-list {
+      margin-top: 1rem;
+    }
+
+    .task {
+      background: #7eb123;
+      color: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      font-weight: bold;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 0.5rem;
-      background: #7eb123;
-      color: white;
-      border-radius: 5px;
-    }
-
-    #task-list input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      accent-color: #4b7eb4;
     }
 
     input[type="text"] {
-      padding: 0.5rem;
-      margin-top: 1rem;
-      width: 80%;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      width: calc(100% - 120px);
+      max-width: 400px;
     }
 
     button {
-      padding: 0.5rem 1rem;
-      margin-left: 10px;
+      padding: 10px;
+      margin: 10px 5px 0 0;
       background-color: #7eb123;
       color: white;
       border: none;
@@ -88,46 +90,44 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #689f38;
-    }
-
-    footer#quote-footer {
-      background-color: #845EC2;
+    footer {
+      margin-top: 2rem;
       padding: 1rem;
-      text-align: center;
-      color: #fff;
+      background-color: #8258a6;
+      color: white;
       font-style: italic;
-      font-size: 1rem;
-      width: 100%;
+      text-align: center;
+      width: 100vw;
+      position: relative;
+      left: -1rem;
     }
   </style>
 </head>
 <body>
   <header>
+    <img src="lotus-icon.png" alt="Lotus Icon" class="logo" />
     <h1 id="day-title">Tasks for Today</h1>
-    <div class="affirmation" id="daily-affirmation">🌿 Loading affirmation...</div>
+    <p id="affirmation">🌿 Loading affirmation...</p>
   </header>
 
-  <div class="main-content">
-    <div class="day-nav">
-      <a href="?day=Monday">Mon</a>
-      <a href="?day=Tuesday">Tue</a>
-      <a href="?day=Wednesday">Wed</a>
-      <a href="?day=Thursday">Thu</a>
-      <a href="?day=Friday">Fri</a>
-      <a href="?day=Saturday">Sat</a>
-      <a href="?day=Sunday">Sun</a>
-    </div>
-
-    <div id="task-list"></div>
-
-    <input type="text" id="new-task" placeholder="Add new task">
-    <button onclick="addTask()">Add Task</button>
-    <button onclick="resetTasks()">Reset All Tasks</button>
+  <div class="day-nav">
+    <a href="?day=Monday">Mon</a>
+    <a href="?day=Tuesday">Tue</a>
+    <a href="?day=Wednesday">Wed</a>
+    <a href="?day=Thursday">Thu</a>
+    <a href="?day=Friday">Fri</a>
+    <a href="?day=Saturday">Sat</a>
+    <a href="?day=Sunday">Sun</a>
   </div>
 
-  <footer id="quote-footer">Loading motivation...</footer>
+  <div id="task-list"></div>
+  <input type="text" id="new-task" placeholder="Add new task">
+  <button onclick="addTask()">Add Task</button>
+  <button onclick="resetTasks()">Reset All Tasks</button>
+
+  <footer>
+    <p id="quote-box">"Loading motivational quote..."</p>
+  </footer>
 
   <script type="module" src="main.js"></script>
 </body>
