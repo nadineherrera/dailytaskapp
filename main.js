@@ -9,8 +9,7 @@ const firebaseConfig = {
   projectId: "my-daily-tasks-5a313",
   storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
   messagingSenderId: "676679892031",
-  appId: "1:676679892031:web:4746c594d8415697394c8a",
-  measurementId: "G-7DEQC4CWQH"
+  appId: "1:676679892031:web:4746c594d8415697394c8a"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -34,68 +33,74 @@ async function setupApp() {
   }
 }
 
-// ✅ Get current day name
+// 🗓️ Date Helpers
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-// ✅ Get today’s full date string
 function getTodayDate() {
-  return new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+  return new Date().toISOString().split('T')[0];
 }
 
-// ✅ Save Journal Entries
+// 📝 Journal Functions
 async function saveJournalEntries() {
   const date = getTodayDate();
-  const dream = document.getElementById('dream-journal')?.value || '';
-  const daily = document.getElementById('daily-journal')?.value || '';
+  const dream = document.getElementById('dream-journal')?.value?.trim() || '';
+  const daily = document.getElementById('daily-journal')?.value?.trim() || '';
 
-  const journalRef = doc(db, 'users', userId, 'journals', date);
-  const entry = {};
-  if (dream) entry.dream = dream;
-  if (daily) entry.daily = daily;
+  const entry = { ...(dream && { dream }), ...(daily && { daily }) };
+  if (!dream && !daily) {
+    alert("Please enter something to save.");
+    return;
+  }
 
-  await setDoc(journalRef, entry, { merge: true });
-  alert('Journal entry saved!');
+  try {
+    const ref = doc(db, 'users', userId, 'journals', date);
+    await setDoc(ref, entry, { merge: true });
+    alert("Journal entry saved!");
+  } catch (err) {
+    console.error("Error saving journal:", err);
+    alert("Failed to save entry.");
+  }
 }
 
-// ✅ Load Journal Entries
 async function loadJournalEntries() {
   const date = getTodayDate();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
-
   if (!dreamField || !dailyField) return;
 
-  const entryRef = doc(db, 'users', userId, 'journals', date);
-  const snapshot = await getDoc(entryRef);
-  const data = snapshot.exists() ? snapshot.data() : {};
-
-  dreamField.value = data.dream || '';
-  dailyField.value = data.daily || '';
+  try {
+    const ref = doc(db, 'users', userId, 'journals', date);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    dreamField.value = data.dream || '';
+    dailyField.value = data.daily || '';
+  } catch (err) {
+    console.error("Failed to load journal:", err);
+  }
 }
 
-// ✅ Task Management
+// ✅ Tasks
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
-    const docRef = doc(db, 'users', userId, day, 'default');
-    const docSnap = await getDoc(docRef);
-    const data = docSnap.exists() ? docSnap.data() : {};
-
-    if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
-      const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
-      await setDoc(docRef, { tasks: defaultTasks });
+    const ref = doc(db, 'users', userId, day, 'default');
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    if (!Array.isArray(data.tasks) || data.tasks.length === 0) {
+      const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+      await setDoc(ref, { tasks: defaults });
     }
   }
 }
 
 async function loadTasks() {
   const day = getCurrentDay();
-  const docRef = doc(db, 'users', userId, day, 'default');
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? docSnap.data().tasks : [];
+  const ref = doc(db, 'users', userId, day, 'default');
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().tasks : [];
 }
 
 async function initTaskApp() {
@@ -105,31 +110,22 @@ async function initTaskApp() {
 
   function renderTasks() {
     taskList.innerHTML = '';
-    tasks.forEach((task, index) => {
+    tasks.forEach((task, i) => {
       if (task.done) return;
-
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
-
       checkbox.onchange = () => {
-        tasks[index].done = checkbox.checked;
+        tasks[i].done = checkbox.checked;
         saveTasks(tasks);
-
         if (checkbox.checked) {
-          const emojis = ['🥳', '👏', '✨', '🎉', '🌟', '🔥', '🫶🏼', '💫', '⭐️', '🎊', '💯', '👍'];
           const emoji = document.createElement('span');
-          emoji.className = 'celebration';
-          emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          emoji.textContent = ['🎉', '🌟', '💯', '👏'][Math.floor(Math.random() * 4)];
           h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
-
-          setTimeout(() => {
-            emoji.remove();
-            renderTasks();
-          }, 2200);
+          setTimeout(() => { emoji.remove(); renderTasks(); }, 2000);
         } else {
           renderTasks();
         }
@@ -141,22 +137,21 @@ async function initTaskApp() {
       h2.appendChild(span);
 
       if (task.manual) {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '❌';
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.onclick = () => {
-          tasks.splice(index, 1);
+        const del = document.createElement('button');
+        del.textContent = '❌';
+        del.onclick = () => {
+          tasks.splice(i, 1);
           saveTasks(tasks);
           renderTasks();
         };
-        h2.appendChild(deleteBtn);
+        h2.appendChild(del);
       }
 
       taskList.appendChild(h2);
     });
   }
 
-  window.addTask = function () {
+  window.addTask = () => {
     const text = newTaskInput.value.trim();
     if (text) {
       tasks.push({ text, done: false, manual: true });
@@ -166,8 +161,8 @@ async function initTaskApp() {
     }
   };
 
-  window.resetTasks = function () {
-    tasks = tasks.map(task => ({ ...task, done: false }));
+  window.resetTasks = () => {
+    tasks = tasks.map(t => ({ ...t, done: false }));
     saveTasks(tasks);
     renderTasks();
   };
@@ -177,73 +172,60 @@ async function initTaskApp() {
 
 async function saveTasks(tasks) {
   const day = getCurrentDay();
-  await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
+  const ref = doc(db, 'users', userId, day, 'default');
+  await setDoc(ref, { tasks });
 }
 
 function getDefaultTasksForDay(day) {
-  const baseTasks = [
+  const base = [
     "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
     "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
-    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
-    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
-    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
+    "Spend Time With Family", "15-Minute Clean Up", "Learn Spanish",
+    "Check Email", "Check Social Media", "Strength Train", "Read", "Journal",
+    "Drink Water", "Update Tasks"
   ];
-  const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Wednesday: [...baseTasks, "2 PM Therapy Session"],
-    Thursday: [...baseTasks, "Work on Alchemy Body Werks"],
-    Friday: [...baseTasks, "Pay Bills", "Call IRS to Setup Payment Plan"],
-    Saturday: [...baseTasks, "Deep Clean House", "Laundry"],
-    Sunday: [...baseTasks, "CSU Homework"]
+  const addOns = {
+    Monday: ["Work for 5 Hours at Apple"],
+    Tuesday: ["Work for 5 Hours at Apple"],
+    Wednesday: ["2 PM Therapy Session"],
+    Thursday: ["Work on Alchemy Body Werks"],
+    Friday: ["Pay Bills", "Call IRS"],
+    Saturday: ["Deep Clean", "Laundry"],
+    Sunday: ["CSU Homework"]
   };
-  return extended[day] || baseTasks;
+  return [...base, ...(addOns[day] || [])];
 }
 
-// ✅ Load Quotes
+// ✅ Quotes
 async function loadRandomQuote() {
-  const quoteBox = document.getElementById('quote-box');
-  if (!quoteBox) return;
+  const box = document.getElementById('quote-box');
+  if (!box) return;
 
   try {
-    const snapshot = await getDocs(collection(db, 'quotes'));
-    const quotes = snapshot.docs.map(doc => doc.data());
-    if (quotes.length === 0) {
-      quoteBox.textContent = "Stay motivated.";
-    } else {
-      const random = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteBox.textContent = `"${random.text}" — ${random.author || 'Unknown'}`;
-    }
-    quoteBox.classList.add('visible');
-  } catch (error) {
-    console.error('Error loading quotes:', error);
-    quoteBox.textContent = "Couldn't load quote.";
-    quoteBox.classList.add('visible');
+    const snap = await getDocs(collection(db, 'quotes'));
+    const quotes = snap.docs.map(doc => doc.data());
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
+    box.classList.add('visible');
+  } catch (e) {
+    console.error(e);
+    box.textContent = "Could not load quote.";
   }
 }
 
-// ✅ Load Daily Affirmation
+// ✅ Affirmation
 async function loadDailyAffirmation() {
-  const affirmationBox = document.getElementById('affirmation-box');
-  if (!affirmationBox) return;
+  const box = document.getElementById('affirmation-box');
+  if (!box) return;
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-
   try {
-    const docRef = doc(db, 'affirmations', today);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      affirmationBox.textContent = `🌿 Affirmation: ${data.text}`;
-    } else {
-      affirmationBox.textContent = "🌿 No affirmation set for today.";
-    }
-    affirmationBox.classList.add('visible');
-  } catch (error) {
-    console.error("Error loading affirmation:", error);
-    affirmationBox.textContent = "🌿 Unable to load affirmation.";
-    affirmationBox.classList.add('visible');
+    const ref = doc(db, 'affirmations', today);
+    const snap = await getDoc(ref);
+    box.textContent = snap.exists() ? `🌿 Affirmation: ${snap.data().text}` : "🌿 No affirmation for today.";
+    box.classList.add('visible');
+  } catch (e) {
+    console.error(e);
+    box.textContent = "🌿 Unable to load affirmation.";
   }
 }
