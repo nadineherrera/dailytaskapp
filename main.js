@@ -130,14 +130,10 @@ async function initTaskApp() {
     tasks.forEach((task, i) => {
       const h2 = document.createElement('h2');
 
-      if (task.done) {
-        h2.style.opacity = '0';
-        h2.style.height = '0';
-        h2.style.overflow = 'hidden';
-        h2.style.margin = '0';
-        h2.style.padding = '0';
-        h2.style.border = 'none';
-      }
+    if (task.done) {
+  h2.style.transition = 'opacity 0.3s ease';
+  h2.style.opacity = '0.3'; // Faded but still visible
+}
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -145,16 +141,27 @@ async function initTaskApp() {
       checkbox.onchange = () => {
         tasks[i].done = checkbox.checked;
         saveTasks(tasks);
+        
         if (checkbox.checked) {
           const emoji = document.createElement('span');
           emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
           h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
-          setTimeout(() => {
-            emoji.remove();
-            renderTasks();
-          }, 2000);
+          
+       setTimeout(() => {
+  emoji.remove();
+
+  // Fully hide the task AFTER the emoji disappears
+  h2.style.opacity = '0';
+  h2.style.height = '0';
+  h2.style.overflow = 'hidden';
+  h2.style.margin = '0';
+  h2.style.padding = '0';
+  h2.style.border = 'none';
+
+  updateProgressBar(); // Still update progress after
+}, 2000);
         } else {
           renderTasks();
         }
