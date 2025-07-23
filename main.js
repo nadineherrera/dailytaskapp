@@ -22,7 +22,6 @@ const auth = getAuth(app);
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// === Sign in anonymously ===
 signInAnonymously(auth)
   .then(() => {
     onAuthStateChanged(auth, user => {
@@ -30,7 +29,7 @@ signInAnonymously(auth)
         const userId = user.uid;
         initializeAllDays(userId).then(() => {
           initTaskApp(userId);
-          displayDailyQuote();
+          displayDailyCard(); // 🚀 NEW
         });
       }
     });
@@ -38,8 +37,6 @@ signInAnonymously(auth)
   .catch(error => {
     console.error("Anonymous login error:", error.message);
   });
-
-// === Firestore Logic ===
 
 async function saveTasksForDay(userId, day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -51,7 +48,6 @@ async function initializeAllDays(userId) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
     const data = docSnap.exists() ? docSnap.data() : {};
-
     if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await saveTasksForDay(userId, day, defaultTasks);
@@ -148,68 +144,44 @@ async function initTaskApp(userId) {
   renderTasks();
 }
 
-function getDefaultTasksForDay(day) {
-  const baseTasks = [
-    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
-    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family & Call Family Members", "15-Minute Clean Up",
-    "Learn Spanish", "Check All Email Accounts", "Check Social Media",
-    "Strength Train", "Take a Shower", "Stretch", "Read a Book", "Journal",
-    "Drink a Gallon of Water Throughout Day", "Update Daily Tasks if Needed"
-  ];
+// 🧠 Minimal quote + affirmation in one card
+async function displayDailyCard() {
+  const container = document.getElementById('quote-container');
+  if (!container) return;
 
-  const extended = {
-    Monday: [...baseTasks, "Work for 5 Hours at Apple", "Call IRS to Setup Payment Plan"],
-    Tuesday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Wednesday: [...baseTasks, "Pay Bills", "Check on CPAP Supplies", "Order Groceries", "2 PM Therapy Session", "Work on Alchemy Body Werks"],
-    Thursday: [...baseTasks, "Work for 5 Hours at Apple"],
-    Friday: [...baseTasks, "Take Trash Cans to Curb", "Retrieve Trash Cans from Curb", "Work for 5 Hours at Apple"],
-    Saturday: [...baseTasks, "Deep Clean House", "1 PM Soccer", "Laundry", "Yard Work", "Finish MKG540 Module 8 Portfolio Project", "Find Lenovo Charger", "Work on Alchemy Body Werks"],
-    Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
-  };
+  container.innerHTML = '';
+  container.classList.remove('loaded');
 
-  return extended[day] || baseTasks;
-}
+  const today = new Date().toISOString().split('T')[0];
+  const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
 
-// === Daily Motivational Quote with Per-Day Persistence ===
-async function displayDailyQuote() {
-  const quoteContainer = document.getElementById('quote-container');
-  if (!quoteContainer) return;
-
-  quoteContainer.innerHTML = '';
-  quoteContainer.classList.remove('loaded');
-
-  const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-23"
-  const savedQuote = JSON.parse(localStorage.getItem('dailyQuote') || '{}');
-
-  if (savedQuote.date === today && savedQuote.text && savedQuote.author !== undefined) {
-    renderQuote(savedQuote.text, savedQuote.author);
+  const saved = JSON.parse(localStorage.getItem('dailyCard') || '{}');
+  if (saved.date === today && saved.quote && saved.affirmation) {
+    renderCard(saved.quote, saved.author, saved.affirmation);
     return;
   }
 
   try {
-    const snapshot = await getDocs(collection(db, 'quotes'));
-    const quotes = snapshot.docs.map(doc => doc.data());
+    const quoteSnap = await getDocs(collection(db, 'quotes'));
+    const quoteList = quoteSnap.docs.map(doc => doc.data());
+    const { text: quote, author } = quoteList[Math.floor(Math.random() * quoteList.length)];
 
-    if (quotes.length > 0) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      const { text, author } = quotes[randomIndex];
+    const affirmationSnap = await getDoc(doc(db, 'affirmations', dayName));
+    const affirmation = affirmationSnap.exists() ? affirmationSnap.data().text : "";
 
-      localStorage.setItem('dailyQuote', JSON.stringify({ text, author, date: today }));
-      renderQuote(text, author);
-    } else {
-      renderQuote("Keep going. Your effort matters.", "");
-    }
-  } catch (error) {
-    console.error("Error fetching quote:", error);
-    renderQuote("You’re doing great. Just keep showing up.", "");
+    localStorage.setItem('dailyCard', JSON.stringify({ date: today, quote, author, affirmation }));
+    renderCard(quote, author, affirmation);
+  } catch (err) {
+    console.error("Card fetch error:", err);
+    renderCard("You’re doing great. Just keep showing up.", "", "I am enough. I am doing my best.");
   }
 
-  function renderQuote(text, author) {
-    quoteContainer.innerHTML = `
-      <div style="font-size: 1.2rem; font-weight: 500;">"${text}"</div>
-      ${author ? `<div style="font-size: 0.9rem; margin-top: 0.5rem; color: #666;">– ${author}</div>` : ""}
+  function renderCard(quote, author, affirmation) {
+    container.innerHTML = `
+      <div style="font-size: 1.15rem; font-weight: 500; margin-bottom: 0.5rem;">"${quote}"</div>
+      ${author ? `<div style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">– ${author}</div>` : ""}
+      <div style="font-size: 1rem; font-weight: 400; font-style: normal; color: #845EC2;">${affirmation}</div>
     `;
-    quoteContainer.classList.add('loaded');
+    container.classList.add('loaded');
   }
 }
