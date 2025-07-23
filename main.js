@@ -20,14 +20,19 @@ let userId = null;
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
+// ✅ Wait for Firebase to confirm user session
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
+  if (!user) {
+    console.warn("No user is signed in.");
+    return;
+  }
+
+  try {
     userId = user.uid;
     await initializeAllDays();
     displayDailyQuote();
-  } else {
-    alert("You're not signed in. Please log in to view your tasks.");
-    // Optional redirect: window.location.href = "login.html";
+  } catch (error) {
+    console.error("Error during task initialization:", error);
   }
 });
 
