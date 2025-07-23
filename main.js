@@ -1,12 +1,12 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
   authDomain: "my-daily-tasks-5a313.firebaseapp.com",
   projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.appspot.com",
+  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
   messagingSenderId: "676679892031",
   appId: "1:676679892031:web:4746c594d8415697394c8a",
   measurementId: "G-7DEQC4CWQH"
@@ -16,25 +16,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let userId = null;
+let userId = 'djUVi4KmRVfQohInCiM6oVmbYx92'; // Email/password user
+
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// ✅ Wait for Firebase to confirm user session
+// If using auth flow, uncomment below
+/*
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    console.warn("No user is signed in.");
-    return;
-  }
-
-  try {
+  if (user) {
     userId = user.uid;
     await initializeAllDays();
-    displayDailyQuote();
-  } catch (error) {
-    console.error("Error during task initialization:", error);
+  } else {
+    console.warn("You're not signed in.");
   }
 });
+*/
+
+initializeAllDays(); // Directly initialize if user ID is fixed
 
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
@@ -169,25 +168,4 @@ function getDefaultTasksForDay(day) {
     Sunday: [...baseTasks, "CSU Homework", "CSU Homework"]
   };
   return extended[day] || baseTasks;
-}
-
-async function displayDailyQuote() {
-  const quoteContainer = document.getElementById('quote-container');
-  if (!quoteContainer) return;
-
-  try {
-    const snapshot = await getDocs(collection(db, 'quotes'));
-    const quotes = snapshot.docs.map(doc => doc.data());
-
-    if (quotes.length > 0) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      const { text, author } = quotes[randomIndex];
-      quoteContainer.innerHTML = `"${text}"<br><span style="font-size: 0.9em;">– ${author}</span>`;
-    } else {
-      quoteContainer.textContent = "Keep going. Your effort matters.";
-    }
-  } catch (error) {
-    console.error("Error fetching quote:", error);
-    quoteContainer.textContent = "You’re doing great. Just keep showing up.";
-  }
 }
