@@ -228,7 +228,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       const title = document.getElementById('page-title');
       const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-      title.textContent = `Tasks for ${day}`;
+      title.textContent = `${day}`;
       title.style.visibility = 'visible';
     });
     function saveDreamJournal() {
