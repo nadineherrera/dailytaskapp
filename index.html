@@ -18,21 +18,18 @@
       padding: 1rem;
       background: white;
     }
-
     header {
       text-align: center;
       background-color: #FFD966;
       padding: 1rem;
       margin: -1rem -1rem 1rem -1rem;
     }
-
     header img {
       max-width: 100px;
       height: auto;
       display: block;
       margin: 0 auto;
     }
-
     h1 {
       color: white;
       font-weight: bold;
@@ -40,7 +37,6 @@
       visibility: hidden;
       margin-top: 0.5rem;
     }
-
     #affirmation-box {
       text-align: center;
       margin-top: 0.75rem;
@@ -49,11 +45,9 @@
       opacity: 0;
       transition: opacity 1.2s ease-in-out;
     }
-
     #affirmation-box.visible {
       opacity: 1;
     }
-
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
@@ -61,35 +55,37 @@
       padding: 0.5rem;
       border-radius: 5px;
     }
-
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
       color: white;
       font-weight: bold;
     }
-
-    section#journals {
-      background: #CBC3E3;
+    .journal-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
       margin-top: 2rem;
+    }
+    section#journals, section#gratitude {
+      flex: 1 1 300px;
+      background: #CBC3E3;
       padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      max-width: 420px;
-      margin-left: auto;
-      margin-right: auto;
     }
-
-    section#journals h2 {
+    section#journals h2,
+    section#gratitude h2 {
       margin-bottom: 0.5rem;
       font-size: 1.25rem;
       font-weight: bold;
       color: #845EC2;
     }
-
-    section#journals textarea {
+    section#journals textarea,
+    section#gratitude textarea {
       width: 100%;
-      height: 120px;
+      height: 100px;
       padding: 12px;
       margin-bottom: 1.5rem;
       font-family: Arial, sans-serif;
@@ -100,8 +96,8 @@
       resize: vertical;
       background: #fff;
     }
-
-    section#journals button {
+    section#journals button,
+    section#gratitude button {
       display: block;
       margin: 0 auto;
       padding: 0.7rem 1.5rem;
@@ -112,11 +108,17 @@
       font-size: 1rem;
       cursor: pointer;
     }
-
+    #gratitude select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #bcaecf;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
     #task-list {
       margin-bottom: 2rem;
     }
-
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -128,9 +130,7 @@
       color: white;
       font-weight: bold;
       font-size: 1.1rem;
-      position: relative;
     }
-
     .task-input-group {
       display: flex;
       flex-wrap: wrap;
@@ -138,7 +138,6 @@
       gap: 0.5rem;
       margin-bottom: 2rem;
     }
-
     #new-task {
       width: 70%;
       max-width: 400px;
@@ -148,7 +147,6 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
-
     button {
       padding: 0.6rem 1.2rem;
       font-size: 1rem;
@@ -158,22 +156,6 @@
       border: none;
       cursor: pointer;
     }
-
-    .delete-btn {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
-    .celebration {
-      margin-left: 5px;
-      font-size: 1.5rem;
-      animation: emojiPopBounce 1.8s ease-out forwards;
-    }
-
     footer#quote-footer {
       background-color: #845EC2;
       padding: 1.5rem;
@@ -182,27 +164,15 @@
       color: #fff;
       font-style: italic;
       font-size: 1rem;
-      border-radius: 0px;
       width: calc(100% + 2rem);
       box-sizing: border-box;
     }
-
     #quote-box {
       opacity: 0;
       transition: opacity 1.2s ease-in-out;
     }
-
     #quote-box.visible {
       opacity: 1;
-    }
-
-    @keyframes emojiPopBounce {
-      0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
-      20% { transform: scale(1.6) rotate(10deg); opacity: 1; }
-      40% { transform: scale(2.4) rotate(0deg); opacity: 1; }
-      70% { transform: scale(1.4); opacity: 1; }
-      85% { transform: scale(1.6); }
-      100% { transform: scale(0.9); opacity: 0; }
     }
   </style>
 </head>
@@ -212,7 +182,6 @@
     <h1 id="page-title">Daily Tasks</h1>
     <div id="affirmation-box"></div>
   </header>
-
   <div class="day-nav">
     <a href="?day=Monday">Mon</a>
     <a href="?day=Tuesday">Tue</a>
@@ -222,30 +191,38 @@
     <a href="?day=Saturday">Sat</a>
     <a href="?day=Sunday">Sun</a>
   </div>
-
-  <!-- ✅ Journal Section (moved to top) -->
-  <section id="journals">
-    <h2>Dream Journal</h2>
-    <textarea id="dreamJournal" placeholder="What did you dream about?"></textarea>
-
-    <h2>Daily Journal</h2>
-    <textarea id="dailyJournal" placeholder="How are you feeling today?"></textarea>
-
-    <button onclick="saveJournals()">Save Journals</button>
-  </section>
-
+  <div class="journal-grid">
+    <section id="journals">
+      <h2>Dream Journal</h2>
+      <textarea id="dreamJournal" placeholder="What did you dream about?"></textarea>
+      <h2>Daily Journal</h2>
+      <textarea id="dailyJournal" placeholder="How are you feeling today?"></textarea>
+      <button onclick="saveJournals()">Save Journals</button>
+    </section>
+    <section id="gratitude">
+      <h2>Gratitude Prompt</h2>
+      <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
+      <h2>Your Mood</h2>
+      <select id="mood">
+        <option value="">How do you feel?</option>
+        <option value="😀">Happy</option>
+        <option value="😐">Neutral</option>
+        <option value="😔">Sad</option>
+        <option value="😤">Frustrated</option>
+        <option value="😴">Tired</option>
+        <option value="😌">Peaceful</option>
+      </select>
+    </section>
+  </div>
   <div id="task-list"></div>
-
   <div class="task-input-group">
     <input type="text" id="new-task" placeholder="Add new task">
     <button onclick="addTask()">Add Task</button>
     <button onclick="resetTasks()">Reset All Tasks</button>
   </div>
-
   <footer id="quote-footer">
     <p id="quote-box">Loading quote...</p>
   </footer>
-
   <script type="module" src="main.js"></script>
   <script>
     window.addEventListener('DOMContentLoaded', () => {
@@ -254,31 +231,35 @@
       title.textContent = `Tasks for ${day}`;
       title.style.visibility = 'visible';
     });
-
     function saveDreamJournal() {
       const dream = document.getElementById('dreamJournal').value;
       localStorage.setItem('dreamJournal', dream);
-      alert("Dream journal entry saved!");
     }
-
     function saveDailyJournal() {
       const entry = document.getElementById('dailyJournal').value;
       localStorage.setItem('dailyJournal', entry);
-      alert("Daily journal entry saved!");
     }
-
+    function saveGratitude() {
+      const gratitude = document.getElementById('gratitudeEntry').value;
+      const mood = document.getElementById('mood').value;
+      localStorage.setItem('gratitudeEntry', gratitude);
+      localStorage.setItem('mood', mood);
+    }
     function saveJournals() {
       saveDreamJournal();
       saveDailyJournal();
+      saveGratitude();
     }
-
     function loadJournals() {
       const savedDream = localStorage.getItem('dreamJournal');
       const savedDaily = localStorage.getItem('dailyJournal');
+      const savedGratitude = localStorage.getItem('gratitudeEntry');
+      const savedMood = localStorage.getItem('mood');
       if (savedDream) document.getElementById('dreamJournal').value = savedDream;
       if (savedDaily) document.getElementById('dailyJournal').value = savedDaily;
+      if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
+      if (savedMood) document.getElementById('mood').value = savedMood;
     }
-
     window.addEventListener('load', loadJournals);
   </script>
 </body>
