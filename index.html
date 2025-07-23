@@ -124,6 +124,28 @@
       85% { transform: scale(1.6); }
       100% { transform: scale(0.9); opacity: 0; }
     }
+
+  #quote-footer {
+  background-color: #845EC2; /* soft purple, change to teal or gold if you prefer */
+  padding: 1rem;
+  margin-top: 2rem;
+  text-align: center;
+  color: #fff;
+  font-style: italic;
+  font-size: 1rem;
+  position: relative;
+  border-radius: 8px;
+}
+
+#quote-box {
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+
+#quote-box.visible {
+  opacity: 1;
+}
+    
   </style>
 </head>
 <body>
