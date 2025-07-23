@@ -176,8 +176,8 @@ async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
 
-  // ✅ Clear any fallback HTML before inserting quote
-  quoteContainer.textContent = '';
+  quoteContainer.innerHTML = ''; // Clear fallback or loading message
+  quoteContainer.classList.remove('loaded'); // reset state if reloaded
 
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
@@ -193,8 +193,11 @@ async function displayDailyQuote() {
     } else {
       quoteContainer.textContent = "Keep going. Your effort matters.";
     }
+
+    quoteContainer.classList.add('loaded'); // Fade in
   } catch (error) {
     console.error("Error fetching quote:", error);
     quoteContainer.textContent = "You’re doing great. Just keep showing up.";
+    quoteContainer.classList.add('loaded');
   }
 }
