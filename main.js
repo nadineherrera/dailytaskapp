@@ -176,6 +176,9 @@ async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
 
+  // ✅ Clear any fallback HTML before inserting quote
+  quoteContainer.textContent = '';
+
   try {
     const snapshot = await getDocs(collection(db, 'quotes'));
     const quotes = snapshot.docs.map(doc => doc.data());
