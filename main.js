@@ -258,3 +258,44 @@ async function loadDailyAffirmation() {
     box.textContent = "🌿  Unable to load affirmation.";
   }
 }
+// ✅ Breathing Modal Chime Logic
+const chimeSound = document.getElementById('chime-sound');
+
+function playChime() {
+  if (chimeSound) {
+    chimeSound.currentTime = 0;
+    chimeSound.play().catch((e) => console.warn("Chime blocked:", e));
+  }
+}
+// ✅ Breathing Logic
+let isInhale = true;
+let breathingInterval;
+
+function updateBreathingText() {
+  const breathText = document.getElementById('breath-text');
+  isInhale = !isInhale;
+  if (breathText) {
+    breathText.textContent = isInhale ? "Inhale" : "Exhale";
+  }
+  playChime();
+}
+
+// ✅ Modal Trigger Logic
+const openModalBtn = document.getElementById('open-breathing-modal');
+const closeModalBtn = document.getElementById('close-breathing-modal');
+const modal = document.getElementById('breathing-modal');
+
+if (openModalBtn && modal && closeModalBtn) {
+  openModalBtn.addEventListener('click', () => {
+    modal.style.display = 'flex';
+    document.getElementById('breath-text').textContent = "Inhale";
+    isInhale = true;
+    playChime();
+    breathingInterval = setInterval(updateBreathingText, 4000); // every 4 seconds
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    clearInterval(breathingInterval);
+  });
+}
