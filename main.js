@@ -143,9 +143,10 @@ async function initTaskApp() {
         saveTasks(tasks);
         
         if (checkbox.checked) {
-          const emoji = document.createElement('span');
-          emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
-          h2.appendChild(emoji);
+        const emoji = document.createElement('span');
+emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
+emoji.classList.add('celebration-emoji');
+h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
           
