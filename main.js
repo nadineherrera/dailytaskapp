@@ -1,3 +1,4 @@
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import {
   getFirestore, doc, getDoc, setDoc, collection, getDocs
@@ -257,64 +258,4 @@ async function loadDailyAffirmation() {
     console.error(e);
     box.textContent = "🌿  Unable to load affirmation.";
   }
-}
-// ✅ Breathing Modal Chime Logic
-const chimeSound = document.getElementById('chime-sound');
-
-function playChime() {
-  if (chimeSound) {
-    chimeSound.currentTime = 0;
-    chimeSound.play().catch((e) => console.warn("Chime blocked:", e));
-  }
-}
-// ✅ Breathing Logic
-let isInhale = true;
-let breathingInterval;
-
-function playChime() {
-  const chimeSound = document.getElementById('chime-sound');
-  if (chimeSound) {
-    chimeSound.currentTime = 0;
-    chimeSound.volume = 1.0;
-    chimeSound.muted = false;
-    chimeSound.play().catch((e) => console.warn("Chime blocked:", e));
-  }
-}
-
-function updateBreathingText() {
-  const breathText = document.getElementById('breath-text');
-  isInhale = !isInhale;
-  if (breathText) {
-    breathText.textContent = isInhale ? "Inhale" : "Exhale";
-  }
-  playChime(); // Play on every phase change
-}
-
-// ✅ Modal Trigger Logic
-const openModalBtn = document.getElementById('open-breathing-modal');
-const closeModalBtn = document.getElementById('close-breathing-modal');
-const modal = document.getElementById('breathing-modal');
-
-if (openModalBtn && modal && closeModalBtn) {
-  openModalBtn.addEventListener('click', () => {
-    modal.style.display = 'flex';
-    document.getElementById('breath-text').textContent = "Inhale";
-    isInhale = true;
-
-    // ✅ Play chime immediately (first user interaction)
-    const chimeSound = document.getElementById('chime-sound');
-    if (chimeSound) {
-      chimeSound.currentTime = 0;
-      chimeSound.volume = 1.0;
-      chimeSound.muted = false;
-      chimeSound.play().catch((e) => console.warn("Chime blocked on open:", e));
-    }
-
-    breathingInterval = setInterval(updateBreathingText, 4000); // every 4 seconds
-  });
-
-  closeModalBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-    clearInterval(breathingInterval);
-  });
 }
