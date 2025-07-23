@@ -46,8 +46,10 @@ function getTodayDate() {
 // 📝 Journal Functions
 async function saveJournalEntries() {
   const date = getTodayDate();
-  const dream = document.getElementById('dream-journal')?.value?.trim() || '';
-  const daily = document.getElementById('daily-journal')?.value?.trim() || '';
+  const dreamInput = document.getElementById('dream-journal');
+  const dailyInput = document.getElementById('daily-journal');
+  const dream = dreamInput?.value?.trim() || '';
+  const daily = dailyInput?.value?.trim() || '';
 
   const entry = { ...(dream && { dream }), ...(daily && { daily }) };
   if (!dream && !daily) {
@@ -58,6 +60,11 @@ async function saveJournalEntries() {
   try {
     const ref = doc(db, 'users', userId, 'journals', date);
     await setDoc(ref, entry, { merge: true });
+
+    // ✅ Clear fields after save
+    if (dreamInput) dreamInput.value = '';
+    if (dailyInput) dailyInput.value = '';
+
     alert("Journal entry saved!");
   } catch (err) {
     console.error("Error saving journal:", err);
