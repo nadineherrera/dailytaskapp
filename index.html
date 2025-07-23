@@ -53,18 +53,50 @@
       color: white;
       font-weight: bold;
     }
+
+    /* ✅ Enhanced quote container styling */
     #quote-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 1.5rem auto;
+      padding: 1.5rem;
+      background-color: #f0fdf4;
+      border: 2px solid #66B032;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(102, 176, 50, 0.2);
+      color: #333;
       text-align: center;
       font-style: italic;
-      margin: 1rem auto 1.5rem;
       font-size: 1.1rem;
-      color: #424242;
-      opacity: 0;
       transition: opacity 0.6s ease;
+      opacity: 0;
     }
     #quote-container.loaded {
       opacity: 1;
     }
+    #quote-container div:first-child {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: #424835;
+    }
+    #quote-container div:last-child {
+      font-size: 1rem;
+      color: #666;
+    }
+    @media (max-width: 600px) {
+      #quote-container {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+      #quote-container div:first-child {
+        font-size: 1.15rem;
+      }
+      #quote-container div:last-child {
+        font-size: 0.9rem;
+      }
+    }
+
     #task-list h2 {
       display: flex;
       align-items: center;
@@ -149,10 +181,7 @@
     <a href="?day=Sunday">Sun</a>
   </div>
 
-  <!-- ✅ Loading fallback shown until Firestore quote appears -->
-  <div id="quote-container">
-    Loading your daily motivation...
-  </div>
+  <div id="quote-container"></div>
 
   <div id="task-list"></div>
   <input type="text" id="new-task" placeholder="Add new task">
