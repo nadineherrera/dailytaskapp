@@ -26,6 +26,7 @@ async function setupApp() {
   loadRandomQuote();
   loadDailyAffirmation();
   await loadJournalEntries();
+  startBreathingBubble();
 
   const saveBtn = document.getElementById('save-journal-btn');
   if (saveBtn) {
@@ -130,10 +131,10 @@ async function initTaskApp() {
     tasks.forEach((task, i) => {
       const h2 = document.createElement('h2');
 
-    if (task.done) {
-  h2.style.transition = 'opacity 0.3s ease';
-  h2.style.opacity = '0.3'; // Faded but still visible
-}
+      if (task.done) {
+        h2.style.transition = 'opacity 0.3s ease';
+        h2.style.opacity = '0.3';
+      }
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -141,28 +142,25 @@ async function initTaskApp() {
       checkbox.onchange = () => {
         tasks[i].done = checkbox.checked;
         saveTasks(tasks);
-        
+
         if (checkbox.checked) {
-        const emoji = document.createElement('span');
-emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
-emoji.classList.add('celebration-emoji');
-h2.appendChild(emoji);
+          const emoji = document.createElement('span');
+          emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
+          emoji.classList.add('celebration-emoji');
+          h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
-          
-       setTimeout(() => {
-  emoji.remove();
 
-  // Fully hide the task AFTER the emoji disappears
-  h2.style.opacity = '0';
-  h2.style.height = '0';
-  h2.style.overflow = 'hidden';
-  h2.style.margin = '0';
-  h2.style.padding = '0';
-  h2.style.border = 'none';
-
-  updateProgressBar(); // Still update progress after
-}, 2000);
+          setTimeout(() => {
+            emoji.remove();
+            h2.style.opacity = '0';
+            h2.style.height = '0';
+            h2.style.overflow = 'hidden';
+            h2.style.margin = '0';
+            h2.style.padding = '0';
+            h2.style.border = 'none';
+            updateProgressBar();
+          }, 2000);
         } else {
           renderTasks();
         }
@@ -257,4 +255,17 @@ async function loadDailyAffirmation() {
     console.error(e);
     box.textContent = "🌿  Unable to load affirmation.";
   }
+}
+
+function startBreathingBubble() {
+  const bubble = document.getElementById('breath-bubble');
+  const text = document.getElementById('breath-text');
+  if (!bubble || !text) return;
+
+  const cycle = ["Inhale", "Hold", "Exhale", "Hold"];
+  let index = 0;
+  setInterval(() => {
+    text.textContent = cycle[index % cycle.length];
+    index++;
+  }, 4000);
 }
