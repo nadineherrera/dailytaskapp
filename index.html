@@ -181,6 +181,28 @@
     #quote-box.visible {
       opacity: 1;
     }
+
+    /* 🌿 Task Progress Styles */
+    #progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      height: 20px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #66B032;
+      transition: width 0.3s ease;
+    }
+    #progress-text {
+      text-align: center;
+      font-weight: bold;
+      color: #4b7b2f;
+      margin-bottom: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -221,16 +243,27 @@
       </select>
     </section>
   </div>
+
   <h2 class="section-label">🌱 Today's Tasks</h2>
+
+  <!-- 🌿 Progress Bar -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+  <p id="progress-text">0% Complete</p>
+
   <div id="task-list"></div>
+
   <div class="task-input-group">
     <input type="text" id="new-task" placeholder="Add new task">
     <button onclick="addTask()">Add Task</button>
     <button onclick="resetTasks()">Reset All Tasks</button>
   </div>
+
   <footer id="quote-footer">
     <p id="quote-box">Loading quote...</p>
   </footer>
+
   <script type="module" src="main.js"></script>
   <script>
     window.addEventListener('DOMContentLoaded', () => {
@@ -239,25 +272,30 @@
       title.textContent = `${day}`;
       title.style.visibility = 'visible';
     });
+
     function saveDreamJournal() {
       const dream = document.getElementById('dreamJournal').value;
       localStorage.setItem('dreamJournal', dream);
     }
+
     function saveDailyJournal() {
       const entry = document.getElementById('dailyJournal').value;
       localStorage.setItem('dailyJournal', entry);
     }
+
     function saveGratitude() {
       const gratitude = document.getElementById('gratitudeEntry').value;
       const mood = document.getElementById('mood').value;
       localStorage.setItem('gratitudeEntry', gratitude);
       localStorage.setItem('mood', mood);
     }
+
     function saveJournals() {
       saveDreamJournal();
       saveDailyJournal();
       saveGratitude();
     }
+
     function loadJournals() {
       const savedDream = localStorage.getItem('dreamJournal');
       const savedDaily = localStorage.getItem('dailyJournal');
@@ -268,7 +306,32 @@
       if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
       if (savedMood) document.getElementById('mood').value = savedMood;
     }
+
     window.addEventListener('load', loadJournals);
+  </script>
+
+  <!-- 🌿 Progress Bar Logic -->
+  <script>
+    function updateProgressBar() {
+      const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+      const total = checkboxes.length;
+      const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked').length;
+      const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+      document.getElementById('progress-bar').style.width = percent + '%';
+      document.getElementById('progress-text').textContent = `${percent}% Complete`;
+    }
+
+    const observer = new MutationObserver(() => {
+      updateProgressBar();
+      document.querySelectorAll('#task-list input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateProgressBar);
+      });
+    });
+
+    window.addEventListener('load', () => {
+      const taskList = document.getElementById('task-list');
+      observer.observe(taskList, { childList: true, subtree: true });
+    });
   </script>
 </body>
 </html>
