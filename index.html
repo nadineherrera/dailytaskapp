@@ -5,170 +5,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
-
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-
   <title>Daily Task App</title>
-
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 1rem;
+      font-family: Arial, sans-serif;
       background: white;
     }
+
     header {
-      text-align: center;
       background-color: #FFD966;
+      color: #333;
+      text-align: center;
       padding: 1rem;
-      margin: -1rem -1rem 1rem -1rem;
     }
-    header img {
-      max-width: 100px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
-    h1 {
-      color: white;
-      font-weight: bold;
-      font-size: 1.5rem;
-      visibility: hidden;
+
+    .affirmation {
+      font-size: 1.1rem;
+      color: #444;
+      font-style: italic;
       margin-top: 0.5rem;
     }
-    #affirmation-box {
-      text-align: center;
-      margin-top: 0.75rem;
-      font-style: italic;
-      color: #666;
-      opacity: 0;
-      transition: opacity 1.2s ease-in-out;
+
+    .main-content {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1rem;
     }
-    #affirmation-box.visible {
-      opacity: 1;
+
+    h1 {
+      margin-bottom: 0.5rem;
     }
+
     .day-nav {
       text-align: center;
       margin-bottom: 1rem;
-      background: #845EC2;
-      padding: 0.5rem;
-      border-radius: 5px;
     }
+
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
-      color: white;
       font-weight: bold;
+      color: #4b7eb4;
     }
+
     #task-list h2 {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 1rem;
-      background: #66B032;
-      margin-bottom: 10px;
-      border-radius: 5px;
+      padding: 0.5rem;
+      background: #7eb123;
       color: white;
-      font-weight: bold;
-      font-size: 1.1rem;
-      position: relative;
+      border-radius: 5px;
     }
+
+    #task-list input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #4b7eb4;
+    }
+
     input[type="text"] {
-      width: 80%;
       padding: 0.5rem;
       margin-top: 1rem;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
+
     button {
-      margin-top: 1rem;
       padding: 0.5rem 1rem;
-      background-color: #66B032;
+      margin-left: 10px;
+      background-color: #7eb123;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 1rem;
     }
-    .delete-btn {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .celebration {
-      margin-left: 5px;
-      font-size: 1.5rem;
-      animation: emojiPopBounce 1.8s ease-out forwards;
+
+    button:hover {
+      background-color: #689f38;
     }
 
     footer#quote-footer {
       background-color: #845EC2;
       padding: 1rem;
-      margin-top: 2rem;
       text-align: center;
       color: #fff;
       font-style: italic;
       font-size: 1rem;
-      border-radius: 8px;
-    }
-    #quote-box {
-      opacity: 0;
-      transition: opacity 1.2s ease-in-out;
-    }
-    #quote-box.visible {
-      opacity: 1;
-    }
-
-    @keyframes emojiPopBounce {
-      0% { transform: scale(0.4) rotate(-10deg); opacity: 0; }
-      20% { transform: scale(1.6) rotate(10deg); opacity: 1; }
-      40% { transform: scale(2.4) rotate(0deg); opacity: 1; }
-      70% { transform: scale(1.4); opacity: 1; }
-      85% { transform: scale(1.6); }
-      100% { transform: scale(0.9); opacity: 0; }
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="apple-touch-icon.png" alt="App Logo">
-    <h1 id="page-title">Daily Tasks</h1>
-    <div id="affirmation-box"></div>
+    <h1 id="day-title">Tasks for Today</h1>
+    <div class="affirmation" id="daily-affirmation">🌿 Loading affirmation...</div>
   </header>
 
-  <div class="day-nav">
-    <a href="?day=Monday">Mon</a>
-    <a href="?day=Tuesday">Tue</a>
-    <a href="?day=Wednesday">Wed</a>
-    <a href="?day=Thursday">Thu</a>
-    <a href="?day=Friday">Fri</a>
-    <a href="?day=Saturday">Sat</a>
-    <a href="?day=Sunday">Sun</a>
+  <div class="main-content">
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a>
+      <a href="?day=Tuesday">Tue</a>
+      <a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a>
+      <a href="?day=Friday">Fri</a>
+      <a href="?day=Saturday">Sat</a>
+      <a href="?day=Sunday">Sun</a>
+    </div>
+
+    <div id="task-list"></div>
+
+    <input type="text" id="new-task" placeholder="Add new task">
+    <button onclick="addTask()">Add Task</button>
+    <button onclick="resetTasks()">Reset All Tasks</button>
   </div>
 
-  <div id="task-list"></div>
-  <input type="text" id="new-task" placeholder="Add new task">
-  <button onclick="addTask()">Add Task</button>
-  <button onclick="resetTasks()">Reset All Tasks</button>
-
-  <!-- ✅ Colorful footer for the quote -->
-  <footer id="quote-footer">
-    <p id="quote-box">Loading quote...</p>
-  </footer>
+  <footer id="quote-footer">Loading motivation...</footer>
 
   <script type="module" src="main.js"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const title = document.getElementById('page-title');
-      const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-      title.textContent = `Tasks for ${day}`;
-      title.style.visibility = 'visible';
-    });
-  </script>
 </body>
 </html>
