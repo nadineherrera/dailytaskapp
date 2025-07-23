@@ -106,6 +106,17 @@
       animation: emojiPopBounce 1.8s ease-out forwards;
     }
 
+    section#journals {
+      margin-top: 2rem;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 0.5rem;
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+    }
+
     footer#quote-footer {
       background-color: #845EC2;
       padding: 1rem;
@@ -115,6 +126,8 @@
       font-style: italic;
       font-size: 1rem;
       border-radius: 8px;
+      width: 100vw;
+      box-sizing: border-box;
     }
     #quote-box {
       opacity: 0;
@@ -156,6 +169,17 @@
   <button onclick="addTask()">Add Task</button>
   <button onclick="resetTasks()">Reset All Tasks</button>
 
+  <!-- ✅ Journal Area -->
+  <section id="journals">
+    <h2>📝 Dream Journal</h2>
+    <textarea id="dreamJournal" rows="5" placeholder="Write about your dreams..."></textarea>
+    <button onclick="saveDreamJournal()">Save Dream Entry</button>
+
+    <h2 style="margin-top: 2rem;">📓 Daily Journal</h2>
+    <textarea id="dailyJournal" rows="5" placeholder="Reflect on your day..."></textarea>
+    <button onclick="saveDailyJournal()">Save Daily Entry</button>
+  </section>
+
   <!-- ✅ Colorful footer for the quote -->
   <footer id="quote-footer">
     <p id="quote-box">Loading quote...</p>
@@ -169,6 +193,27 @@
       title.textContent = `Tasks for ${day}`;
       title.style.visibility = 'visible';
     });
+
+    function saveDreamJournal() {
+      const dream = document.getElementById('dreamJournal').value;
+      localStorage.setItem('dreamJournal', dream);
+      alert("Dream journal entry saved!");
+    }
+
+    function saveDailyJournal() {
+      const entry = document.getElementById('dailyJournal').value;
+      localStorage.setItem('dailyJournal', entry);
+      alert("Daily journal entry saved!");
+    }
+
+    function loadJournals() {
+      const savedDream = localStorage.getItem('dreamJournal');
+      const savedDaily = localStorage.getItem('dailyJournal');
+      if (savedDream) document.getElementById('dreamJournal').value = savedDream;
+      if (savedDaily) document.getElementById('dailyJournal').value = savedDaily;
+    }
+
+    window.addEventListener('load', loadJournals);
   </script>
 </body>
 </html>
