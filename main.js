@@ -25,7 +25,7 @@ setupApp();
 async function setupApp() {
   await ensureAllDaysInitialized();
   await initTaskApp();         // Wait until tasks show up
-  loadRandomQuote();           // Then load the quote
+  loadRandomQuote();           // Then fade in the quote
 }
 
 async function ensureAllDaysInitialized() {
@@ -166,13 +166,14 @@ async function loadRandomQuote() {
     const quotes = snapshot.docs.map(doc => doc.data());
     if (quotes.length === 0) {
       quoteBox.textContent = "Stay motivated.";
-      return;
+    } else {
+      const random = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteBox.textContent = `"${random.text}" — ${random.author || 'Unknown'}`;
     }
-
-    const random = quotes[Math.floor(Math.random() * quotes.length)];
-    quoteBox.textContent = `"${random.text}" — ${random.author || 'Unknown'}`;
+    quoteBox.classList.add('visible');
   } catch (error) {
     console.error('Error loading quotes:', error);
     quoteBox.textContent = "Couldn't load quote.";
+    quoteBox.classList.add('visible');
   }
 }
