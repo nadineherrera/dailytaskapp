@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAZh-tXWVRaoYIuQ9BH6z0upIuExZ8rAGs",
   authDomain: "my-daily-tasks-5a313.firebaseapp.com",
   projectId: "my-daily-tasks-5a313",
-  storageBucket: "my-daily-tasks-5a313.firebasestorage.app",
+  storageBucket: "my-daily-tasks-5a313.appspot.com",
   messagingSenderId: "676679892031",
   appId: "1:676679892031:web:4746c594d8415697394c8a",
   measurementId: "G-7DEQC4CWQH"
@@ -25,19 +25,20 @@ let userId = null;
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// 🎯 Start once user is authenticated
+// 🔐 Wait for user to authenticate
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     userId = user.uid;
     displayDailyQuote();
     await initializeAllDays();
   } else {
-    console.log("No user signed in.");
-    // Optional: redirect to login page or show error
+    console.warn("No user signed in.");
+    // Optional: Redirect to login.html if desired
+    // window.location.href = "login.html";
   }
 });
 
-// 🧠 Default tasks by day
+// 🔁 Default Task Generator
 function getDefaultTasksForDay(day) {
   const baseTasks = [
     "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
@@ -61,44 +62,41 @@ function getDefaultTasksForDay(day) {
   return extended[day] || baseTasks;
 }
 
-// 🧠 Get current day from URL or system
+// 📅 Determine Day
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
-// 🔄 Initialize data for all days (once per user)
+// 📦 Initialize all days if missing
 async function initializeAllDays() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
   for (const day of days) {
     const docRef = doc(db, 'users', userId, day, 'default');
     const docSnap = await getDoc(docRef);
     const data = docSnap.exists() ? docSnap.data() : {};
 
-    if (!Array.isArray(data.tasks) || data.tasks.length === 0 || typeof data.tasks[0]?.text !== 'string') {
+    if (!Array.isArray(data.tasks) || typeof data.tasks[0]?.text !== 'string') {
       const defaultTasks = getDefaultTasksForDay(day).map(text => ({
         text, done: false, manual: false
       }));
-      await saveTasksForDay(day, defaultTasks);
+      await setDoc(docRef, { tasks: defaultTasks });
     }
   }
 
-  initTaskApp(); // ✅ After data exists, load UI
+  initTaskApp(); // ➕ Build UI
 }
 
-// 💾 Save tasks for specific day
+// 💾 Save for any day
 async function saveTasksForDay(day, tasks) {
   await setDoc(doc(db, 'users', userId, day, 'default'), { tasks });
 }
 
-// 💾 Save for current day
 async function saveTasks(tasks) {
   const day = getCurrentDay();
   await saveTasksForDay(day, tasks);
 }
 
-// 📦 Load tasks for current day
 async function loadTasks() {
   const day = getCurrentDay();
   const docRef = doc(db, 'users', userId, day, 'default');
@@ -106,7 +104,7 @@ async function loadTasks() {
   return docSnap.exists() ? docSnap.data().tasks : [];
 }
 
-// 🔧 Initialize Task App
+// 🧠 Main App UI
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
@@ -176,7 +174,7 @@ async function initTaskApp() {
     }
   };
 
-  // 🔁 Reset Tasks
+  // 🔁 Reset All
   window.resetTasks = function () {
     tasks = tasks.map(task => ({ ...task, done: false }));
     saveTasks(tasks);
@@ -186,7 +184,7 @@ async function initTaskApp() {
   renderTasks();
 }
 
-// ✨ Show quote from Firestore
+// 🧠 Show Daily Quote
 async function displayDailyQuote() {
   const quoteContainer = document.getElementById('quote-container');
   if (!quoteContainer) return;
