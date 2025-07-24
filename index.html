@@ -12,12 +12,13 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: white;
-    }
+  body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 1rem;
+  background: white;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); /* NEW */
+}
     header {
       text-align: center;
       background-color: #FFD966;
@@ -114,7 +115,7 @@
       border-radius: 10px;
       border: 1px solid #bcaecf;
       font-size: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
     .section-label {
       text-align: center;
@@ -202,15 +203,15 @@
       70% { transform: scale(1.2); opacity: 0.7; }
       100% { transform: scale(0.5); opacity: 0; }
     }
-    #breath-bubble-container {
-  position: relative;
+ #breath-bubble-container {
   width: 100%;
-  min-height: 250px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-      transform-origin: center; 
+  transform-origin: center;
+  padding: 1rem 0;
 }
 
 #breath-bubble {
@@ -218,7 +219,9 @@
   height: 80px;
   background: radial-gradient(circle, #72c6ff, #008cba);
   border-radius: 60%;
-  box-shadow: 0 0 20px rgba(0, 140, 186, 0.6);
+  box-shadow: 
+    0 0 20px rgba(0, 140, 186, 0.6),  /* original glow */
+    0 10px 25px rgba(0, 0, 0, 0.15);  /* added soft drop shadow */
   transform-origin: center;
 }
 
@@ -302,7 +305,9 @@
         <option value="😴">Tired</option>
         <option value="😌">Peaceful</option>
       </select>
-    
+
+      <h2 style="text-align:center; color:#008cba; margin-bottom:0.5rem;">Breathing Exercise</h2>
+
       <div id="breath-bubble-container">
   <div id="breath-bubble"></div>
   <p id="breath-text">Inhale</p>
