@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,12 +168,7 @@
       width: calc(100% + 2rem);
       box-sizing: border-box;
     }
-
- #quote-box.visible { opacity: 1; }
-    #progress-container {
-      width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 1rem; overflow: hidden;
-    }
-
+    #quote-box.visible { opacity: 1; }
     #progress-container {
       width: 100%;
       background-color: #e0e0e0;
@@ -195,8 +189,7 @@
       color: #4b7b2f;
       margin-bottom: 1.5rem;
     }
-
-.celebration-emoji {
+    .celebration-emoji {
       animation: pop-fade 2s ease forwards;
       font-size: 1.5rem;
     }
@@ -206,7 +199,6 @@
       70% { transform: scale(1.2); opacity: 0.7; }
       100% { transform: scale(0.5); opacity: 0; }
     }
-
     #breath-bubble-container {
       display: flex;
       flex-direction: column;
@@ -344,10 +336,15 @@
       if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
       if (savedMood) document.getElementById('mood').value = savedMood;
     }
-
-    window.addEventListener('load', loadJournals);
+ <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById('save-journal-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', saveJournals);
+      }
+    });
   </script>
-
+  
   <!-- 🌿 Progress Bar Logic -->
   <script>
     function updateProgressBar() {
