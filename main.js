@@ -42,15 +42,15 @@ function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
   const paramDay = urlParams.get('day');
   const validDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  return validDays.includes(paramDay) ? paramDay : new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  return validDays.includes(paramDay) ? paramDay : null;
 }
 
-function getTodayDate() {
-  return new Date().toISOString().split('T')[0];
+function getEffectiveDay() {
+  return getCurrentDay() || getTodayDay();
 }
 
 async function saveJournalEntries() {
-  const day = getCurrentDay(); 
+const day = getEffectiveDay();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   const dream = dreamField?.value.trim() || '';
@@ -61,13 +61,6 @@ async function saveJournalEntries() {
     const ref = doc(db, 'users', userId, 'journals', day);
     await setDoc(ref, entry, { merge: true });
     alert("Journal entry saved!");
-
-  // Clear only if on the same day as today
-    const todayDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    if (day === todayDay) {
-      if (dreamField) dreamField.value = '';
-      if (dailyField) dailyField.value = '';
-    }
   } catch (err) {
     console.error("Error saving journal:", err);
     alert("Failed to save entry.");
@@ -75,7 +68,7 @@ async function saveJournalEntries() {
 }
 
 async function loadJournalEntries() {
-  const day = getCurrentDay(); 
+   const day = getEffectiveDay();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
