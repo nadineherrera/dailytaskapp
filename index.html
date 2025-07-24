@@ -207,6 +207,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+      transform-origin: center; 
 }
 
     #breath-bubble {
@@ -228,9 +229,14 @@
       font-weight: bold;
     }
     @keyframes breathe {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.5); }
-    }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+}
+
+.breathe-animation {
+  animation: breathe 4s ease-in-out infinite;
+}
+
   </style>
 </head>
 <body>
