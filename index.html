@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
   <link rel="manifest" href="manifest.json">
@@ -48,13 +48,16 @@
     #affirmation-box.visible {
       opacity: 1;
     }
-    .day-nav {
-      text-align: center;
-      margin-bottom: 1rem;
-      background: #845EC2;
-      padding: 0.5rem;
-      border-radius: 5px;
-    }
+   .day-nav {
+  text-align: center;
+  margin-bottom: 1rem;
+  background: #845EC2;
+  padding: 0.5rem;
+  border-radius: 5px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
     .day-nav a {
       margin: 0 5px;
       text-decoration: none;
@@ -244,6 +247,21 @@
   color: white;
   border: none;
   cursor: pointer;
+}
+    @media (max-width: 600px) {
+  #breath-bubble {
+    width: 120px;
+    height: 120px;
+  }
+
+  #breath-text {
+    font-size: 1.3rem;
+  }
+
+  #breath-toggle-btn {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
 }
   </style>
 </head>
