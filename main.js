@@ -21,20 +21,21 @@ yaySound.volume = 1.0;
 setupApp();
 
 async function setupApp() {
+  const currentDayLabel = document.getElementById('current-day-label');
+  const effectiveDay = getEffectiveDay();
+  if (currentDayLabel) {
+    currentDayLabel.textContent = `You’re viewing: ${effectiveDay}`;
+  }
   await ensureAllDaysInitialized();
   await initTaskApp();
-  await loadJournalEntries();
   loadRandomQuote();
   loadDailyAffirmation();
+  await loadJournalEntries();
   startBreathingBubble();
 
   const saveBtn = document.getElementById('save-journal-btn');
   if (saveBtn) {
     saveBtn.addEventListener('click', saveJournalEntries);
-  }
-  const currentDayLabel = document.getElementById('current-day-label');
-  if (currentDayLabel) {
-    currentDayLabel.textContent = `You’re viewing: ${getEffectiveDay()}`;
   }
 }
 
@@ -52,10 +53,51 @@ function getEffectiveDay() {
   return today.charAt(0).toUpperCase() + today.slice(1);
 }
 
+async function saveJournalEntries() {
+  const day = getEffectiveDay();
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+  const dream = dreamField?.value.trim() || '';
+  const daily = dailyField?.value.trim() || '';
+  const entry = { dream, daily };
+
+  try {
+    const ref = doc(db, 'users', userId, 'journals', day);
+    await setDoc(ref, entry, { merge: true });
+    alert("Journal entry saved!");
+  } catch (err) {
+    console.error("Error saving journal:", err);
+    alert("Failed to save entry.");
+  }
+}
+
+async function loadJournalEntries() {
+  const day = getEffectiveDay();
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+  if (!dreamField || !dailyField) return;
+
+  try {
+    const ref = doc(db, 'users', userId, 'journals', day);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      dreamField.value = data.dream || '';
+      dailyField.value = data.daily || '';
+    } else {
+      dreamField.value = '';
+      dailyField.value = '';
+    }
+  } catch (err) {
+    console.error("Failed to load journal:", err);
+  }
+}
+
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
-    const ref = doc(db, 'users', userId, day, 'default');
+    const ref = doc(db, 'users', userId, day, 'tasks');
     const snap = await getDoc(ref);
     if (!snap.exists() || !Array.isArray(snap.data().tasks)) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
@@ -114,7 +156,8 @@ async function initTaskApp() {
 
         if (checkbox.checked) {
           const emoji = document.createElement('span');
-emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];          emoji.classList.add('celebration-emoji');
+          emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
+          emoji.classList.add('celebration-emoji');
           h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
@@ -177,56 +220,15 @@ emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '
 
 async function loadTasks() {
   const day = getEffectiveDay();
-  const ref = doc(db, 'users', userId, day, 'default');
+  const ref = doc(db, 'users', userId, day, 'tasks');
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
 }
 
 async function saveTasks(tasks) {
   const day = getEffectiveDay();
-  const ref = doc(db, 'users', userId, day, 'default');
+  const ref = doc(db, 'users', userId, day, 'tasks');
   await setDoc(ref, { tasks });
-}
-
-async function saveJournalEntries() {
-  const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  const dream = dreamField?.value.trim() || '';
-  const daily = dailyField?.value.trim() || '';
-  const entry = { dream, daily };
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    await setDoc(ref, entry, { merge: true });
-    alert("Journal entry saved!");
-  } catch (err) {
-    console.error("Error saving journal:", err);
-    alert("Failed to save entry.");
-  }
-}
-
-async function loadJournalEntries() {
-  const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  if (!dreamField || !dailyField) return;
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    const snap = await getDoc(ref);
-
-    if (snap.exists()) {
-      const data = snap.data();
-      dreamField.value = data.dream || '';
-      dailyField.value = data.daily || '';
-    } else {
-      dreamField.value = '';
-      dailyField.value = '';
-    }
-  } catch (err) {
-    console.error("Failed to load journal:", err);
-  }
 }
 
 async function loadRandomQuote() {
