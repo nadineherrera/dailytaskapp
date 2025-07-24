@@ -210,13 +210,17 @@
 }
 
     #breath-bubble {
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #72c6ff, #008cba);
-      border-radius: 50%;
-      animation: breathe 4s ease-in-out infinite;
-      box-shadow: 0 0 20px rgba(0, 140, 186, 0.6);
-    }
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #72c6ff, #008cba);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(0, 140, 186, 0.6);
+}
+
+.breathe-animation {
+  animation: breathe 4s ease-in-out infinite;
+}
+
     #breath-text {
       font-size: 1.1rem;
       margin-top: 0.75rem;
@@ -387,10 +391,14 @@ function startBreathingBubble() {
 
   toggleBtn.addEventListener('click', () => {
     if (intervalId === null) {
+      // Start breathing
+      bubble.classList.add("breathe-animation");
+      cycle(); // run once immediately
       intervalId = setInterval(cycle, 4000);
       toggleBtn.textContent = "Stop Breath";
-      cycle(); // trigger immediately
     } else {
+      // Stop breathing
+      bubble.classList.remove("breathe-animation");
       clearInterval(intervalId);
       intervalId = null;
       toggleBtn.textContent = "Start Breath";
@@ -398,6 +406,7 @@ function startBreathingBubble() {
     }
   });
 }
+
 
 startBreathingBubble();
 
