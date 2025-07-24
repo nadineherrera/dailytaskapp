@@ -45,7 +45,7 @@ function getTodayDate() {
 
 // ✅ Journal
 async function saveJournalEntries() {
-  const date = getCurrentDay();
+ const date = getTodayDate();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   const dream = dreamField?.value.trim() || '';
@@ -67,7 +67,7 @@ async function saveJournalEntries() {
 }
 
 async function loadJournalEntries() {
-  const date = getCurrentDay();
+ const date = getTodayDate();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
