@@ -227,10 +227,6 @@
   </style>
 </head>
 <body>
-  <!-- HTML content here -->
-  <!-- Include journaling, gratitude, mood select, breath animation, task list, quote footer -->
-  <!-- Your existing scripts and logic remain below this comment -->
-</body>
 <header>
     <img src="apple-touch-icon.png" alt="App Logo">
     <h1 id="page-title">Daily Tasks</h1>
@@ -331,14 +327,14 @@
       if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
       if (savedMood) document.getElementById('mood').value = savedMood;
     }
- <script>
+     
     window.addEventListener('DOMContentLoaded', () => {
       const saveBtn = document.getElementById('save-journal-btn');
       if (saveBtn) {
         saveBtn.addEventListener('click', saveJournals);
       }
     });
-  </script>
+
   
   <!-- 🌿 Progress Bar Logic -->
   <script>
@@ -348,7 +344,7 @@
       const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked').length;
       const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
       document.getElementById('progress-bar').style.width = percent + '%';
-      document.getElementById('progress-text').textContent = ${percent}% Complete;
+document.getElementById('progress-text').textContent = `${percent}% Complete`;
     }
 
     const observer = new MutationObserver(() => {
@@ -358,11 +354,10 @@
       });
     });
 
-   <script>
   window.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('page-title');
     const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    title.textContent = '{day}';
+title.textContent = `${day}`;
     title.style.visibility = 'visible';
   });
 </script>
