@@ -220,11 +220,13 @@
 }
 
     #breath-text {
-      font-size: 1.1rem;
-      margin-top: 0.75rem;
-      color: #008cba;
-      font-weight: bold;
-    }
+  font-size: 1.1rem;
+  margin-top: 1rem; /* increase spacing from bubble */
+  margin-bottom: 1.25rem; /* increase spacing to button */
+  color: #008cba;
+  font-weight: bold;
+}
+
     @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.5); }
@@ -233,10 +235,16 @@
 .breathe-animation {
   animation: breathe 4s ease-in-out infinite;
 }
-
     #breath-toggle-btn {
-      margin-top: 1rem; /* ✅ spacing between bubble and button */
-    }  
+  margin-top: 0; /* remove any extra top margin */
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  background-color: #845EC2;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
