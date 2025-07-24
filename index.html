@@ -370,7 +370,7 @@ document.getElementById('progress-text').textContent = `${percent}% Complete`;
   window.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('page-title');
     const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-title.textContent = ${day};
+title.textContent = `${day}`;
     title.style.visibility = 'visible';
 
  loadJournals(); // Don't forget to call this too!
@@ -401,7 +401,7 @@ function startBreathingBubble() {
       toggleBtn.textContent = "Stop Breath";
     } else {
       // Stop breathing
-      bubble.classList.remove("breathe-animation");
+      bubble.classList.add("breathe-animation");
       clearInterval(intervalId);
       intervalId = null;
       toggleBtn.textContent = "Start Breath";
