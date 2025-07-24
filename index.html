@@ -266,10 +266,13 @@
         <option value="😴">Tired</option>
         <option value="😌">Peaceful</option>
       </select>
+    
       <div id="breath-bubble-container">
   <div id="breath-bubble"></div>
   <p id="breath-text">Inhale</p>
+  <button id="breath-toggle-btn">Start Breath</button>
 </div>
+
 
     </section>
   </div>
@@ -347,7 +350,7 @@
       const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked').length;
       const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
       document.getElementById('progress-bar').style.width = percent + '%';
-document.getElementById('progress-text').textContent = ${percent}% Complete;
+document.getElementById('progress-text').textContent = `${percent}% Complete`;
     }
 
     const observer = new MutationObserver(() => {
@@ -364,7 +367,41 @@ title.textContent = ${day};
     title.style.visibility = 'visible';
 
  loadJournals(); // Don't forget to call this too!
- 
+
+// 🌬️ Breath Bubble Toggle Logic
+function startBreathingBubble() {
+  const bubble = document.getElementById('breath-bubble');
+  const text = document.getElementById('breath-text');
+  const toggleBtn = document.getElementById('breath-toggle-btn');
+
+  if (!bubble || !text || !toggleBtn) return;
+
+  let index = 0;
+  const phases = ["Inhale", "Hold", "Exhale", "Hold"];
+  let intervalId = null;
+
+  function cycle() {
+    text.textContent = phases[index % phases.length];
+    index++;
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if (intervalId === null) {
+      intervalId = setInterval(cycle, 4000);
+      toggleBtn.textContent = "Stop Breath";
+      cycle(); // trigger immediately
+    } else {
+      clearInterval(intervalId);
+      intervalId = null;
+      toggleBtn.textContent = "Start Breath";
+      text.textContent = "Inhale";
+    }
+  });
+}
+
+startBreathingBubble();
+
+    
 // Start observing the task list
     observer.observe(document.getElementById('task-list'), {
       childList: true,
