@@ -297,15 +297,7 @@
 
   <script type="module" src="main.js"></script>
 
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const title = document.getElementById('page-title');
-    const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    title.textContent = `${day}`;
-    title.style.visibility = 'visible';
-  });
-</script>
-    
+   <script> 
     function saveDreamJournal() {
       const dream = document.getElementById('dreamJournal').value;
       localStorage.setItem('dreamJournal', dream);
@@ -370,11 +362,10 @@
   window.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('page-title');
     const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    title.textContent = ${day};
+    title.textContent = '{day}';
     title.style.visibility = 'visible';
   });
 </script>
-  </script>
 </body>
 </html>
 
