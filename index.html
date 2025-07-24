@@ -200,12 +200,15 @@
       100% { transform: scale(0.5); opacity: 0; }
     }
     #breath-bubble-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 1.5rem;
-      margin-bottom: 2rem;
-    }
+  position: relative;
+  width: 100%;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
     #breath-bubble {
       width: 80px;
       height: 80px;
