@@ -203,7 +203,7 @@
       70% { transform: scale(1.2); opacity: 0.7; }
       100% { transform: scale(0.5); opacity: 0; }
     }
- #breath-bubble-container {
+#breath-bubble-container {
   width: 100%;
   height: 300px;
   display: flex;
@@ -212,7 +212,11 @@
   align-items: center;
   transform-origin: center;
   padding: 1rem 0;
+
+  margin-top: 1rem;       /* 👈 NEW */
+  min-height: 250px;      /* 👈 NEW */
 }
+
 
 #breath-bubble {
   width: 80px;
@@ -283,6 +287,7 @@
     <a href="?day=Saturday">Sat</a>
     <a href="?day=Sunday">Sun</a>
   </div>
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
   <div class="journal-grid">
     <section id="journals">
       <h2>Dream Journal</h2>
