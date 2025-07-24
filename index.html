@@ -228,15 +228,15 @@
 }
 
 #breath-bubble {
-  margin: 1rem 0; /* 👈 Add space above/below bubble */
-  width: 80px;
-  height: 80px;
+  width: 150px;
+  height: 150px;
   background: radial-gradient(circle, #72c6ff, #008cba);
-  border-radius: 60%;
+  border-radius: 50%;
   box-shadow: 
-    0 0 20px rgba(0, 140, 186, 0.6),  /* original glow */
-    0 10px 25px rgba(0, 0, 0, 0.15);  /* added soft drop shadow */
+    0 0 20px rgba(0, 140, 186, 0.6),
+    0 10px 25px rgba(0, 0, 0, 0.15);
   transform-origin: center;
+  transition: transform 4s ease-in-out;
 }
 
     #breath-text {
@@ -265,12 +265,7 @@
   border: none;
   cursor: pointer;
 }
-    @media (max-width: 600px) {
-  #breath-bubble {
-    width: 150px;
-    height: 150px;
-  }
-
+  
   #breath-text {
     font-size: 1.4rem;
   }
