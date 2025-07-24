@@ -295,13 +295,13 @@
 
    <script> 
     function saveDreamJournal() {
-      const dream = document.getElementById('dreamJournal').value;
-      localStorage.setItem('dreamJournal', dream);
+      const dream = document.getElementById('dream-journal').value;
+      localStorage.setItem('dream-journal', dream);
     }
 
     function saveDailyJournal() {
-      const entry = document.getElementById('dailyJournal').value;
-      localStorage.setItem('dailyJournal', entry);
+      const entry = document.getElementById('daily-journal').value;
+      localStorage.setItem('daily-journal', entry);
     }
 
     function saveGratitude() {
@@ -318,12 +318,12 @@
     }
 
     function loadJournals() {
-      const savedDream = localStorage.getItem('dreamJournal');
-      const savedDaily = localStorage.getItem('dailyJournal');
+      const savedDream = localStorage.getItem('dream-journal');
+      const savedDaily = localStorage.getItem('daily-journal');
       const savedGratitude = localStorage.getItem('gratitudeEntry');
       const savedMood = localStorage.getItem('mood');
-      if (savedDream) document.getElementById('dreamJournal').value = savedDream;
-      if (savedDaily) document.getElementById('dailyJournal').value = savedDaily;
+      if (savedDream) document.getElementById('dream-journal').value = savedDream;
+      if (savedDaily) document.getElementById('daily-journal').value = savedDaily;
       if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
       if (savedMood) document.getElementById('mood').value = savedMood;
     }
@@ -336,8 +336,8 @@
     });
 
   
-  <!-- 🌿 Progress Bar Logic -->
-  <script>
+  // 🌿 Progress Bar Logic 
+
     function updateProgressBar() {
       const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
       const total = checkboxes.length;
@@ -359,6 +359,14 @@ document.getElementById('progress-text').textContent = `${percent}% Complete`;
     const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 title.textContent = `${day}`;
     title.style.visibility = 'visible';
+
+ loadJournals(); // Don't forget to call this too!
+ 
+// Start observing the task list
+    observer.observe(document.getElementById('task-list'), {
+      childList: true,
+      subtree: true
+    });
   });
 </script>
 </body>
