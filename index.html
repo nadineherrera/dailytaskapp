@@ -515,4 +515,525 @@ startBreathingBubble();
 </div> <!-- closes .container -->
 </script>
 </body>
+</html>   <<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Daily Task App</title>
+  <style>
+    
+html, body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff; /* ✅ This ensures full white background */
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+    
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    
+    .container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+    
+   header {
+  background-color: #FFD966;
+  padding: 1rem;
+  margin: 0 auto 1rem auto;
+}
+    header img {
+      max-width: 100px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .day-heading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0 0.25rem;
+  color: white; /* Adjust if your background color is light */
+  visibility: visible;
+}
+    
+    #affirmation-box {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-style: italic;
+      color: #666;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    #affirmation-box.visible {
+      opacity: 1;
+    }
+    
+   .day-nav {
+  text-align: center;
+  margin-bottom: 1rem;
+  background: #845EC2;
+  padding: 0.5rem;
+  border-radius: 5px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+    .day-nav a {
+      margin: 0 5px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+    .journal-grid {
+      background-color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+  section#journals, section#gratitude {
+  flex: 1 1 300px;
+  background: #CBC3E3;
+  padding: 1rem 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+    
+    section#journals h2, section#gratitude h2 {
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #845EC2;
+    }
+    
+    section#journals textarea, section#gratitude textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      margin-bottom: 1.5rem;
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #bcaecf;
+      box-sizing: border-box;
+      resize: vertical;
+      background: #fff;
+    }
+    
+    section#journals button, section#gratitude button {
+      display: block;
+      margin: 0 auto;
+      padding: 0.7rem 1.5rem;
+      background-color: #845EC2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    #gratitude select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #bcaecf;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .section-label {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #66B032;
+      margin: 2rem 0 1rem 0;
+      font-weight: bold;
+    }
+    
+    #task-list h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 1rem;
+      background: #66B032;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+  .task-input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 2rem 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 600px; /* keeps layout neat */
+}
+
+.task-input-group input,
+.task-input-group button {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+    #new-task {
+      width: 70%;
+      max-width: 400px;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      background-color: #845EC2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    
+    footer#quote-footer {
+      background-color: #845EC2;
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-style: italic;
+      font-size: 1rem;
+      margin: 2rem 0 0 0;
+    width: 100%;
+      box-sizing: border-box;
+    }
+    
+    #quote-box.visible { opacity: 1; }
+    #progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      height: 20px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #66B032;
+      transition: width 0.3s ease;
+    }
+    
+    #progress-text {
+      text-align: center;
+      font-weight: bold;
+      color: #4b7b2f;
+      margin-bottom: 1.5rem;
+    }
+    
+    .celebration-emoji {
+      animation: pop-fade 2s ease forwards;
+      font-size: 1.5rem;
+    }
+    @keyframes pop-fade {
+      0% { transform: scale(1); opacity: 1; }
+      30% { transform: scale(1.8); opacity: 1; }
+      70% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(0.5); opacity: 0; }
+    }
+    
+#breath-bubble-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: transparent; /* remove white background */
+  margin-top: 2rem;
+}
+
+#breath-bubble {
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, #72c6ff, #008cba);
+  border-radius: 50%; /* 👈 Ensures perfect circle */
+  box-shadow: 
+    0 0 20px rgba(0, 140, 186, 0.6),  
+    0 10px 25px rgba(0, 0, 0, 0.15);
+  transform-origin: center;
+}
+
+ #breath-text {
+      font-size: 1.4rem;
+      color: #008cba;
+      font-weight: bold;
+   text-align: center;
+  margin: 0;
+}
+    
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.8);
+  }
+}
+
+.breathe-animation {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+#breath-toggle-btn {
+  margin-top: 0;
+  padding: 0.8rem 1.4rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  background-color: #845EC2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+    
+    @media (min-width: 600px) {
+  .task-input-group {
+    flex-wrap: nowrap;
+  }
+
+  .task-input-group input {
+    flex: 2 1 auto;
+    max-width: 100%;
+  }
+
+  .task-input-group button {
+    flex: 1 1 auto;
+    max-width: 100%;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+<header>
+    <img src="apple-touch-icon.png" alt="App Logo">
+<h1 id="page-title" class="day-heading"></h1>
+    <div id="affirmation-box"></div>
+  </header>
+  <div class="day-nav">
+    <a href="?day=Monday">Mon</a>
+    <a href="?day=Tuesday">Tue</a>
+    <a href="?day=Wednesday">Wed</a>
+    <a href="?day=Thursday">Thu</a>
+    <a href="?day=Friday">Fri</a>
+    <a href="?day=Saturday">Sat</a>
+    <a href="?day=Sunday">Sun</a>
+  </div>
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
+  
+    <div class="journal-grid">
+    <section id="journals">
+      <h2>Dream Journal</h2>
+<textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+      
+      <h2>Daily Journal</h2>
+<textarea id="daily-journal" placeholder="How are you feeling today?"></textarea>
+     
+      <button id="save-journal-btn">Save Journals</button>
+    </section>
+   
+    <section id="gratitude">
+      <h2>Gratitude Prompt</h2>
+      <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
+      
+      <h2>Your Mood</h2>
+      <select id="mood">
+        <option value="">How do you feel?</option>
+        <option value="😀">Happy</option>
+        <option value="😐">Neutral</option>
+        <option value="😔">Sad</option>
+        <option value="😤">Frustrated</option>
+        <option value="😴">Tired</option>
+        <option value="😌">Peaceful</option>
+      </select>
+    </section>
+  </div>
+    
+        <!-- 🌬️ Breathing Exercise Section -->
+<section id="breathing">
+  <h2 style="text-align:center; color:#008cba; margin-bottom:0.5rem;">Breathing Exercise</h2>
+  <div id="breath-bubble-container">
+    <div id="breath-bubble"></div>
+    <p id="breath-text">Inhale</p>
+    <button id="breath-toggle-btn">Start Breath</button>
+     </div>
+</section>
+
+  <h2 class="section-label">🌱 Today's Tasks</h2>
+
+  <!-- 🌿 Progress Bar -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+  <p id="progress-text">0% Complete</p>
+
+  <div id="task-list"></div>
+
+  <div class="task-input-group">
+    <input type="text" id="new-task" placeholder="Add new task">
+    <button onclick="addTask()">Add Task</button>
+    <button onclick="resetTasks()">Reset All Tasks</button>
+  </div>
+
+  <footer id="quote-footer">
+    <p id="quote-box">Loading quote...</p>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+
+   <script> 
+    function saveDreamJournal() {
+      const dream = document.getElementById('dream-journal').value;
+      localStorage.setItem('dream-journal', dream);
+    }
+
+    function saveDailyJournal() {
+      const entry = document.getElementById('daily-journal').value;
+      localStorage.setItem('daily-journal', entry);
+    }
+
+    function saveGratitude() {
+      const gratitude = document.getElementById('gratitudeEntry').value;
+      const mood = document.getElementById('mood').value;
+      localStorage.setItem('gratitudeEntry', gratitude);
+      localStorage.setItem('mood', mood);
+    }
+
+    function saveJournals() {
+      saveDreamJournal();
+      saveDailyJournal();
+      saveGratitude();
+    }
+
+    function loadJournals() {
+      const savedDream = localStorage.getItem('dream-journal');
+      const savedDaily = localStorage.getItem('daily-journal');
+      const savedGratitude = localStorage.getItem('gratitudeEntry');
+      const savedMood = localStorage.getItem('mood');
+      if (savedDream) document.getElementById('dream-journal').value = savedDream;
+      if (savedDaily) document.getElementById('daily-journal').value = savedDaily;
+      if (savedGratitude) document.getElementById('gratitudeEntry').value = savedGratitude;
+      if (savedMood) document.getElementById('mood').value = savedMood;
+    }
+     
+    window.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById('save-journal-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', saveJournals);
+      }
+    });
+
+  
+  // 🌿 Progress Bar Logic 
+
+    function updateProgressBar() {
+      const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+      const total = checkboxes.length;
+      const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked').length;
+      const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+      document.getElementById('progress-bar').style.width = percent + '%';
+document.getElementById('progress-text').textContent = `${percent}% Complete`;
+    }
+
+    const observer = new MutationObserver(() => {
+      updateProgressBar();
+      document.querySelectorAll('#task-list input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateProgressBar);
+      });
+    });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const title = document.getElementById('page-title');
+    const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+title.textContent = `${day}`;
+    title.style.visibility = 'visible';
+
+ loadJournals(); // Don't forget to call this too!
+
+// 🌬️ Breath Bubble Toggle Logic
+function startBreathingBubble() {
+  const bubble = document.getElementById('breath-bubble');
+  const text = document.getElementById('breath-text');
+  const toggleBtn = document.getElementById('breath-toggle-btn');
+
+  if (!bubble || !text || !toggleBtn) return;
+
+  let index = 0;
+  const phases = ["Inhale", "Hold", "Exhale", "Hold"];
+  let intervalId = null;
+
+  function cycle() {
+    text.textContent = phases[index % phases.length];
+    index++;
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if (intervalId === null) {
+      // Start breathing
+      bubble.classList.add("breathe-animation");
+      cycle(); // run once immediately
+      intervalId = setInterval(cycle, 4000);
+      toggleBtn.textContent = "Stop Breath";
+    } else {
+      // Stop breathing
+      bubble.classList.remove("breathe-animation");
+      clearInterval(intervalId);
+      intervalId = null;
+      toggleBtn.textContent = "Start Breath";
+      text.textContent = "Inhale";
+    }
+  });
+}
+
+
+startBreathingBubble();
+
+    
+// Start observing the task list
+    observer.observe(document.getElementById('task-list'), {
+      childList: true,
+      subtree: true
+    });
+  });
+</div> <!-- closes .container -->
+</script>
+</body>
 </html>   
