@@ -47,8 +47,9 @@ function getCurrentDay() {
 
 function getEffectiveDay() {
   const currentDay = getCurrentDay();
-  if (currentDay) return currentDay;
-  return new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  if (currentDay) return currentDay; // already validated and capitalized
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  return today.charAt(0).toUpperCase() + today.slice(1); // ensure capitalized
 }
 
 async function saveJournalEntries() {
