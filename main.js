@@ -23,9 +23,9 @@ setupApp();
 async function setupApp() {
   await ensureAllDaysInitialized();
   await initTaskApp();
+  await loadJournalEntries();
   loadRandomQuote();
   loadDailyAffirmation();
-  await loadJournalEntries();
   startBreathingBubble();
 
   const saveBtn = document.getElementById('save-journal-btn');
@@ -52,43 +52,6 @@ function getEffectiveDay() {
   return today.charAt(0).toUpperCase() + today.slice(1); // ensure capitalized
 }
 
-async function saveJournalEntries() {
-const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  const dream = dreamField?.value.trim() || '';
-  const daily = dailyField?.value.trim() || '';
-  const entry = { dream, daily };
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    await setDoc(ref, entry, { merge: true });
-    alert("Journal entry saved!");
-  } catch (err) {
-    console.error("Error saving journal:", err);
-    alert("Failed to save entry.");
-  }
-}
-
-async function loadJournalEntries() {
-  const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  if (!dreamField || !dailyField) return;
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    const snap = await getDoc(ref);
-
- if (snap.exists()) {
-  const data = snap.data();
-  dreamField.value = data.dream || '';
-  dailyField.value = data.daily || '';
-} else {
-  dreamField.value = '';
-  dailyField.value = '';
-}
-}
 
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -137,15 +100,11 @@ async function initTaskApp() {
     if (text) text.textContent = `${percent}% Complete`;
   }
 
-  function renderTasks() {
+   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, i) => {
       const h2 = document.createElement('h2');
-
-      if (task.done) {
-        h2.style.transition = 'opacity 0.3s ease';
-        h2.style.opacity = '0.3';
-      }
+      if (task.done) h2.style.opacity = '0.3';
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -219,16 +178,56 @@ async function initTaskApp() {
 }
 
 async function loadTasks() {
-  const day = getCurrentDay();
+  const day = getEffectiveDay();
   const ref = doc(db, 'users', userId, day, 'default');
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
-}
 
 async function saveTasks(tasks) {
-  const day = getCurrentDay();
+  const day = getEffectiveDay();
   const ref = doc(db, 'users', userId, day, 'default');
   await setDoc(ref, { tasks });
+}
+
+async function saveJournalEntries() {
+const day = getEffectiveDay();
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+  const dream = dreamField?.value.trim() || '';
+  const daily = dailyField?.value.trim() || '';
+  const entry = { dream, daily };
+
+  try {
+    const ref = doc(db, 'users', userId, 'journals', day);
+    await setDoc(ref, entry, { merge: true });
+    alert("Journal entry saved!");
+  } catch (err) {
+    console.error("Error saving journal:", err);
+    alert("Failed to save entry.");
+  }
+}
+
+async function loadJournalEntries() {
+  const day = getEffectiveDay();
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+  if (!dreamField || !dailyField) return;
+
+  try {
+    const ref = doc(db, 'users', userId, 'journals', day);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const data = snap.data();
+      dreamField.value = data.dream || '';
+      dailyField.value = data.daily || '';
+    } else {
+      dreamField.value = '';
+      dailyField.value = '';
+    }
+  } catch (err) {
+    console.error("Failed to load journal:", err);
+  }
 }
 
 async function loadRandomQuote() {
