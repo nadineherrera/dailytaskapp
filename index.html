@@ -13,18 +13,19 @@
   <title>Daily Task App</title>
   <style>
 html, body {
-  background-color: white; !important;
-  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
   margin: 0;
-  padding: env(safe-area-inset);
+  padding: constant(safe-area-inset, 0); /* old iOS */
+padding: env(safe-area-inset, 0);      /* modern iOS */
+  height: 100%;
   box-sizing: border-box;
 }
-    header {
-      text-align: center;
-      background-color: #FFD966;
-      padding: 1rem;
-      margin: -1rem -1rem 1rem -1rem;
-    }
+   header {
+  background-color: #FFD966;
+  padding: 1rem;
+  margin: 0 auto 1rem auto;
+}
     header img {
       max-width: 100px;
       height: auto;
@@ -66,6 +67,7 @@ html, body {
       font-weight: bold;
     }
     .journal-grid {
+      background-color: white;
       display: flex;
       flex-wrap: wrap;
       gap: 2rem;
@@ -174,12 +176,12 @@ html, body {
     footer#quote-footer {
       background-color: #845EC2;
       padding: 1.5rem;
-      margin: 2rem -1rem 0 -1rem;
       text-align: center;
       color: #fff;
       font-style: italic;
       font-size: 1rem;
-      width: calc(100% + 2rem);
+      margin: 2rem 0 0 0;
+    width: 100%;
       box-sizing: border-box;
     }
     #quote-box.visible { opacity: 1; }
@@ -225,6 +227,11 @@ html, body {
   margin-top: 1rem;       /* 👈 NEW */
   min-height: 320px;      /* 👈 NEW */
   gap: 1.5rem; /* 👈 Add space between items inside */
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 #breath-bubble {
