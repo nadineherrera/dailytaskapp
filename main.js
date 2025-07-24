@@ -46,14 +46,20 @@ function getTodayDate() {
 // ✅ Journal
 async function saveJournalEntries() {
   const date = getCurrentDay();
-  const dream = document.getElementById('dream-journal')?.value.trim() || '';
-  const daily = document.getElementById('daily-journal')?.value.trim() || '';
+  const dreamField = document.getElementById('dream-journal');
+  const dailyField = document.getElementById('daily-journal');
+  const dream = dreamField?.value.trim() || '';
+  const daily = dailyField?.value.trim() || '';
   const entry = { dream, daily };
 
   try {
     const ref = doc(db, 'users', userId, 'journals', date);
     await setDoc(ref, entry, { merge: true });
     alert("Journal entry saved!");
+
+    // ✅ Clear the journal inputs after saving
+    if (dreamField) dreamField.value = '';
+    if (dailyField) dailyField.value = '';
   } catch (err) {
     console.error("Error saving journal:", err);
     alert("Failed to save entry.");
