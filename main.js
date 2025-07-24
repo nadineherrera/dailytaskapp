@@ -20,7 +20,17 @@ yaySound.volume = 1.0;
 
 setupApp();
 
+function updatePageTitle() {
+  const title = document.getElementById('page-title');
+  const day = getEffectiveDay();
+  if (title) {
+    title.textContent = day;
+    title.style.visibility = 'visible';
+  }
+}
+
 async function setupApp() {
+  updatePageTitle();
   const currentDayLabel = document.getElementById('current-day-label');
   const effectiveDay = getEffectiveDay();
   if (currentDayLabel) {
