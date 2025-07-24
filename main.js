@@ -46,7 +46,9 @@ function getCurrentDay() {
 }
 
 function getEffectiveDay() {
-  return getCurrentDay() || getTodayDay();
+  const currentDay = getCurrentDay();
+  if (currentDay) return currentDay;
+  return new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
 async function saveJournalEntries() {
