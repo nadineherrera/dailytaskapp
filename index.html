@@ -234,6 +234,9 @@
   animation: breathe 4s ease-in-out infinite;
 }
 
+    #breath-toggle-btn {
+      margin-top: 1rem; /* ✅ spacing between bubble and button */
+    }  
   </style>
 </head>
 <body>
@@ -401,7 +404,7 @@ function startBreathingBubble() {
       toggleBtn.textContent = "Stop Breath";
     } else {
       // Stop breathing
-      bubble.classList.add("breathe-animation");
+      bubble.classList.remove("breathe-animation");
       clearInterval(intervalId);
       intervalId = null;
       toggleBtn.textContent = "Start Breath";
