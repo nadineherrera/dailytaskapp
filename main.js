@@ -80,20 +80,13 @@ async function loadJournalEntries() {
     const ref = doc(db, 'users', userId, 'journals', day);
     const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      const data = snap.data();
-      dreamField.value = data.dream || '';
-      dailyField.value = data.daily || '';
-    } else {
-      // 👇 This line ensures ghost data doesn't stick around
-      dreamField.value = '';
-      dailyField.value = '';
-    }
-  } catch (err) {
-    console.error("Failed to load journal:", err);
-    dreamField.value = '';
-    dailyField.value = '';
-  }
+ if (snap.exists()) {
+  const data = snap.data();
+  dreamField.value = data.dream || '';
+  dailyField.value = data.daily || '';
+} else {
+  dreamField.value = '';
+  dailyField.value = '';
 }
 
 async function ensureAllDaysInitialized() {
