@@ -138,12 +138,21 @@
       font-size: 1.1rem;
     }
     .task-input-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-    }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 2rem 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 600px; /* keeps layout neat */
+}
+
+.task-input-group input,
+.task-input-group button {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
     #new-task {
       width: 70%;
       max-width: 400px;
@@ -214,10 +223,12 @@
   transform-origin: center;
   padding: 1rem 0;
   margin-top: 1rem;       /* 👈 NEW */
-  min-height: 250px;      /* 👈 NEW */
+  min-height: 320px;      /* 👈 NEW */
+  gap: 1.5rem; /* 👈 Add space between items inside */
 }
 
 #breath-bubble {
+  margin: 1rem 0; /* 👈 Add space above/below bubble */
   width: 80px;
   height: 80px;
   background: radial-gradient(circle, #72c6ff, #008cba);
@@ -267,6 +278,21 @@
   #breath-toggle-btn {
     font-size: 1rem;
     padding: 0.8rem 1.4rem;
+  }
+}
+    @media (min-width: 600px) {
+  .task-input-group {
+    flex-wrap: nowrap;
+  }
+
+  .task-input-group input {
+    flex: 2 1 auto;
+    max-width: 100%;
+  }
+
+  .task-input-group button {
+    flex: 1 1 auto;
+    max-width: 100%;
   }
 }
   </style>
