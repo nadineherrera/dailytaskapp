@@ -228,15 +228,14 @@
 }
 
 #breath-bubble {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   background: radial-gradient(circle, #72c6ff, #008cba);
-  border-radius: 50%;
+  border-radius: 50%; /* 👈 Ensures perfect circle */
   box-shadow: 
-    0 0 20px rgba(0, 140, 186, 0.6),
+    0 0 20px rgba(0, 140, 186, 0.6),  
     0 10px 25px rgba(0, 0, 0, 0.15);
   transform-origin: center;
-  transition: transform 4s ease-in-out;
 }
 
     #breath-text {
@@ -247,14 +246,18 @@
   font-weight: bold;
 }
 
-    @keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.5); }
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.8);
+  }
 }
 
 .breathe-animation {
   animation: breathe 4s ease-in-out infinite;
-}
+}}
     #breath-toggle-btn {
   margin-top: 0; /* remove any extra top margin */
   padding: 0.6rem 1.5rem;
