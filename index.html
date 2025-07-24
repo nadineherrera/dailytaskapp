@@ -210,12 +210,14 @@
       transform-origin: center; 
 }
 
-    #breath-bubble {
+#breath-bubble {
   width: 80px;
   height: 80px;
   background: radial-gradient(circle, #72c6ff, #008cba);
   border-radius: 50%;
   box-shadow: 0 0 20px rgba(0, 140, 186, 0.6);
+  transform: scale(1); /* ← this is the key */
+  transform-origin: center;
 }
 
 .breathe-animation {
