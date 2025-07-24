@@ -14,12 +14,20 @@
   <style>
 html, body {
   font-family: Arial, sans-serif;
-  background-color: #ffffff;
   margin: 0;
-  padding: constant(safe-area-inset, 0); /* old iOS */
-padding: env(safe-area-inset, 0);      /* modern iOS */
+  padding: env(safe-area-inset, 0);
   height: 100%;
+  width: 100%;
+  background-color: #ffffff; /* ✅ This ensures full white background */
   box-sizing: border-box;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ffffff;
+  z-index: -1;
 }
     .container {
   max-width: 800px;
