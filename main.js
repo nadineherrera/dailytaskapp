@@ -34,7 +34,7 @@ async function setupApp() {
   }
    const currentDayLabel = document.getElementById('current-day-label');
   if (currentDayLabel) {
-    currentDayLabel.textContent = `You’re viewing: ${getCurrentDay()}`;
+currentDayLabel.textContent = `You’re viewing: ${getEffectiveDay()}`;
   }
 }
 
