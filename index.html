@@ -73,12 +73,13 @@
       margin-top: 2rem;
     }
     section#journals, section#gratitude {
-      flex: 1 1 300px;
-      background: #CBC3E3;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
+  flex: 1 1 300px;
+  background: #CBC3E3;
+  padding: 1rem;
+  padding-bottom: 2rem; /* ✅ Added for spacing under button */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
     section#journals h2, section#gratitude h2 {
       margin-bottom: 0.5rem;
       font-size: 1.25rem;
@@ -212,11 +213,9 @@
   align-items: center;
   transform-origin: center;
   padding: 1rem 0;
-
   margin-top: 1rem;       /* 👈 NEW */
   min-height: 250px;      /* 👈 NEW */
 }
-
 
 #breath-bubble {
   width: 80px;
@@ -257,17 +256,17 @@
 }
     @media (max-width: 600px) {
   #breath-bubble {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
   }
 
   #breath-text {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   #breath-toggle-btn {
     font-size: 1rem;
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem 1.4rem;
   }
 }
   </style>
