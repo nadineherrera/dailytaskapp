@@ -71,7 +71,7 @@ const day = getEffectiveDay();
 }
 
 async function loadJournalEntries() {
-   const day = getEffectiveDay();
+  const day = getEffectiveDay();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
@@ -79,11 +79,20 @@ async function loadJournalEntries() {
   try {
     const ref = doc(db, 'users', userId, 'journals', day);
     const snap = await getDoc(ref);
-    const data = snap.exists() ? snap.data() : {};
-    dreamField.value = data.dream || '';
-    dailyField.value = data.daily || '';
+
+    if (snap.exists()) {
+      const data = snap.data();
+      dreamField.value = data.dream || '';
+      dailyField.value = data.daily || '';
+    } else {
+      // 👇 This line ensures ghost data doesn't stick around
+      dreamField.value = '';
+      dailyField.value = '';
+    }
   } catch (err) {
     console.error("Failed to load journal:", err);
+    dreamField.value = '';
+    dailyField.value = '';
   }
 }
 
