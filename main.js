@@ -36,16 +36,15 @@ async function setupApp() {
 
 function getCurrentDay() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  return urlParams.get('day') || 'Monday';
 }
 
 function getTodayDate() {
   return new Date().toISOString().split('T')[0];
 }
 
-// ✅ Journal
 async function saveJournalEntries() {
-  const date = getCurrentDay(); 
+  const day = getCurrentDay(); 
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   const dream = dreamField?.value.trim() || '';
@@ -53,11 +52,10 @@ async function saveJournalEntries() {
   const entry = { dream, daily };
 
   try {
-    const ref = doc(db, 'users', userId, 'journals', date);
+    const ref = doc(db, 'users', userId, 'journals', day);
     await setDoc(ref, entry, { merge: true });
     alert("Journal entry saved!");
 
-    // ✅ Clear the journal inputs after saving
     if (dreamField) dreamField.value = '';
     if (dailyField) dailyField.value = '';
   } catch (err) {
@@ -67,13 +65,13 @@ async function saveJournalEntries() {
 }
 
 async function loadJournalEntries() {
-  const date = getCurrentDay(); 
+  const day = getCurrentDay(); 
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   if (!dreamField || !dailyField) return;
 
   try {
-    const ref = doc(db, 'users', userId, 'journals', date);
+    const ref = doc(db, 'users', userId, 'journals', day);
     const snap = await getDoc(ref);
     const data = snap.exists() ? snap.data() : {};
     dreamField.value = data.dream || '';
@@ -83,7 +81,6 @@ async function loadJournalEntries() {
   }
 }
 
-// ✅ Task Defaults
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
@@ -116,7 +113,6 @@ function getDefaultTasksForDay(day) {
   return [...base, ...(addOns[day] || [])];
 }
 
-// ✅ Tasks + Progress Bar
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   const newTaskInput = document.getElementById('new-task');
@@ -226,7 +222,6 @@ async function saveTasks(tasks) {
   await setDoc(ref, { tasks });
 }
 
-// ✅ Quotes + Affirmations
 async function loadRandomQuote() {
   const box = document.getElementById('quote-box');
   if (!box) return;
