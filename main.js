@@ -285,12 +285,41 @@ async function loadDailyAffirmation() {
 function startBreathingBubble() {
   const bubble = document.getElementById('breath-bubble');
   const text = document.getElementById('breath-text');
-  if (!bubble || !text) return;
+  const button = document.getElementById('breath-toggle-btn');
+  if (!bubble || !text || !button) return;
 
-  const cycle = ["Inhale", "Hold", "Exhale", "Hold"];
+  let cycle = ["Inhale", "Hold", "Exhale", "Hold"];
   let index = 0;
-  setInterval(() => {
+  let intervalId = null;
+  let timeoutId = null;
+
+  function updateText() {
     text.textContent = cycle[index % cycle.length];
     index++;
-  }, 4000);
+  }
+
+  function startSession() {
+    updateText();
+    intervalId = setInterval(updateText, 4000);
+    timeoutId = setTimeout(stopSession, 60000); // 1 minute
+    button.textContent = 'Stop Breath';
+  }
+
+  function stopSession() {
+    clearInterval(intervalId);
+    clearTimeout(timeoutId);
+    text.textContent = 'Inhale';
+    button.textContent = 'Start Breath';
+  }
+
+  let isRunning = false;
+
+  button.addEventListener('click', () => {
+    if (!isRunning) {
+      startSession();
+    } else {
+      stopSession();
+    }
+    isRunning = !isRunning;
+  });
 }
