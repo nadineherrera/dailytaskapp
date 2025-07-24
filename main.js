@@ -32,9 +32,9 @@ async function setupApp() {
   if (saveBtn) {
     saveBtn.addEventListener('click', saveJournalEntries);
   }
-   const currentDayLabel = document.getElementById('current-day-label');
+  const currentDayLabel = document.getElementById('current-day-label');
   if (currentDayLabel) {
-currentDayLabel.textContent = `You’re viewing: ${getEffectiveDay()}`;
+    currentDayLabel.textContent = `You’re viewing: ${getEffectiveDay()}`;
   }
 }
 
@@ -47,11 +47,10 @@ function getCurrentDay() {
 
 function getEffectiveDay() {
   const currentDay = getCurrentDay();
-  if (currentDay) return currentDay; // already validated and capitalized
+  if (currentDay) return currentDay;
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  return today.charAt(0).toUpperCase() + today.slice(1); // ensure capitalized
+  return today.charAt(0).toUpperCase() + today.slice(1);
 }
-
 
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -100,7 +99,7 @@ async function initTaskApp() {
     if (text) text.textContent = `${percent}% Complete`;
   }
 
-   function renderTasks() {
+  function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, i) => {
       const h2 = document.createElement('h2');
@@ -115,8 +114,7 @@ async function initTaskApp() {
 
         if (checkbox.checked) {
           const emoji = document.createElement('span');
-          emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
-          emoji.classList.add('celebration-emoji');
+emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];          emoji.classList.add('celebration-emoji');
           h2.appendChild(emoji);
           yaySound.currentTime = 0;
           yaySound.play();
@@ -182,6 +180,7 @@ async function loadTasks() {
   const ref = doc(db, 'users', userId, day, 'default');
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
+}
 
 async function saveTasks(tasks) {
   const day = getEffectiveDay();
@@ -190,7 +189,7 @@ async function saveTasks(tasks) {
 }
 
 async function saveJournalEntries() {
-const day = getEffectiveDay();
+  const day = getEffectiveDay();
   const dreamField = document.getElementById('dream-journal');
   const dailyField = document.getElementById('daily-journal');
   const dream = dreamField?.value.trim() || '';
