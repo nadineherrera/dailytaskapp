@@ -88,6 +88,7 @@ async function loadJournalEntries() {
   dreamField.value = '';
   dailyField.value = '';
 }
+}
 
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
