@@ -74,6 +74,11 @@ async function saveJournalEntries() {
   try {
     const ref = doc(db, 'users', userId, 'journals', day);
     await setDoc(ref, entry, { merge: true });
+
+    // ✅ Clear the inputs after saving
+    if (dreamField) dreamField.value = '';
+    if (dailyField) dailyField.value = '';
+
     alert("Journal entry saved!");
   } catch (err) {
     console.error("Error saving journal:", err);
