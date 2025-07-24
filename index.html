@@ -12,6 +12,10 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
   <style>
+     html {
+      background-color: #ffffff;
+      padding: env(safe-area-inset);
+    }
 body {
   background-color: white; /* keeps inner content white */
   margin: 0;
@@ -239,13 +243,11 @@ body {
   transform-origin: center;
 }
 
-    #breath-text {
-  font-size: 1.1rem;
-  margin-top: 2rem; /* increase spacing from bubble */
-  margin-bottom: 1.25rem; /* increase spacing to button */
-  color: #008cba;
-  font-weight: bold;
-}
+ #breath-text {
+      font-size: 1.4rem;
+      color: #008cba;
+      font-weight: bold;
+    }
 
 @keyframes breathe {
   0%, 100% {
@@ -259,25 +261,16 @@ body {
 .breathe-animation {
   animation: breathe 4s ease-in-out infinite;
 }}
-    #breath-toggle-btn {
-  margin-top: 0; /* remove any extra top margin */
-  padding: 0.6rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 12px;
-  background-color: #845EC2;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-  
-  #breath-text {
-    font-size: 1.4rem;
-  }
-
-  #breath-toggle-btn {
-    font-size: 1rem;
-    padding: 0.8rem 1.4rem;
-  }
+ #breath-toggle-btn {
+      margin-top: 0;
+      padding: 0.8rem 1.4rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      background-color: #845EC2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
 }
     @media (min-width: 600px) {
   .task-input-group {
