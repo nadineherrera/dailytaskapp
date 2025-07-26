@@ -277,19 +277,18 @@ html, body {
   margin: 0 auto 1.5rem; /* ✅ Add spacing between bubble and button */
 }
 
- #breath-text {
-      font-size: 1.4rem;
-      color: #008cba;
-      font-weight: bold;
-   text-align: center;
-  margin: 0;
+#breath-text {
+  font-size: 1.4rem;
+  color: #008cba;
+  font-weight: bold;
+  text-align: center;
+  margin: 1.5rem 0 0; /* ✅ Add margin-top to separate from bubble */
 }
 
 #breath-text span#countdown {
-  display: block;
   font-size: 2rem;
-  color: #008cba; /* ✅ match main header */
-  margin-top: 0.3rem;
+  color: #008cba;
+  margin-left: 0.25rem;
 }
    
 @keyframes breathe {
@@ -500,7 +499,7 @@ function updatePhase() {
   const current = phases[index % phases.length];
   countdown = 4; // ✅ Move this here so the value displays immediately
 
-  text.innerHTML = `${current.label}<br><span id="countdown">${countdown}</span>`;
+text.innerHTML = `${current.label} for <span id="countdown">${countdown}</span>`;
   bubble.style.transition = "transform 4s ease-in-out";
   bubble.style.transform = `scale(${current.scale})`;
 
