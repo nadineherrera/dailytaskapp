@@ -417,6 +417,7 @@ html, body {
 
    
 <script>
+  // 🌙 Save & Load Journals
   function saveDreamJournal() {
     const dream = document.getElementById('dream-journal').value;
     localStorage.setItem('dream-journal', dream);
@@ -451,6 +452,7 @@ html, body {
     if (savedMood) document.getElementById('mood').value = savedMood;
   }
 
+  // 📊 Task Progress Tracker
   function updateProgressBar() {
     const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
     const total = checkboxes.length;
@@ -467,32 +469,10 @@ html, body {
     });
   });
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const saveBtn = document.getElementById('save-journal-btn');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', saveJournals);
-    }
-
-    const title = document.getElementById('page-title');
-    const day = new URLSearchParams(window.location.search).get('day') || new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    title.textContent = `${day}`;
-    title.style.visibility = 'visible';
-
-    loadJournals();
-
-    // 🌬️ Breath Bubble Toggle Logic
-function startBreathingBubble() {
-  const bubble = document.getElementById('breath-bubble');
-  const text = document.getElementById('breath-text');
-  const toggleBtn = document.getElementById('breath-toggle-btn');
-
-  if (!bubble || !text || !toggleBtn) return;
-
-  let index = 0;
-  let countdown = 4;
+  // 🌬️ Breathing Exercise
   let intervalId = null;
   let countdownInterval = null;
-
+  let index = 0;
   const phases = [
     { label: "Inhale", scale: 1.5 },
     { label: "Hold", scale: 1.5 },
@@ -501,6 +481,8 @@ function startBreathingBubble() {
   ];
 
   function updatePhase() {
+    const bubble = document.getElementById("breath-bubble");
+    const text = document.getElementById("breath-text");
     const current = phases[index % phases.length];
     let count = 4;
 
@@ -513,33 +495,51 @@ function startBreathingBubble() {
       count--;
       const countdownEl = document.getElementById("countdown");
       if (countdownEl) countdownEl.textContent = count;
-      if (count <= 1) clearInterval(countdownInterval);
+      if (count <= 1) {
+        clearInterval(countdownInterval);
+        index++;
+        setTimeout(updatePhase, 1000);
+      }
     }, 1000);
-
-    index++;
   }
 
-  toggleBtn.addEventListener('click', () => {
-    if (intervalId === null) {
-      updatePhase();
-      intervalId = setInterval(updatePhase, 4000);
-      toggleBtn.textContent = "Stop Breath";
-    } else {
-      clearInterval(intervalId);
-      clearInterval(countdownInterval);
-      intervalId = null;
-      countdownInterval = null;
-      toggleBtn.textContent = "Start Breath";
-      text.innerHTML = `Inhale for <span id="countdown">4</span>`;
-      bubble.style.transform = "scale(1)";
-      index = 0;
-    }
-  });
-}
+  function startBreathingBubble() {
+    const toggleBtn = document.getElementById("breath-toggle-btn");
+    const bubble = document.getElementById("breath-bubble");
+    const text = document.getElementById("breath-text");
 
+    toggleBtn.addEventListener('click', () => {
+      if (!intervalId) {
+        updatePhase();
+        toggleBtn.textContent = "Stop Breath";
+        intervalId = true;
+      } else {
+        clearInterval(countdownInterval);
+        intervalId = null;
+        toggleBtn.textContent = "Start Breath";
+        text.innerHTML = `Inhale for <span id="countdown">4</span>`;
+        bubble.style.transform = "scale(1)";
+        index = 0;
+      }
+    });
+  }
+
+  // ✅ Page Initialization
+  window.addEventListener('DOMContentLoaded', () => {
+    const saveBtn = document.getElementById('save-journal-btn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', saveJournals);
+    }
+
+    const title = document.getElementById('page-title');
+    const day = new URLSearchParams(window.location.search).get('day') ||
+                new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    title.textContent = `${day}`;
+    title.style.visibility = 'visible';
+
+    loadJournals();
     startBreathingBubble();
 
-    // 🌱 Start observing task list changes
     observer.observe(document.getElementById('task-list'), {
       childList: true,
       subtree: true
