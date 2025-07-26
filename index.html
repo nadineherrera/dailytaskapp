@@ -502,7 +502,7 @@ function startBreathingBubble() {
 
 function updatePhase() {
   const current = phases[index % phases.length];
-  let count = 0;
+  let count = 4;
 
   text.innerHTML = `${current.label} for <span id="countdown">${count}</span>`;
   bubble.style.transition = "transform 4s ease-in-out";
@@ -510,11 +510,14 @@ function updatePhase() {
 
   if (countdownInterval) clearInterval(countdownInterval);
   countdownInterval = setInterval(() => {
-    count++;
+    count--;
     const countdownEl = document.getElementById("countdown");
     if (countdownEl) countdownEl.textContent = count;
-    if (count >= 4) clearInterval(countdownInterval);
+    if (count <= 1) clearInterval(countdownInterval);
   }, 1000);
+
+  index++;
+}
 
   index++;
 }
