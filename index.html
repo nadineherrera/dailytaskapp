@@ -257,10 +257,12 @@ html, body {
   align-items: center;
   justify-content: center;
   max-width: 100%;
-  padding: 2rem 1rem;
-  margin: 2rem auto 0 auto; /* top margin only */
+  padding: 4rem 1rem 3rem; /* ⬆️ more top & bottom space */
+  margin: 3rem auto; /* ⬇️ more space around the bubble */
   text-align: center;
+  gap: 2rem; /* 🟰 equal spacing between bubble & button */
 }
+
 
 #breath-bubble {
   width: 180px;
@@ -272,7 +274,7 @@ html, body {
     0 10px 25px rgba(0, 0, 0, 0.15);
   transform-origin: center;
  display: block;
-  margin: 0 auto;
+  margin: 0 auto 1.5rem; /* ✅ Add spacing between bubble and button */
 }
 
  #breath-text {
@@ -378,7 +380,7 @@ html, body {
     
         <!-- 🌬️ Breathing Exercise Section -->
 <section id="breathing">
-  <h2 style="text-align:center; color:#008cba; margin-bottom:0.5rem;">Breathing Exercise</h2>
+<h2 style="text-align:center; color:#008cba; margin-bottom:2rem;">Breathing Exercise</h2>
   <div id="breath-bubble-container">
     <div id="breath-bubble"></div>
     <p id="breath-text">Inhale</p>
