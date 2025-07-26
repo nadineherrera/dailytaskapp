@@ -494,24 +494,25 @@ function startBreathingBubble() {
     { label: "Hold", scale: 1 }
   ];
 
-  function updatePhase() {
-    const current = phases[index % phases.length];
-    text.innerHTML = `${current.label}<br><span id="countdown">${countdown}</span>`;
-    bubble.style.transition = "transform 4s ease-in-out";
-    bubble.style.transform = `scale(${current.scale})`;
-    countdown = 4;
+function updatePhase() {
+  const current = phases[index % phases.length];
+  countdown = 4; // ✅ Move this here so the value displays immediately
 
-    // Countdown logic
-    if (countdownInterval) clearInterval(countdownInterval);
-    countdownInterval = setInterval(() => {
-      countdown--;
-      const countdownEl = document.getElementById("countdown");
-      if (countdownEl) countdownEl.textContent = countdown;
-      if (countdown <= 0) clearInterval(countdownInterval);
-    }, 1000);
+  text.innerHTML = `${current.label}<br><span id="countdown">${countdown}</span>`;
+  bubble.style.transition = "transform 4s ease-in-out";
+  bubble.style.transform = `scale(${current.scale})`;
 
-    index++;
-  }
+  // Countdown logic
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    countdown--;
+    const countdownEl = document.getElementById("countdown");
+    if (countdownEl) countdownEl.textContent = countdown;
+    if (countdown <= 0) clearInterval(countdownInterval);
+  }, 1000);
+
+  index++;
+}
 
   toggleBtn.addEventListener('click', () => {
     if (intervalId === null) {
