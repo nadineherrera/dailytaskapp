@@ -500,30 +500,24 @@ function startBreathingBubble() {
     { label: "Hold", scale: 1 }
   ];
 
-function updatePhase() {
-  const current = phases[index % phases.length];
-  let count = 4;
+  function updatePhase() {
+    const current = phases[index % phases.length];
+    let count = 4;
 
-  text.innerHTML = `${current.label} for <span id="countdown">${count}</span>`;
-  bubble.style.transition = "transform 4s ease-in-out";
-  bubble.style.transform = `scale(${current.scale})`;
+    text.innerHTML = `${current.label} for <span id="countdown">${count}</span>`;
+    bubble.style.transition = "transform 4s ease-in-out";
+    bubble.style.transform = `scale(${current.scale})`;
 
-  if (countdownInterval) clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    count--;
-    const countdownEl = document.getElementById("countdown");
-    if (countdownEl) countdownEl.textContent = count;
-    if (count <= 1) clearInterval(countdownInterval);
-  }, 1000);
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      count--;
+      const countdownEl = document.getElementById("countdown");
+      if (countdownEl) countdownEl.textContent = count;
+      if (count <= 1) clearInterval(countdownInterval);
+    }, 1000);
 
-  index++;
-}
-
-  index++;
-}
-
-  index++; // ✅ Advances to the next phase each time
-}
+    index++;
+  }
 
   toggleBtn.addEventListener('click', () => {
     if (intervalId === null) {
@@ -536,12 +530,12 @@ function updatePhase() {
       intervalId = null;
       countdownInterval = null;
       toggleBtn.textContent = "Start Breath";
-text.innerHTML = `Inhale for <span id="countdown">4</span>`;
+      text.innerHTML = `Inhale for <span id="countdown">4</span>`;
       bubble.style.transform = "scale(1)";
+      index = 0;
     }
   });
 }
-
 
     startBreathingBubble();
 
