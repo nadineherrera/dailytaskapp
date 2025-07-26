@@ -274,21 +274,26 @@ html, body {
     0 10px 25px rgba(0, 0, 0, 0.15);
   transform-origin: center;
  display: block;
-  margin: 0 auto 1.5rem; /* ✅ Add spacing between bubble and button */
+  margin: 0 auto 1rem; /* ✅ Add spacing between bubble and button */
 }
 
 #breath-text {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   color: #008cba;
   font-weight: bold;
   text-align: center;
-  margin: 1.5rem 0 0; /* ✅ Add margin-top to separate from bubble */
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.4rem;
 }
+
 
 #breath-text span#countdown {
   font-size: 2rem;
-  color: #008cba;
-  margin-left: 0.25rem;
+  color: #66B032;
+  font-weight: bold;
 }
    
 @keyframes breathe {
