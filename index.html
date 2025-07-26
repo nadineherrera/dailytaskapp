@@ -257,8 +257,8 @@ html, body {
   align-items: center;
   justify-content: center;
   max-width: 100%;
-  padding: 4rem 1rem 3rem; /* ⬆️ more top & bottom space */
-  margin: 3rem auto; /* ⬇️ more space around the bubble */
+  padding: 4rem 1rem 2rem; /* ⬆️ more top & bottom space */
+  margin: 2rem auto; /* ⬇️ more space around the bubble */
   text-align: center;
   gap: 2rem; /* 🟰 equal spacing between bubble & button */
 }
@@ -526,7 +526,7 @@ text.innerHTML = `${current.label} for <span id="countdown">${countdown}</span>`
       intervalId = null;
       countdownInterval = null;
       toggleBtn.textContent = "Start Breath";
-      text.textContent = "Inhale";
+text.innerHTML = `Inhale for <span id="countdown">4</span>`;
       bubble.style.transform = "scale(1)";
     }
   });
