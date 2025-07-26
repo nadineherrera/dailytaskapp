@@ -282,7 +282,14 @@ html, body {
    text-align: center;
   margin: 0;
 }
-    
+
+#breath-text span#countdown {
+  display: block;
+  font-size: 2rem;
+  color: #845EC2;
+  margin-top: 0.3rem;
+}
+   
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.5); }
@@ -468,37 +475,61 @@ html, body {
     loadJournals();
 
     // 🌬️ Breath Bubble Toggle Logic
-    function startBreathingBubble() {
-      const bubble = document.getElementById('breath-bubble');
-      const text = document.getElementById('breath-text');
-      const toggleBtn = document.getElementById('breath-toggle-btn');
+function startBreathingBubble() {
+  const bubble = document.getElementById('breath-bubble');
+  const text = document.getElementById('breath-text');
+  const toggleBtn = document.getElementById('breath-toggle-btn');
 
-      if (!bubble || !text || !toggleBtn) return;
+  if (!bubble || !text || !toggleBtn) return;
 
-      let index = 0;
-      const phases = ["Inhale", "Hold", "Exhale", "Hold"];
-      let intervalId = null;
+  let index = 0;
+  let countdown = 4;
+  let intervalId = null;
+  let countdownInterval = null;
 
-      function cycle() {
-        text.textContent = phases[index % phases.length];
-        index++;
-      }
+  const phases = [
+    { label: "Inhale", scale: 1.5 },
+    { label: "Hold", scale: 1.5 },
+    { label: "Exhale", scale: 1 },
+    { label: "Hold", scale: 1 }
+  ];
 
-      toggleBtn.addEventListener('click', () => {
-        if (intervalId === null) {
-          bubble.classList.add("breathe-animation");
-          cycle();
-          intervalId = setInterval(cycle, 4000);
-          toggleBtn.textContent = "Stop Breath";
-        } else {
-          bubble.classList.remove("breathe-animation");
-          clearInterval(intervalId);
-          intervalId = null;
-          toggleBtn.textContent = "Start Breath";
-          text.textContent = "Inhale";
-        }
-      });
+  function updatePhase() {
+    const current = phases[index % phases.length];
+    text.innerHTML = `${current.label}<br><span id="countdown">${countdown}</span>`;
+    bubble.style.transition = "transform 4s ease-in-out";
+    bubble.style.transform = `scale(${current.scale})`;
+    countdown = 4;
+
+    // Countdown logic
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      countdown--;
+      const countdownEl = document.getElementById("countdown");
+      if (countdownEl) countdownEl.textContent = countdown;
+      if (countdown <= 0) clearInterval(countdownInterval);
+    }, 1000);
+
+    index++;
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    if (intervalId === null) {
+      updatePhase();
+      intervalId = setInterval(updatePhase, 4000);
+      toggleBtn.textContent = "Stop Breath";
+    } else {
+      clearInterval(intervalId);
+      clearInterval(countdownInterval);
+      intervalId = null;
+      countdownInterval = null;
+      toggleBtn.textContent = "Start Breath";
+      text.textContent = "Inhale";
+      bubble.style.transform = "scale(1)";
     }
+  });
+}
+
 
     startBreathingBubble();
 
