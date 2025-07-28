@@ -331,6 +331,23 @@ html, body {
     max-width: 100%;
   }
 }
+
+.weather-header {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.weather-box {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Arial', sans-serif;
+}
+   
   </style>
 </head>
 <body>
@@ -339,6 +356,9 @@ html, body {
     <img src="apple-touch-icon.png" alt="App Logo">
 <h1 id="page-title" class="day-heading"></h1>
     <div id="affirmation-box"></div>
+ 
+   <!-- 🌤️ Weather Display -->
+  <div id="weather" class="weather-box">Loading weather...</div>
   </header>
    
   <div class="day-nav">
@@ -544,6 +564,33 @@ html, body {
       subtree: true
     });
   });
+
+ navigator.geolocation.getCurrentPosition(successWeather, errorWeather);
+
+function successWeather(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+  const apiKey = 'c30f91e272b6b6c6d468994f7abfdabe'; // Replace this with your actual OpenWeather API key
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const temp = Math.round(data.main.temp);
+      const desc = data.weather[0].description;
+      const city = data.name;
+      document.getElementById('weather').textContent = `${city}: ${temp}°F • ${desc}`;
+    })
+    .catch(() => {
+      document.getElementById('weather').textContent = "Weather unavailable.";
+    });
+}
+
+function errorWeather() {
+  document.getElementById('weather').textContent = "Location permission denied.";
+}
+
+ 
 </script>
 
 </div> <!-- closes .container -->
