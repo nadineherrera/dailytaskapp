@@ -614,12 +614,41 @@ function successWeather(position) {
       const feelsLike = Math.round(data.main.feels_like);
       const desc = data.weather[0].description;
       const humidity = data.main.humidity;
-      const iconCode = data.weather[0].icon;
-      const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+      const weatherMain = data.weather[0].main;
+
+      // Use emoji instead of OpenWeather icons
+      let weatherEmoji = "❓";
+      switch (weatherMain.toLowerCase()) {
+        case "clear":
+          weatherEmoji = "🌞";
+          break;
+        case "clouds":
+          weatherEmoji = "⛅";
+          break;
+        case "rain":
+        case "drizzle":
+          weatherEmoji = "🌧️";
+          break;
+        case "thunderstorm":
+          weatherEmoji = "⛈️";
+          break;
+        case "snow":
+          weatherEmoji = "❄️";
+          break;
+        case "mist":
+        case "fog":
+        case "haze":
+          weatherEmoji = "🌫️";
+          break;
+        case "night":
+          weatherEmoji = "🌙";
+          break;
+        default:
+          weatherEmoji = "🌡️";
+      }
 
       const weatherHTML = `
-        ${iconCode !== "01n" ? `<img src="${iconUrl}" alt="${desc}" />` : ''}
-        <div class="temp">${city}: ${temp}°F</div>
+        <div class="temp">${weatherEmoji} ${city}: ${temp}°F</div>
         <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
         <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
       `;
