@@ -333,13 +333,12 @@ html, body {
 }
 
 .weather-tile {
-  background-color: #f3f0fa;
-  margin: 1.5rem auto;
-  padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #fff; /* or match your header's yellow if preferred */
+  box-sizing: border-box;
   text-align: center;
-  max-width: 600px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .weather-content {
@@ -348,23 +347,27 @@ html, body {
   align-items: center;
   font-size: 1rem;
   color: #333;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .weather-content img {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   margin-bottom: 0.5rem;
+  object-fit: contain;
 }
 
 .weather-content .temp {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .weather-content .desc {
   font-style: italic;
-  color: #666;
+  color: #555;
+  margin-bottom: 0.25rem;
 }
    
   </style>
@@ -597,7 +600,7 @@ function successWeather(position) {
   fetch(url)
     .then(response => response.json())
     .then(data => {
-      const city = data.name;
+      const city = data.name || "Your Location";
       const temp = Math.round(data.main.temp);
       const feelsLike = Math.round(data.main.feels_like);
       const desc = data.weather[0].description;
@@ -605,14 +608,17 @@ function successWeather(position) {
       const iconCode = data.weather[0].icon;
       const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
-      document.getElementById('weather').innerHTML = `
-        <img src="${iconUrl}" alt="${desc}">
+      const weatherHTML = `
+        ${iconCode !== "01n" ? `<img src="${iconUrl}" alt="${desc}" />` : ''}
         <div class="temp">${city}: ${temp}°F</div>
         <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
         <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
       `;
+
+      document.getElementById('weather').innerHTML = weatherHTML;
     })
-    .catch(() => {
+    .catch(error => {
+      console.error("Weather fetch error:", error);
       document.getElementById('weather').innerHTML = `
         <p style="color:#999;">Weather unavailable</p>
       `;
