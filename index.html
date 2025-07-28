@@ -580,6 +580,8 @@ html, body {
     loadJournals();
     startBreathingBubble();
 
+     navigator.geolocation.getCurrentPosition(successWeather);
+
     observer.observe(document.getElementById('task-list'), {
       childList: true,
       subtree: true
