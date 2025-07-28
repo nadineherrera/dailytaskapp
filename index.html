@@ -332,20 +332,29 @@ html, body {
   }
 }
 
-.weather-header {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 10px 20px;
+.weather-section {
+  background-color: #eae2f8;
+  padding: 1rem 1.5rem;
+  margin: 1rem auto;
+  border-radius: 12px;
+  max-width: 600px;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
 .weather-box {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 500;
   color: #333;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-family: 'Arial', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.weather-icon {
+  width: 60px;
+  height: 60px;
 }
    
   </style>
@@ -356,11 +365,13 @@ html, body {
     <img src="apple-touch-icon.png" alt="App Logo">
 <h1 id="page-title" class="day-heading"></h1>
     <div id="affirmation-box"></div>
- 
-   <!-- 🌤️ Weather Display -->
-  <div id="weather" class="weather-box">Loading weather...</div>
   </header>
-   
+
+<!-- ✅ New Weather Section (after header) -->
+<section class="weather-section">
+  <div id="weather" class="weather-box">Loading weather...</div>
+</section>
+
   <div class="day-nav">
     <a href="?day=Monday">Mon</a>
     <a href="?day=Tuesday">Tue</a>
@@ -565,32 +576,35 @@ html, body {
     });
   });
 
- navigator.geolocation.getCurrentPosition(successWeather, errorWeather);
-
 function successWeather(position) {
   const lat = position.coords.latitude;
   const lon = position.coords.longitude;
-  const apiKey = 'c30f91e272b6b6c6d468994f7abfdabe'; // Replace this with your actual OpenWeather API key
+  const apiKey = 'c30f91e272b6b6c6d468994f7abfdabe';
   const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
 
   fetch(url)
     .then(response => response.json())
     .then(data => {
       const temp = Math.round(data.main.temp);
+      const feelsLike = Math.round(data.main.feels_like);
       const desc = data.weather[0].description;
       const city = data.name;
-      document.getElementById('weather').textContent = `${city}: ${temp}°F • ${desc}`;
+      const humidity = data.main.humidity;
+      const iconCode = data.weather[0].icon;
+      const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+      document.getElementById('weather').innerHTML = `
+        <img src="${iconUrl}" alt="${desc}" class="weather-icon">
+        <div><strong>${city}</strong>: ${temp}°F</div>
+        <div>${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
+        <div>Feels like: ${feelsLike}°F | Humidity: ${humidity}%</div>
+      `;
     })
     .catch(() => {
       document.getElementById('weather').textContent = "Weather unavailable.";
     });
 }
 
-function errorWeather() {
-  document.getElementById('weather').textContent = "Location permission denied.";
-}
-
- 
 </script>
 
 </div> <!-- closes .container -->
