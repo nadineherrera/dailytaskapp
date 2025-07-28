@@ -647,12 +647,14 @@ function successWeather(position) {
           weatherEmoji = "🌡️";
       }
 
-      const weatherHTML = `
-        <div class="temp">${weatherEmoji} ${city}: ${temp}°F</div>
-        <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
-        <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
-      `;
 
+const weatherHTML = `
+  <div style="font-size: 2rem; margin-bottom: 0.25rem;">${weatherEmoji}</div>
+  <div class="temp">${city}: ${temp}°F</div>
+  <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
+  <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
+`;
+  
       document.getElementById('weather').innerHTML = weatherHTML;
     })
     .catch(error => {
@@ -669,3 +671,4 @@ function successWeather(position) {
 
 </body>
 </html>
+ 
