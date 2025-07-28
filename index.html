@@ -332,29 +332,39 @@ html, body {
   }
 }
 
-.weather-section {
-  background-color: #eae2f8;
-  padding: 1rem 1.5rem;
-  margin: 1rem auto;
+.weather-tile {
+  background-color: #f3f0fa;
+  margin: 1.5rem auto;
+  padding: 1.25rem;
   border-radius: 12px;
-  max-width: 600px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  max-width: 600px;
 }
 
-.weather-box {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
+.weather-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
+  font-size: 1rem;
+  color: #333;
 }
 
-.weather-icon {
-  width: 60px;
-  height: 60px;
+.weather-content img {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 0.5rem;
+}
+
+.weather-content .temp {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.weather-content .desc {
+  font-style: italic;
+  color: #666;
 }
    
   </style>
@@ -368,8 +378,8 @@ html, body {
   </header>
 
 <!-- ✅ New Weather Section (after header) -->
-<section class="weather-section">
-  <div id="weather" class="weather-box">Loading weather...</div>
+<section class="weather-tile">
+  <div id="weather" class="weather-content"></div>
 </section>
 
   <div class="day-nav">
@@ -585,23 +595,25 @@ function successWeather(position) {
   fetch(url)
     .then(response => response.json())
     .then(data => {
+      const city = data.name;
       const temp = Math.round(data.main.temp);
       const feelsLike = Math.round(data.main.feels_like);
       const desc = data.weather[0].description;
-      const city = data.name;
       const humidity = data.main.humidity;
       const iconCode = data.weather[0].icon;
       const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
       document.getElementById('weather').innerHTML = `
-        <img src="${iconUrl}" alt="${desc}" class="weather-icon">
-        <div><strong>${city}</strong>: ${temp}°F</div>
-        <div>${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
-        <div>Feels like: ${feelsLike}°F | Humidity: ${humidity}%</div>
+        <img src="${iconUrl}" alt="${desc}">
+        <div class="temp">${city}: ${temp}°F</div>
+        <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
+        <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
       `;
     })
     .catch(() => {
-      document.getElementById('weather').textContent = "Weather unavailable.";
+      document.getElementById('weather').innerHTML = `
+        <p style="color:#999;">Weather unavailable</p>
+      `;
     });
 }
 
