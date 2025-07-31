@@ -670,6 +670,12 @@ const weatherHTML = `
     });
 }
 
+  if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/dailytaskapp/service-worker.js")
+    .then(() => console.log("✅ Service Worker registered"))
+    .catch(err => console.error("❌ Service Worker failed", err));
+}
+
 </script>
 
 </div> <!-- closes .container -->
