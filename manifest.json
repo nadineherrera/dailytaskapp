@@ -1,7 +1,7 @@
 {
   "name": "Daily Task App",
   "short_name": "DailyTasks",
-  "start_url": "/dailytaskapp/index.html"
+  "start_url": "/dailytaskapp/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
