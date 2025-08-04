@@ -19,8 +19,8 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-let initialTotalTasks = 0; // ✅ store total from start
-let completedTasksCount = 0; // ✅ track how many completed so far
+let initialTotalTasks = 0;
+let celebrationShown = false;
 
 setupApp();
 
@@ -45,9 +45,7 @@ async function setupApp() {
   getWeather();
 
   const saveBtn = document.getElementById('save-journal-btn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveJournalEntries);
-  }
+  if (saveBtn) saveBtn.addEventListener('click', saveJournalEntries);
 }
 
 function getCurrentDay() {
@@ -80,7 +78,6 @@ async function saveJournalEntries() {
     alert("Journal entry saved!");
   } catch (err) {
     console.error("Error saving journal:", err);
-    alert("Failed to save entry.");
   }
 }
 
@@ -114,9 +111,7 @@ async function ensureAllDaysInitialized() {
   }
   const ongoingRef = doc(db, 'users', userId, 'ongoing', 'tasks');
   const ongoingSnap = await getDoc(ongoingRef);
-  if (!ongoingSnap.exists()) {
-    await setDoc(ongoingRef, { tasks: [] });
-  }
+  if (!ongoingSnap.exists()) await setDoc(ongoingRef, { tasks: [] });
 }
 
 function getDefaultTasksForDay(day) {
@@ -143,8 +138,7 @@ function getDefaultTasksForDay(day) {
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
   let tasks = await loadTasks();
-
-  initialTotalTasks += tasks.length; // ✅ set initial total ONCE
+  initialTotalTasks = tasks.length + (await loadOngoingTasks()).length;
 
   function renderTasks() {
     taskList.innerHTML = '';
@@ -154,25 +148,22 @@ async function initTaskApp() {
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
 
-      checkbox.onchange = async () => {
-        if (!tasks[i].done) {
-          completedTasksCount++; // ✅ only count once
+      checkbox.onchange = () => {
+        tasks[i].done = checkbox.checked;
+        saveTasks(tasks);
+
+        if (checkbox.checked) {
+          yaySound.play();
+          const emoji = document.createElement('span');
+          emoji.textContent = '🎉';
+          emoji.className = 'celebration-emoji';
+          h2.appendChild(emoji);
+          setTimeout(() => {
+            tasks.splice(i, 1);
+            saveTasks(tasks);
+            renderTasks();
+          }, 800);
         }
-        tasks[i].done = true;
-        await saveTasks(tasks);
-
-        yaySound.play();
-        const emoji = document.createElement('span');
-        emoji.textContent = '🎉';
-        emoji.className = 'celebration-emoji';
-        h2.appendChild(emoji);
-
-        setTimeout(() => {
-          tasks.splice(i, 1); // ✅ remove from list visually
-          saveTasks(tasks);
-          renderTasks();
-        }, 800);
-
         updateProgressBar();
       };
 
@@ -189,7 +180,6 @@ async function initTaskApp() {
     const text = document.getElementById('new-task').value.trim();
     if (text) {
       tasks.push({ text, done: false, manual: true });
-      initialTotalTasks++; // ✅ increase total
       saveTasks(tasks);
       document.getElementById('new-task').value = '';
       renderTasks();
@@ -198,9 +188,8 @@ async function initTaskApp() {
 
   window.resetTasks = () => {
     tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
-    initialTotalTasks = tasks.length;
-    completedTasksCount = 0;
     saveTasks(tasks);
+    celebrationShown = false;
     renderTasks();
   };
 
@@ -222,8 +211,7 @@ async function saveTasks(tasks) {
 async function initOngoingTasks() {
   const ongoingList = document.getElementById('ongoing-task-list');
   let tasks = await loadOngoingTasks();
-
-  initialTotalTasks += tasks.length; // ✅ include ongoing in total
+  initialTotalTasks += tasks.length;
 
   function renderOngoing() {
     ongoingList.innerHTML = '';
@@ -233,12 +221,9 @@ async function initOngoingTasks() {
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
 
-      checkbox.onchange = async () => {
-        if (!tasks[i].done) {
-          completedTasksCount++;
-        }
-        tasks[i].done = true;
-        await saveOngoingTasks(tasks);
+      checkbox.onchange = () => {
+        tasks[i].done = checkbox.checked;
+        saveOngoingTasks(tasks);
         updateProgressBar();
       };
 
@@ -255,7 +240,6 @@ async function initOngoingTasks() {
     const text = document.getElementById('new-ongoing-task').value.trim();
     if (text) {
       tasks.push({ text, done: false, manual: true });
-      initialTotalTasks++;
       saveOngoingTasks(tasks);
       document.getElementById('new-ongoing-task').value = '';
       renderOngoing();
@@ -264,8 +248,8 @@ async function initOngoingTasks() {
 
   window.resetOngoingTasks = () => {
     tasks = tasks.map(t => ({ ...t, done: false }));
-    completedTasksCount = 0;
     saveOngoingTasks(tasks);
+    celebrationShown = false;
     renderOngoing();
   };
 
@@ -284,11 +268,43 @@ async function saveOngoingTasks(tasks) {
 }
 
 /* ---------------- Progress Bar ---------------- */
-function updateProgressBar() {
-  const percent = initialTotalTasks ? Math.round((completedTasksCount / initialTotalTasks) * 100) : 0;
+async function updateProgressBar() {
+  const daily = await loadTasks();
+  const ongoing = await loadOngoingTasks();
+  const total = daily.length + ongoing.length + (initialTotalTasks - (daily.length + ongoing.length));
+  const completed = initialTotalTasks - (daily.length + ongoing.length);
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+
   document.getElementById('progress-bar').style.width = `${percent}%`;
   document.getElementById('progress-text').textContent = `${percent}% Complete`;
+
+  if (percent === 100 && !celebrationShown) {
+    celebrationShown = true;
+    showCelebration();
+  }
 }
+
+function showCelebration() {
+  for (let i = 0; i < 30; i++) {
+    const emoji = document.createElement('div');
+    emoji.textContent = ['🎉', '✨', '🌟', '🥳'][Math.floor(Math.random() * 4)];
+    emoji.style.position = 'fixed';
+    emoji.style.left = Math.random() * 100 + 'vw';
+    emoji.style.top = '-2rem';
+    emoji.style.fontSize = '1.5rem';
+    emoji.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+    document.body.appendChild(emoji);
+    setTimeout(() => emoji.remove(), 5000);
+  }
+  yaySound.play();
+}
+
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fall {
+  to { transform: translateY(100vh); opacity: 0; }
+}`;
+document.head.appendChild(style);
 
 /* ---------------- Quotes ---------------- */
 async function loadRandomQuote() {
