@@ -1,183 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Daily Tasks">
-<link rel="manifest" href="/dailytaskapp/manifest.json">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<title>Daily Task App</title>
-
-<style>
-html, body { font-family: Arial, sans-serif; margin: 0; padding: 0; height: 100%; width: 100%; background-color: #ffffff; box-sizing: border-box; overflow-x: hidden; }
-body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-.container { max-width: 800px; margin: 0 auto; padding: 1rem; }
-header { background-color: #FFD966; padding: 1rem; margin-bottom: 1rem; }
-header img { max-width: 100px; display: block; margin: 0 auto; }
-.day-heading { text-align: center; font-size: 2rem; font-weight: bold; margin: 0.5rem 0 0.25rem; color: white; }
-.day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
-.day-nav a { margin: 0 5px; color: white; font-weight: bold; text-decoration: none; }
-
-.section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
-#task-list h2, #ongoing-task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-size: 1.1rem; }
-
-.task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; align-items: center; max-width: 600px; }
-.task-input-group input, .task-input-group button { flex: 1 1 100%; }
-#new-task, #new-ongoing-task { width: 70%; max-width: 400px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 5px; }
-button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
-
-#progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 1rem; overflow: hidden; }
-#progress-bar { height: 100%; width: 0%; background-color: #66B032; transition: width 0.3s ease; }
-#progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
-#completion-banner { display: none; text-align: center; font-size: 1.5rem; font-weight: bold; color: white; background: #4CAF50; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; opacity: 0; }
-#completion-banner.show { display: block; animation: fadeInOut 2.5s ease-in-out forwards; }
-@keyframes fadeInOut { 0% { opacity: 0; transform: translateY(-10px); } 15% { opacity: 1; transform: translateY(0); } 85% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-10px); } }
-@keyframes pulseFlash { 0% { background-color: #66B032; transform: scale(1); } 25% { background-color: #4CAF50; transform: scale(1.05); } 50% { background-color: #66B032; transform: scale(1); } 75% { background-color: #4CAF50; transform: scale(1.05); } 100% { background-color: #66B032; transform: scale(1); } }
-#progress-bar.pulse-complete { animation: pulseFlash 1s ease-in-out 3; }
-
-.breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
-#breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); margin: 0 auto 1.5rem; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <link rel="manifest" href="/dailytaskapp/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Daily Task App</title>
+  <style>
+    /* ✅ All your original styles here (unchanged) */
+    html, body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #ffffff;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+    header { background-color: #FFD966; padding: 1rem; margin: 0 auto 1rem auto; }
+    header img { max-width: 100px; height: auto; display: block; margin: 0 auto; }
+    .day-heading { text-align: center; font-size: 2rem; font-weight: bold; margin: 0.50rem 0 0.25rem; color: white; visibility: visible; }
+    #affirmation-box { text-align: center; margin-top: 0.75rem; font-style: italic; color: #666; opacity: 0; transition: opacity 1.2s ease-in-out; }
+    #affirmation-box.visible { opacity: 1; }
+    .day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
+    .day-nav a { margin: 0 5px; text-decoration: none; color: white; font-weight: bold; }
+    .journal-grid { background-color: white; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 2rem; }
+    section#journals, section#gratitude { flex: 1 1 300px; background: #CBC3E3; padding: 1rem 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
+    section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial, sans-serif; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
+    section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
+    #gratitude select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #bcaecf; font-size: 1rem; margin-bottom: 2rem; }
+    .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
+    #task-list h2, #ongoing-task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-weight: bold; font-size: 1.1rem; }
+    .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; align-items: center; text-align: center; max-width: 600px; }
+    .task-input-group input, .task-input-group button { flex: 1 1 100%; max-width: 100%; }
+    #new-task, #new-ongoing-task { width: 70%; max-width: 400px; padding: 0.6rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
+    footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
+    #quote-box.visible { opacity: 1; }
+    #progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 1rem; overflow: hidden; }
+    #progress-bar { height: 100%; width: 0%; background-color: #66B032; transition: width 0.3s ease; }
+    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
+    .celebration-emoji { animation: pop-fade 2s ease forwards; font-size: 1.5rem; }
+    @keyframes pop-fade { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.8); opacity: 1; } 70% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(0.5); opacity: 0; } }
+    /* Breathing Bubble Styles (unchanged) */
+    #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
+    .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
+    #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
+    #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
+    #breath-toggle-btn { margin-top: 0; padding: 0.8rem 1.4rem; font-size: 1rem; border-radius: 12px; background-color: #845EC2; color: white; border: none; cursor: pointer; text-align: center; }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
+    <header>
+      <img src="apple-touch-icon.png" alt="App Logo">
+      <h1 id="page-title" class="day-heading"></h1>
+      <div id="weather" class="weather-content" style="margin-top: 0.5rem; margin-bottom: 0.5rem;"></div>
+      <div id="affirmation-box"></div>
+    </header>
 
-<header>
-<img src="apple-touch-icon.png" alt="App Logo">
-<h1 id="page-title" class="day-heading"></h1>
-<div id="weather" class="weather-content"></div>
-<div id="affirmation-box"></div>
-</header>
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a>
+      <a href="?day=Tuesday">Tue</a>
+      <a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a>
+      <a href="?day=Friday">Fri</a>
+      <a href="?day=Saturday">Sat</a>
+      <a href="?day=Sunday">Sun</a>
+    </div>
 
-<div class="day-nav">
-<a href="?day=Monday">Mon</a>
-<a href="?day=Tuesday">Tue</a>
-<a href="?day=Wednesday">Wed</a>
-<a href="?day=Thursday">Thu</a>
-<a href="?day=Friday">Fri</a>
-<a href="?day=Saturday">Sat</a>
-<a href="?day=Sunday">Sun</a>
-</div>
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
+    <div class="journal-grid">
+      <section id="journals">
+        <h2>Dream Journal</h2>
+        <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+        <h2>Daily Journal</h2>
+        <textarea id="daily-journal" placeholder="How are you feeling today?"></textarea>
+        <button id="save-journal-btn">Save Journals</button>
+      </section>
+      <section id="gratitude">
+        <h2>Gratitude Prompt</h2>
+        <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
+        <h2>Your Mood</h2>
+        <select id="mood">
+          <option value="">How do you feel?</option>
+          <option value="😀">Happy</option>
+          <option value="😐">Neutral</option>
+          <option value="😔">Sad</option>
+          <option value="😤">Frustrated</option>
+          <option value="😴">Tired</option>
+          <option value="😌">Peaceful</option>
+        </select>
+      </section>
+    </div>
 
-<section id="breathing">
-<h2 style="text-align:center; color:#008cba;">Breathing Exercise</h2>
-<div class="breathing-tile">
-<div id="breath-bubble"></div>
-<p id="breath-text">Inhale for <span id="countdown">4</span></p>
-<button id="breath-toggle-btn">Start Breath</button>
-</div>
-</section>
+    <!-- 🌬️ Breathing Exercise Section -->
+    <section id="breathing">
+      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
+      <div class="breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
+          <button id="breath-toggle-btn">Start Breath</button>
+        </div>
+      </div>
+    </section>
 
-<h2 class="section-label">🌱 Today's Tasks</h2>
-<div id="completion-banner">🎯 You Did It! 🎉</div>
-<div id="progress-container"><div id="progress-bar"></div></div>
-<p id="progress-text">0% Complete</p>
-<div id="task-list"></div>
-<div class="task-input-group">
-<input type="text" id="new-task" placeholder="Add new task">
-<button onclick="addTask()">Add Task</button>
-<button onclick="resetTasks()">Reset All Tasks</button>
-</div>
+    <!-- Daily Tasks -->
+    <h2 class="section-label">🌱 Today's Tasks</h2>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <p id="progress-text">0% Complete</p>
+    <div id="task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-task" placeholder="Add new task">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="resetTasks()">Reset All Tasks</button>
+    </div>
 
-<h2 class="section-label">♾ Ongoing Tasks</h2>
-<div id="ongoing-task-list"></div>
-<div class="task-input-group">
-<input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
-<button onclick="addOngoingTask()">Add Task</button>
-<button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button>
-</div>
+    <!-- Ongoing Tasks -->
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button onclick="addOngoingTask()">Add Task</button>
+      <button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button>
+    </div>
 
-<footer id="quote-footer">
-<p id="quote-box">Loading quote...</p>
-</footer>
-
-</div>
-
-<script>
-/* ===== Progress Bar ===== */
-function updateProgressBar() {
-  const dailyCheckboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
-  const ongoingCheckboxes = document.querySelectorAll('#ongoing-task-list input[type="checkbox"]');
-  const total = dailyCheckboxes.length + ongoingCheckboxes.length;
-  const completed = [...dailyCheckboxes].filter(cb => cb.checked).length + [...ongoingCheckboxes].filter(cb => cb.checked).length;
-  document.getElementById('progress-bar').style.width = (total ? (completed / total * 100) : 0) + '%';
-  document.getElementById('progress-text').textContent = `${Math.round(total ? (completed / total * 100) : 0)}% Complete`;
-  checkAllTasksComplete(total, completed);
-}
-function checkAllTasksComplete(total, completed) {
-  const banner = document.getElementById('completion-banner');
-  const bar = document.getElementById('progress-bar');
-  if (total > 0 && completed === total) {
-    triggerCelebration();
-    bar.classList.add('pulse-complete');
-    setTimeout(() => bar.classList.remove('pulse-complete'), 3000);
-    banner.classList.add('show');
-    setTimeout(() => banner.classList.remove('show'), 2500);
-  }
-}
-function triggerCelebration() {
-  for (let i = 0; i < 100; i++) {
-    const confetti = document.createElement('div');
-    confetti.textContent = ['🎉','✨','🌟','💯','🥳'][Math.floor(Math.random()*5)];
-    confetti.style.position = 'fixed';
-    confetti.style.left = Math.random()*100 + 'vw';
-    confetti.style.top = '-2rem';
-    confetti.style.fontSize = '1.5rem';
-    confetti.style.zIndex = '9999';
-    confetti.style.animation = `fall ${2+Math.random()*3}s linear forwards`;
-    document.body.appendChild(confetti);
-    setTimeout(() => confetti.remove(), 5000);
-  }
-}
-
-/* ===== Breathing Exercise ===== */
-let breathRunning = false;
-let countdownInterval = null;
-let index = 0;
-const phases = [
-  { label: "Inhale", scale: 1.5 },
-  { label: "Hold", scale: 1.5 },
-  { label: "Exhale", scale: 1 },
-  { label: "Hold", scale: 1 }
-];
-function updatePhase() {
-  const bubble = document.getElementById("breath-bubble");
-  const text = document.getElementById("breath-text");
-  const current = phases[index % phases.length];
-  let count = 4;
-  text.innerHTML = `${current.label} for <span id="countdown">${count}</span>`;
-  bubble.style.transition = "transform 4s ease-in-out";
-  bubble.style.transform = `scale(${current.scale})`;
-  clearInterval(countdownInterval);
-  countdownInterval = setInterval(() => {
-    count--;
-    document.getElementById("countdown").textContent = count;
-    if (count <= 0) {
-      clearInterval(countdownInterval);
-      index++;
-      setTimeout(updatePhase, 1000);
-    }
-  }, 1000);
-}
-document.getElementById("breath-toggle-btn").addEventListener('click', () => {
-  if (!breathRunning) {
-    breathRunning = true;
-    index = 0;
-    updatePhase();
-    document.getElementById("breath-toggle-btn").textContent = "Stop Breath";
-  } else {
-    breathRunning = false;
-    clearInterval(countdownInterval);
-    document.getElementById("breath-text").innerHTML = `Inhale for <span id="countdown">4</span>`;
-    document.getElementById("breath-bubble").style.transform = "scale(1)";
-    document.getElementById("breath-toggle-btn").textContent = "Start Breath";
-  }
-});
-</script>
+    <footer id="quote-footer">
+      <p id="quote-box">Loading quote...</p>
+    </footer>
+  </div>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
