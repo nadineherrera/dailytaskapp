@@ -19,9 +19,8 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
-// Cache tasks in memory so we don't reload every time we update
-let dailyTasksCache = [];
-let ongoingTasksCache = [];
+let initialTotalTasks = 0; // ✅ store total from start
+let completedTasksCount = 0; // ✅ track how many completed so far
 
 setupApp();
 
@@ -142,24 +141,26 @@ function getDefaultTasksForDay(day) {
 
 /* ---------------- Daily Tasks ---------------- */
 async function initTaskApp() {
-  dailyTasksCache = await loadTasks();
-  renderTasks();
-}
-
-function renderTasks() {
   const taskList = document.getElementById('task-list');
-  taskList.innerHTML = '';
-  dailyTasksCache.forEach((task, i) => {
-    const h2 = document.createElement('h2');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = task.done;
+  let tasks = await loadTasks();
 
-    checkbox.onchange = () => {
-      dailyTasksCache[i].done = checkbox.checked;
-      saveTasks(dailyTasksCache);
+  initialTotalTasks += tasks.length; // ✅ set initial total ONCE
 
-      if (checkbox.checked) {
+  function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+
+      checkbox.onchange = async () => {
+        if (!tasks[i].done) {
+          completedTasksCount++; // ✅ only count once
+        }
+        tasks[i].done = true;
+        await saveTasks(tasks);
+
         yaySound.play();
         const emoji = document.createElement('span');
         emoji.textContent = '🎉';
@@ -167,21 +168,43 @@ function renderTasks() {
         h2.appendChild(emoji);
 
         setTimeout(() => {
-          dailyTasksCache.splice(i, 1); // REMOVE task
-          saveTasks(dailyTasksCache);
+          tasks.splice(i, 1); // ✅ remove from list visually
+          saveTasks(tasks);
           renderTasks();
-        }, 500);
-      }
-      updateProgressBar();
-    };
+        }, 800);
 
-    const span = document.createElement('span');
-    span.textContent = task.text;
-    h2.appendChild(checkbox);
-    h2.appendChild(span);
-    taskList.appendChild(h2);
-  });
-  updateProgressBar();
+        updateProgressBar();
+      };
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      taskList.appendChild(h2);
+    });
+    updateProgressBar();
+  }
+
+  window.addTask = () => {
+    const text = document.getElementById('new-task').value.trim();
+    if (text) {
+      tasks.push({ text, done: false, manual: true });
+      initialTotalTasks++; // ✅ increase total
+      saveTasks(tasks);
+      document.getElementById('new-task').value = '';
+      renderTasks();
+    }
+  };
+
+  window.resetTasks = () => {
+    tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
+    initialTotalTasks = tasks.length;
+    completedTasksCount = 0;
+    saveTasks(tasks);
+    renderTasks();
+  };
+
+  renderTasks();
 }
 
 async function loadTasks() {
@@ -195,58 +218,58 @@ async function saveTasks(tasks) {
   await setDoc(ref, { tasks });
 }
 
-window.addTask = () => {
-  const text = document.getElementById('new-task').value.trim();
-  if (text) {
-    dailyTasksCache.push({ text, done: false, manual: true });
-    saveTasks(dailyTasksCache);
-    document.getElementById('new-task').value = '';
-    renderTasks();
-  }
-};
-
-window.resetTasks = () => {
-  dailyTasksCache = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
-  saveTasks(dailyTasksCache);
-  renderTasks();
-};
-
 /* ---------------- Ongoing Tasks ---------------- */
 async function initOngoingTasks() {
-  ongoingTasksCache = await loadOngoingTasks();
-  renderOngoing();
-}
-
-function renderOngoing() {
   const ongoingList = document.getElementById('ongoing-task-list');
-  ongoingList.innerHTML = '';
-  ongoingTasksCache.forEach((task, i) => {
-    const h2 = document.createElement('h2');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = task.done;
+  let tasks = await loadOngoingTasks();
 
-    checkbox.onchange = () => {
-      ongoingTasksCache[i].done = checkbox.checked;
-      saveOngoingTasks(ongoingTasksCache);
+  initialTotalTasks += tasks.length; // ✅ include ongoing in total
 
-      if (checkbox.checked) {
-        setTimeout(() => {
-          ongoingTasksCache.splice(i, 1); // REMOVE task
-          saveOngoingTasks(ongoingTasksCache);
-          renderOngoing();
-        }, 500);
-      }
-      updateProgressBar();
-    };
+  function renderOngoing() {
+    ongoingList.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
 
-    const span = document.createElement('span');
-    span.textContent = task.text;
-    h2.appendChild(checkbox);
-    h2.appendChild(span);
-    ongoingList.appendChild(h2);
-  });
-  updateProgressBar();
+      checkbox.onchange = async () => {
+        if (!tasks[i].done) {
+          completedTasksCount++;
+        }
+        tasks[i].done = true;
+        await saveOngoingTasks(tasks);
+        updateProgressBar();
+      };
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      ongoingList.appendChild(h2);
+    });
+    updateProgressBar();
+  }
+
+  window.addOngoingTask = () => {
+    const text = document.getElementById('new-ongoing-task').value.trim();
+    if (text) {
+      tasks.push({ text, done: false, manual: true });
+      initialTotalTasks++;
+      saveOngoingTasks(tasks);
+      document.getElementById('new-ongoing-task').value = '';
+      renderOngoing();
+    }
+  };
+
+  window.resetOngoingTasks = () => {
+    tasks = tasks.map(t => ({ ...t, done: false }));
+    completedTasksCount = 0;
+    saveOngoingTasks(tasks);
+    renderOngoing();
+  };
+
+  renderOngoing();
 }
 
 async function loadOngoingTasks() {
@@ -260,27 +283,9 @@ async function saveOngoingTasks(tasks) {
   await setDoc(ref, { tasks });
 }
 
-window.addOngoingTask = () => {
-  const text = document.getElementById('new-ongoing-task').value.trim();
-  if (text) {
-    ongoingTasksCache.push({ text, done: false, manual: true });
-    saveOngoingTasks(ongoingTasksCache);
-    document.getElementById('new-ongoing-task').value = '';
-    renderOngoing();
-  }
-};
-
-window.resetOngoingTasks = () => {
-  ongoingTasksCache = ongoingTasksCache.map(t => ({ ...t, done: false }));
-  saveOngoingTasks(ongoingTasksCache);
-  renderOngoing();
-};
-
 /* ---------------- Progress Bar ---------------- */
-async function updateProgressBar() {
-  const total = dailyTasksCache.length + ongoingTasksCache.length;
-  const completed = dailyTasksCache.filter(t => t.done).length + ongoingTasksCache.filter(t => t.done).length;
-  const percent = total ? Math.round((completed / total) * 100) : 0;
+function updateProgressBar() {
+  const percent = initialTotalTasks ? Math.round((completedTasksCount / initialTotalTasks) * 100) : 0;
   document.getElementById('progress-bar').style.width = `${percent}%`;
   document.getElementById('progress-text').textContent = `${percent}% Complete`;
 }
@@ -357,10 +362,10 @@ function successWeather(position) {
       }
 
       document.getElementById('weather').innerHTML = `
-        <div style="font-size: 2rem; margin-bottom: 0.25rem; text-align: center;">${weatherEmoji}</div>
-        <div class="temp" style="text-align: center;">${city}: ${temp}°F</div>
-        <div class="desc" style="text-align: center;">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
-        <div style="text-align: center;">Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
+        <div style="font-size: 2rem; margin-bottom: 0.25rem;">${weatherEmoji}</div>
+        <div class="temp">${city}: ${temp}°F</div>
+        <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
+        <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
       `;
     })
     .catch(() => {
