@@ -283,7 +283,7 @@ async function loadRandomQuote() {
     const snap = await getDocs(collection(db, 'quotes'));
     const quotes = snap.docs.map(doc => doc.data());
     const q = quotes[Math.floor(Math.random() * quotes.length)];
-    box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
+    box.textContent = q ? `\\"${q.text}\\" — ${q.author || 'Unknown'}` : "Stay motivated.";
     box.classList.add('visible');
   } catch {
     box.textContent = "Could not load quote.";
