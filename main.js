@@ -15,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
+
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
@@ -38,6 +39,7 @@ async function setupApp() {
   loadDailyAffirmation();
   await loadJournalEntries();
   startBreathingBubble();
+  getWeather();
 
   const saveBtn = document.getElementById('save-journal-btn');
   if (saveBtn) {
@@ -62,16 +64,11 @@ function getEffectiveDay() {
 /* ---------------- Journals ---------------- */
 async function saveJournalEntries() {
   const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  const gratitudeField = document.getElementById('gratitudeEntry');
-  const moodField = document.getElementById('mood');
-
   const entry = {
-    dream: dreamField?.value.trim() || '',
-    daily: dailyField?.value.trim() || '',
-    gratitude: gratitudeField?.value.trim() || '',
-    mood: moodField?.value || ''
+    dream: document.getElementById('dream-journal')?.value.trim() || '',
+    daily: document.getElementById('daily-journal')?.value.trim() || '',
+    gratitude: document.getElementById('gratitudeEntry')?.value.trim() || '',
+    mood: document.getElementById('mood')?.value || ''
   };
 
   try {
@@ -86,20 +83,15 @@ async function saveJournalEntries() {
 
 async function loadJournalEntries() {
   const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  const gratitudeField = document.getElementById('gratitudeEntry');
-  const moodField = document.getElementById('mood');
-
   try {
     const ref = doc(db, 'users', userId, 'journals', day);
     const snap = await getDoc(ref);
     if (snap.exists()) {
       const data = snap.data();
-      dreamField.value = data.dream || '';
-      dailyField.value = data.daily || '';
-      gratitudeField.value = data.gratitude || '';
-      moodField.value = data.mood || '';
+      document.getElementById('dream-journal').value = data.dream || '';
+      document.getElementById('daily-journal').value = data.daily || '';
+      document.getElementById('gratitudeEntry').value = data.gratitude || '';
+      document.getElementById('mood').value = data.mood || '';
     }
   } catch (err) {
     console.error("Failed to load journal:", err);
@@ -112,4 +104,287 @@ async function ensureAllDaysInitialized() {
   for (const day of days) {
     const dailyRef = doc(db, 'users', userId, day, 'tasks');
     const dailySnap = await getDoc(dailyRef);
-    if (!dailySnap.exists() || !Array.isArray(dailySnap.d
+    if (!dailySnap.exists()) {
+      const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
+      await setDoc(dailyRef, { tasks: defaults });
+    }
+  }
+  const ongoingRef = doc(db, 'users', userId, 'ongoing', 'tasks');
+  const ongoingSnap = await getDoc(ongoingRef);
+  if (!ongoingSnap.exists()) {
+    await setDoc(ongoingRef, { tasks: [] });
+  }
+}
+
+function getDefaultTasksForDay(day) {
+  const base = [
+    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
+    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
+    "Spend Time With Family", "15-Minute Clean Up", "Learn Spanish",
+    "Check Email", "Check Social Media", "Strength Train", "Read", "Journal",
+    "Drink Water", "Update Tasks"
+  ];
+  const addOns = {
+    Monday: ["Work for 5 Hours at Apple"],
+    Tuesday: ["Work for 5 Hours at Apple"],
+    Wednesday: ["2 PM Therapy Session"],
+    Thursday: ["Work on Alchemy Body Werks"],
+    Friday: ["Pay Bills", "Call IRS"],
+    Saturday: ["Deep Clean", "Laundry"],
+    Sunday: ["CSU Homework"]
+  };
+  return [...base, ...(addOns[day] || [])];
+}
+
+/* ---------------- Daily Tasks ---------------- */
+async function initTaskApp() {
+  const taskList = document.getElementById('task-list');
+  let tasks = await loadTasks();
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+
+      checkbox.onchange = () => {
+        tasks[i].done = checkbox.checked;
+        saveTasks(tasks);
+
+        if (checkbox.checked) {
+          yaySound.play();
+          const emoji = document.createElement('span');
+          emoji.textContent = '🎉';
+          emoji.className = 'celebration-emoji';
+          h2.appendChild(emoji);
+          setTimeout(() => {
+            tasks.splice(i, 1);
+            saveTasks(tasks);
+            renderTasks();
+          }, 800);
+        }
+        updateProgressBar();
+      };
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      taskList.appendChild(h2);
+    });
+    updateProgressBar();
+  }
+
+  window.addTask = () => {
+    const text = document.getElementById('new-task').value.trim();
+    if (text) {
+      tasks.push({ text, done: false, manual: true });
+      saveTasks(tasks);
+      document.getElementById('new-task').value = '';
+      renderTasks();
+    }
+  };
+
+  window.resetTasks = () => {
+    tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
+    saveTasks(tasks);
+    renderTasks();
+  };
+
+  renderTasks();
+}
+
+async function loadTasks() {
+  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().tasks : [];
+}
+
+async function saveTasks(tasks) {
+  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
+  await setDoc(ref, { tasks });
+}
+
+/* ---------------- Ongoing Tasks ---------------- */
+async function initOngoingTasks() {
+  const ongoingList = document.getElementById('ongoing-task-list');
+  let tasks = await loadOngoingTasks();
+
+  function renderOngoing() {
+    ongoingList.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+
+      checkbox.onchange = () => {
+        tasks[i].done = checkbox.checked;
+        saveOngoingTasks(tasks);
+        updateProgressBar();
+      };
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      ongoingList.appendChild(h2);
+    });
+    updateProgressBar();
+  }
+
+  window.addOngoingTask = () => {
+    const text = document.getElementById('new-ongoing-task').value.trim();
+    if (text) {
+      tasks.push({ text, done: false, manual: true });
+      saveOngoingTasks(tasks);
+      document.getElementById('new-ongoing-task').value = '';
+      renderOngoing();
+    }
+  };
+
+  window.resetOngoingTasks = () => {
+    tasks = tasks.map(t => ({ ...t, done: false }));
+    saveOngoingTasks(tasks);
+    renderOngoing();
+  };
+
+  renderOngoing();
+}
+
+async function loadOngoingTasks() {
+  const ref = doc(db, 'users', userId, 'ongoing', 'tasks');
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().tasks : [];
+}
+
+async function saveOngoingTasks(tasks) {
+  const ref = doc(db, 'users', userId, 'ongoing', 'tasks');
+  await setDoc(ref, { tasks });
+}
+
+/* ---------------- Progress Bar ---------------- */
+async function updateProgressBar() {
+  const daily = await loadTasks();
+  const ongoing = await loadOngoingTasks();
+  const total = daily.length + ongoing.length;
+  const completed = daily.filter(t => t.done).length + ongoing.filter(t => t.done).length;
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  document.getElementById('progress-bar').style.width = `${percent}%`;
+  document.getElementById('progress-text').textContent = `${percent}% Complete`;
+}
+
+/* ---------------- Quotes ---------------- */
+async function loadRandomQuote() {
+  const box = document.getElementById('quote-box');
+  try {
+    const snap = await getDocs(collection(db, 'quotes'));
+    const quotes = snap.docs.map(doc => doc.data());
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
+    box.classList.add('visible');
+  } catch {
+    box.textContent = "Could not load quote.";
+  }
+}
+
+/* ---------------- Affirmations ---------------- */
+async function loadDailyAffirmation() {
+  const box = document.getElementById('affirmation-box');
+  const today = getEffectiveDay().toLowerCase();
+  try {
+    const ref = doc(db, 'affirmations', today);
+    const snap = await getDoc(ref);
+    box.textContent = snap.exists()
+      ? `🌿 Affirmation: ${snap.data().text}`
+      : "🌿 No affirmation for today.";
+    box.classList.add('visible');
+  } catch {
+    box.textContent = "🌿 Unable to load affirmation.";
+  }
+}
+
+/* ---------------- Weather ---------------- */
+function getWeather() {
+  if (!navigator.geolocation) {
+    document.getElementById('weather').innerHTML = `<p style="color:#999;">Weather unavailable</p>`;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(successWeather, () => {
+    document.getElementById('weather').innerHTML = `<p style="color:#999;">Weather unavailable</p>`;
+  });
+}
+
+function successWeather(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+  const apiKey = 'c30f91e272b6b6c6d468994f7abfdabe';
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const city = data.name || "Your Location";
+      const temp = Math.round(data.main.temp);
+      const feelsLike = Math.round(data.main.feels_like);
+      const desc = data.weather[0].description;
+      const humidity = data.main.humidity;
+      const weatherMain = data.weather[0].main;
+
+      let weatherEmoji = "🌡️";
+      switch (weatherMain.toLowerCase()) {
+        case "clear": weatherEmoji = "☀️"; break;
+        case "clouds": weatherEmoji = "🌤️"; break;
+        case "rain":
+        case "drizzle": weatherEmoji = "🌧️"; break;
+        case "thunderstorm": weatherEmoji = "⛈️"; break;
+        case "snow": weatherEmoji = "❄️"; break;
+        case "mist":
+        case "fog":
+        case "haze": weatherEmoji = "🌫️"; break;
+        default: weatherEmoji = "🌡️";
+      }
+
+      document.getElementById('weather').innerHTML = `
+        <div style="font-size: 2rem; margin-bottom: 0.25rem;">${weatherEmoji}</div>
+        <div class="temp">${city}: ${temp}°F</div>
+        <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
+        <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
+      `;
+    })
+    .catch(() => {
+      document.getElementById('weather').innerHTML = `<p style="color:#999;">Weather unavailable</p>`;
+    });
+}
+
+/* ---------------- Breathing ---------------- */
+function startBreathingBubble() {
+  const bubble = document.getElementById('breath-bubble');
+  const text = document.getElementById('breath-text');
+  const button = document.getElementById('breath-toggle-btn');
+
+  let cycle = ["Inhale", "Hold", "Exhale", "Hold"];
+  let index = 0;
+  let intervalId = null;
+
+  function updateText() {
+    text.textContent = `${cycle[index % cycle.length]} for 4`;
+    index++;
+    bubble.classList.toggle('breathe-animation');
+  }
+
+  button.addEventListener('click', () => {
+    if (!intervalId) {
+      updateText();
+      intervalId = setInterval(updateText, 4000);
+      button.textContent = 'Stop Breath';
+    } else {
+      clearInterval(intervalId);
+      intervalId = null;
+      bubble.classList.remove('breathe-animation');
+      button.textContent = 'Start Breath';
+    }
+  });
+}
