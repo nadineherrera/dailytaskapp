@@ -20,101 +20,67 @@ yaySound.volume = 1.0;
 
 setupApp();
 
-function updatePageTitle() {
-  const title = document.getElementById('page-title');
-  const day = getEffectiveDay();
-  if (title) {
-    title.textContent = day;
-    title.style.visibility = 'visible';
-  }
-}
-
 async function setupApp() {
   updatePageTitle();
-  const currentDayLabel = document.getElementById('current-day-label');
-  const effectiveDay = getEffectiveDay();
-  if (currentDayLabel) {
-    currentDayLabel.textContent = `You’re viewing: ${effectiveDay}`;
-  }
   await ensureAllDaysInitialized();
   await initTaskApp();
+  await initOngoingTaskApp();
   loadRandomQuote();
   loadDailyAffirmation();
   await loadJournalEntries();
   startBreathingBubble();
 
   const saveBtn = document.getElementById('save-journal-btn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveJournalEntries);
+  if (saveBtn) saveBtn.addEventListener('click', saveJournalEntries);
+}
+
+function updatePageTitle() {
+  const title = document.getElementById('page-title');
+  if (title) {
+    title.textContent = getEffectiveDay();
+    title.style.visibility = 'visible';
   }
 }
 
 function getCurrentDay() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const paramDay = urlParams.get('day');
+  const paramDay = new URLSearchParams(window.location.search).get('day');
   const validDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   return validDays.includes(paramDay) ? paramDay : null;
 }
 
 function getEffectiveDay() {
-  const currentDay = getCurrentDay();
-  if (currentDay) return currentDay;
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  return today.charAt(0).toUpperCase() + today.slice(1);
+  return getCurrentDay() || new Date().toLocaleDateString('en-US', { weekday: 'long' });
 }
 
+/* ===== JOURNALS ===== */
 async function saveJournalEntries() {
   const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  const dream = dreamField?.value.trim() || '';
-  const daily = dailyField?.value.trim() || '';
-  const entry = { dream, daily };
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    await setDoc(ref, entry, { merge: true });
-
-    // ✅ Clear the inputs after saving
-    if (dreamField) dreamField.value = '';
-    if (dailyField) dailyField.value = '';
-
-    alert("Journal entry saved!");
-  } catch (err) {
-    console.error("Error saving journal:", err);
-    alert("Failed to save entry.");
-  }
+  const entry = {
+    dream: document.getElementById('dream-journal')?.value.trim() || '',
+    daily: document.getElementById('daily-journal')?.value.trim() || ''
+  };
+  await setDoc(doc(db, 'users', userId, 'journals', day), entry, { merge: true });
+  alert("Journal entry saved!");
 }
 
 async function loadJournalEntries() {
   const day = getEffectiveDay();
-  const dreamField = document.getElementById('dream-journal');
-  const dailyField = document.getElementById('daily-journal');
-  if (!dreamField || !dailyField) return;
-
-  try {
-    const ref = doc(db, 'users', userId, 'journals', day);
-    const snap = await getDoc(ref);
-
-    if (snap.exists()) {
-      const data = snap.data();
-      dreamField.value = data.dream || '';
-      dailyField.value = data.daily || '';
-    } else {
-      dreamField.value = '';
-      dailyField.value = '';
-    }
-  } catch (err) {
-    console.error("Failed to load journal:", err);
+  const ref = doc(db, 'users', userId, 'journals', day);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const data = snap.data();
+    document.getElementById('dream-journal').value = data.dream || '';
+    document.getElementById('daily-journal').value = data.daily || '';
   }
 }
 
+/* ===== TASKS ===== */
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
     const ref = doc(db, 'users', userId, day, 'tasks');
     const snap = await getDoc(ref);
-    if (!snap.exists() || !Array.isArray(snap.data().tasks)) {
+    if (!snap.exists()) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
       await setDoc(ref, { tasks: defaults });
     }
@@ -122,23 +88,7 @@ async function ensureAllDaysInitialized() {
 }
 
 function getDefaultTasksForDay(day) {
-  const base = [
-    "Dream Journal", "Brush Teeth", "Take Medicine", "Take a Shower", "Stretch",
-    "Eat Breakfast", "Walk for 30 Minutes", "Eat Lunch", "Eat Dinner",
-    "Spend Time With Family", "15-Minute Clean Up", "Learn Spanish",
-    "Check Email", "Check Social Media", "Strength Train", "Read", "Journal",
-    "Drink Water", "Update Tasks"
-  ];
-  const addOns = {
-    Monday: ["Work for 5 Hours at Apple"],
-    Tuesday: ["Work for 5 Hours at Apple"],
-    Wednesday: ["2 PM Therapy Session"],
-    Thursday: ["Work on Alchemy Body Werks"],
-    Friday: ["Pay Bills", "Call IRS"],
-    Saturday: ["Deep Clean", "Laundry"],
-    Sunday: ["CSU Homework"]
-  };
-  return [...base, ...(addOns[day] || [])];
+  return ["Dream Journal", "Brush Teeth", "Take Medicine"];
 }
 
 async function initTaskApp() {
@@ -146,78 +96,28 @@ async function initTaskApp() {
   const newTaskInput = document.getElementById('new-task');
   let tasks = await loadTasks();
 
-  function updateProgressBar() {
-    const total = tasks.length;
-    const completed = tasks.filter(t => t.done).length;
-    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-    const bar = document.getElementById('progress-bar');
-    const text = document.getElementById('progress-text');
-    if (bar) bar.style.width = `${percent}%`;
-    if (text) text.textContent = `${percent}% Complete`;
-  }
-
   function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, i) => {
       const h2 = document.createElement('h2');
-      if (task.done) h2.style.opacity = '0.3';
-
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
       checkbox.onchange = () => {
         tasks[i].done = checkbox.checked;
         saveTasks(tasks);
-
-        if (checkbox.checked) {
-          const emoji = document.createElement('span');
-          emoji.textContent = ['🎉', '🌟', '💯', '👏', '👍', '🔥', '⭐️', '🥳', '🎊', '🫶🏼', '💫'][Math.floor(Math.random() * 4)];
-          emoji.classList.add('celebration-emoji');
-          h2.appendChild(emoji);
-          yaySound.currentTime = 0;
-          yaySound.play();
-
-          setTimeout(() => {
-            emoji.remove();
-            h2.style.opacity = '0';
-            h2.style.height = '0';
-            h2.style.overflow = 'hidden';
-            h2.style.margin = '0';
-            h2.style.padding = '0';
-            h2.style.border = 'none';
-            updateProgressBar();
-          }, 2000);
-        } else {
-          renderTasks();
-        }
+        updateProgressBar();
       };
-
-      const span = document.createElement('span');
-      span.textContent = task.text;
       h2.appendChild(checkbox);
-      h2.appendChild(span);
-
-      if (task.manual) {
-        const del = document.createElement('button');
-        del.textContent = 'ⅹ';
-        del.onclick = () => {
-          tasks.splice(i, 1);
-          saveTasks(tasks);
-          renderTasks();
-        };
-        h2.appendChild(del);
-      }
-
+      h2.appendChild(document.createTextNode(task.text));
       taskList.appendChild(h2);
     });
-
     updateProgressBar();
   }
 
   window.addTask = () => {
-    const text = newTaskInput.value.trim();
-    if (text) {
-      tasks.push({ text, done: false, manual: true });
+    if (newTaskInput.value.trim()) {
+      tasks.push({ text: newTaskInput.value.trim(), done: false, manual: true });
       saveTasks(tasks);
       newTaskInput.value = '';
       renderTasks();
@@ -234,92 +134,144 @@ async function initTaskApp() {
 }
 
 async function loadTasks() {
-  const day = getEffectiveDay();
-  const ref = doc(db, 'users', userId, day, 'tasks');
+  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
 }
 
 async function saveTasks(tasks) {
-  const day = getEffectiveDay();
-  const ref = doc(db, 'users', userId, day, 'tasks');
-  await setDoc(ref, { tasks });
+  await setDoc(doc(db, 'users', userId, getEffectiveDay(), 'tasks'), { tasks });
 }
 
+/* ===== ONGOING TASKS ===== */
+async function initOngoingTaskApp() {
+  const taskList = document.getElementById('ongoing-task-list');
+  const newTaskInput = document.getElementById('new-ongoing-task');
+  let tasks = await loadOngoingTasks();
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+      checkbox.onchange = () => {
+        tasks[i].done = checkbox.checked;
+        saveOngoingTasks(tasks);
+        updateProgressBar();
+      };
+      h2.appendChild(checkbox);
+      h2.appendChild(document.createTextNode(task.text));
+      taskList.appendChild(h2);
+    });
+    updateProgressBar();
+  }
+
+  window.addOngoingTask = () => {
+    if (newTaskInput.value.trim()) {
+      tasks.push({ text: newTaskInput.value.trim(), done: false });
+      saveOngoingTasks(tasks);
+      newTaskInput.value = '';
+      renderTasks();
+    }
+  };
+
+  window.resetOngoingTasks = () => {
+    tasks = tasks.map(t => ({ ...t, done: false }));
+    saveOngoingTasks(tasks);
+    renderTasks();
+  };
+
+  renderTasks();
+}
+
+async function loadOngoingTasks() {
+  const ref = doc(db, 'users', userId, 'ongoing', 'tasks');
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data().tasks : [];
+}
+
+async function saveOngoingTasks(tasks) {
+  await setDoc(doc(db, 'users', userId, 'ongoing', 'tasks'), { tasks });
+}
+
+/* ===== PROGRESS BAR ===== */
+function updateProgressBar() {
+  const dailyCheckboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+  const ongoingCheckboxes = document.querySelectorAll('#ongoing-task-list input[type="checkbox"]');
+  const total = dailyCheckboxes.length + ongoingCheckboxes.length;
+  const completed = [...dailyCheckboxes].filter(cb => cb.checked).length + [...ongoingCheckboxes].filter(cb => cb.checked).length;
+  document.getElementById('progress-bar').style.width = (total ? (completed / total * 100) : 0) + '%';
+  document.getElementById('progress-text').textContent = `${Math.round(total ? (completed / total * 100) : 0)}% Complete`;
+}
+
+/* ===== QUOTES & AFFIRMATIONS ===== */
 async function loadRandomQuote() {
   const box = document.getElementById('quote-box');
   if (!box) return;
-
-  try {
-    const snap = await getDocs(collection(db, 'quotes'));
-    const quotes = snap.docs.map(doc => doc.data());
-    const q = quotes[Math.floor(Math.random() * quotes.length)];
-    box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
-    box.classList.add('visible');
-  } catch (e) {
-    console.error(e);
-    box.textContent = "Could not load quote.";
-  }
+  const snap = await getDocs(collection(db, 'quotes'));
+  const quotes = snap.docs.map(doc => doc.data());
+  const q = quotes[Math.floor(Math.random() * quotes.length)];
+  box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
+  box.classList.add('visible');
 }
 
 async function loadDailyAffirmation() {
   const box = document.getElementById('affirmation-box');
   if (!box) return;
-
-  const urlDay = new URLSearchParams(window.location.search).get('day');
-  const today = (urlDay || new Date().toLocaleDateString('en-US', { weekday: 'long' })).toLowerCase();
-
-  try {
-    const ref = doc(db, 'affirmations', today);
-    const snap = await getDoc(ref);
-    box.textContent = snap.exists()
-      ? `🌿  Affirmation: ${snap.data().text}`
-      : "🌿  No affirmation for today.";
-    box.classList.add('visible');
-  } catch (e) {
-    console.error(e);
-    box.textContent = "🌿  Unable to load affirmation.";
-  }
+  const ref = doc(db, 'affirmations', getEffectiveDay().toLowerCase());
+  const snap = await getDoc(ref);
+  box.textContent = snap.exists()
+    ? `🌿  Affirmation: ${snap.data().text}`
+    : "🌿  No affirmation for today.";
+  box.classList.add('visible');
 }
 
+/* ===== BREATHING BUBBLE ===== */
 function startBreathingBubble() {
   const bubble = document.getElementById('breath-bubble');
   const text = document.getElementById('breath-text');
   const button = document.getElementById('breath-toggle-btn');
   if (!bubble || !text || !button) return;
 
-  let cycle = ["Inhale", "Hold", "Exhale", "Hold"];
-  let index = 0;
-  let intervalId = null;
-  let timeoutId = null;
+  const phases = [
+    { label: "Inhale", scale: 1.5 },
+    { label: "Hold", scale: 1.5 },
+    { label: "Exhale", scale: 1 },
+    { label: "Hold", scale: 1 }
+  ];
+  let index = 0, countdownInterval = null, running = false;
 
-  function updateText() {
-    text.textContent = cycle[index % cycle.length];
-    index++;
+  function updatePhase() {
+    const current = phases[index % phases.length];
+    let count = 4;
+    text.innerHTML = `${current.label} for <span id="countdown">${count}</span>`;
+    bubble.style.transform = `scale(${current.scale})`;
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      count--;
+      document.getElementById("countdown").textContent = count;
+      if (count <= 0) {
+        clearInterval(countdownInterval);
+        index++;
+        setTimeout(updatePhase, 1000);
+      }
+    }, 1000);
   }
-
-  function startSession() {
-    updateText();
-    intervalId = setInterval(updateText, 4000);
-    timeoutId = setTimeout(stopSession, 60000); // 1 minute
-    button.textContent = 'Stop Breath';
-  }
-
-  function stopSession() {
-    clearInterval(intervalId);
-    clearTimeout(timeoutId);
-    text.textContent = 'Inhale';
-    button.textContent = 'Start Breath';
-  }
-
-  let isRunning = false;
 
   button.addEventListener('click', () => {
-    if (!isRunning) {
-      startSession();
+    if (!running) {
+      running = true;
+      index = 0;
+      updatePhase();
+      button.textContent = "Stop Breath";
     } else {
-      stopSession();
+      running = false;
+      clearInterval(countdownInterval);
+      text.innerHTML = `Inhale for <span id="countdown">4</span>`;
+      bubble.style.transform = "scale(1)";
+      button.textContent = "Start Breath";
     }
-    isRunning = !isRunning;
   });
 }
