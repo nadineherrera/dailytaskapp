@@ -1,13 +1,13 @@
 {
   "name": "Daily Task App",
   "short_name": "DailyTasks",
-  "start_url": "/dailytaskapp/index.html",
+  "start_url": "/dailytaskapp/index.html?source=pwa",
   "scope": "/dailytaskapp/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#66B032",
-  "description": "A motivating, cross-device daily checklist that syncs with Firebase and features dynamic quotes.",
+  "description": "A motivating, cross-device daily checklist that syncs with Firebase, tracks daily and ongoing tasks, and features dynamic quotes.",
   "icons": [
     {
       "src": "icon-192.png",
@@ -24,26 +24,10 @@
     {
       "src": "apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     }
   ],
   "categories": ["productivity", "wellness", "organization"],
   "lang": "en-US",
-  "dir": "ltr",
-  "prefer_related_applications": false,
-  "shortcuts": [
-    {
-      "name": "Add Task",
-      "short_name": "New Task",
-      "description": "Quickly add a task to your list",
-      "url": "/dailytaskapp/index.html#new-task"
-    },
-    {
-      "name": "Breathing Exercise",
-      "short_name": "Breathe",
-      "description": "Jump to the breathing exercise",
-      "url": "/dailytaskapp/index.html#breathing"
-    }
-  ]
+  "dir": "ltr"
 }
