@@ -19,6 +19,9 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
+let dailyTasksCache = [];
+let ongoingTasksCache = [];
+
 setupApp();
 
 function updatePageTitle() {
@@ -139,19 +142,19 @@ function getDefaultTasksForDay(day) {
 /* ---------------- Daily Tasks ---------------- */
 async function initTaskApp() {
   const taskList = document.getElementById('task-list');
-  let tasks = await loadTasks();
+  dailyTasksCache = await loadTasks();
 
   function renderTasks() {
     taskList.innerHTML = '';
-    tasks.forEach((task, i) => {
+    dailyTasksCache.forEach((task, i) => {
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
 
       checkbox.onchange = () => {
-        tasks[i].done = checkbox.checked;
-        saveTasks(tasks);
+        dailyTasksCache[i].done = checkbox.checked;
+        saveTasks(dailyTasksCache);
 
         if (checkbox.checked) {
           yaySound.play();
@@ -159,11 +162,6 @@ async function initTaskApp() {
           emoji.textContent = '🎉';
           emoji.className = 'celebration-emoji';
           h2.appendChild(emoji);
-          setTimeout(() => {
-            tasks.splice(i, 1);
-            saveTasks(tasks);
-            renderTasks();
-          }, 800);
         }
         updateProgressBar();
       };
@@ -180,16 +178,16 @@ async function initTaskApp() {
   window.addTask = () => {
     const text = document.getElementById('new-task').value.trim();
     if (text) {
-      tasks.push({ text, done: false, manual: true });
-      saveTasks(tasks);
+      dailyTasksCache.push({ text, done: false, manual: true });
+      saveTasks(dailyTasksCache);
       document.getElementById('new-task').value = '';
       renderTasks();
     }
   };
 
   window.resetTasks = () => {
-    tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
-    saveTasks(tasks);
+    dailyTasksCache = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
+    saveTasks(dailyTasksCache);
     renderTasks();
   };
 
@@ -210,19 +208,19 @@ async function saveTasks(tasks) {
 /* ---------------- Ongoing Tasks ---------------- */
 async function initOngoingTasks() {
   const ongoingList = document.getElementById('ongoing-task-list');
-  let tasks = await loadOngoingTasks();
+  ongoingTasksCache = await loadOngoingTasks();
 
   function renderOngoing() {
     ongoingList.innerHTML = '';
-    tasks.forEach((task, i) => {
+    ongoingTasksCache.forEach((task, i) => {
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = task.done;
 
       checkbox.onchange = () => {
-        tasks[i].done = checkbox.checked;
-        saveOngoingTasks(tasks);
+        ongoingTasksCache[i].done = checkbox.checked;
+        saveOngoingTasks(ongoingTasksCache);
         updateProgressBar();
       };
 
@@ -238,16 +236,16 @@ async function initOngoingTasks() {
   window.addOngoingTask = () => {
     const text = document.getElementById('new-ongoing-task').value.trim();
     if (text) {
-      tasks.push({ text, done: false, manual: true });
-      saveOngoingTasks(tasks);
+      ongoingTasksCache.push({ text, done: false, manual: true });
+      saveOngoingTasks(ongoingTasksCache);
       document.getElementById('new-ongoing-task').value = '';
       renderOngoing();
     }
   };
 
   window.resetOngoingTasks = () => {
-    tasks = tasks.map(t => ({ ...t, done: false }));
-    saveOngoingTasks(tasks);
+    ongoingTasksCache = ongoingTasksCache.map(t => ({ ...t, done: false }));
+    saveOngoingTasks(ongoingTasksCache);
     renderOngoing();
   };
 
@@ -266,11 +264,9 @@ async function saveOngoingTasks(tasks) {
 }
 
 /* ---------------- Progress Bar ---------------- */
-async function updateProgressBar() {
-  const daily = await loadTasks();
-  const ongoing = await loadOngoingTasks();
-  const total = daily.length + ongoing.length;
-  const completed = daily.filter(t => t.done).length + ongoing.filter(t => t.done).length;
+function updateProgressBar() {
+  const total = dailyTasksCache.length + ongoingTasksCache.length;
+  const completed = dailyTasksCache.filter(t => t.done).length + ongoingTasksCache.filter(t => t.done).length;
   const percent = total ? Math.round((completed / total) * 100) : 0;
   document.getElementById('progress-bar').style.width = `${percent}%`;
   document.getElementById('progress-text').textContent = `${percent}% Complete`;
@@ -283,7 +279,7 @@ async function loadRandomQuote() {
     const snap = await getDocs(collection(db, 'quotes'));
     const quotes = snap.docs.map(doc => doc.data());
     const q = quotes[Math.floor(Math.random() * quotes.length)];
-    box.textContent = q ? `\\"${q.text}\\" — ${q.author || 'Unknown'}` : "Stay motivated.";
+    box.textContent = q ? `"${q.text}" — ${q.author || 'Unknown'}` : "Stay motivated.";
     box.classList.add('visible');
   } catch {
     box.textContent = "Could not load quote.";
@@ -348,7 +344,7 @@ function successWeather(position) {
       }
 
       document.getElementById('weather').innerHTML = `
-        <div style="font-size: 2rem; margin-bottom: 0.25rem;">${weatherEmoji}</div>
+        <div style="font-size: 2rem;">${weatherEmoji}</div>
         <div class="temp">${city}: ${temp}°F</div>
         <div class="desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</div>
         <div>Feels like: ${feelsLike}°F • Humidity: ${humidity}%</div>
