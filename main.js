@@ -102,7 +102,7 @@ async function loadJournalEntries() {
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
-    const dailyRef = doc(db, 'users', userId, day, 'tasks');
+    const dailyRef = doc(db, 'users', userId, 'dailyTasks', day);
     const dailySnap = await getDoc(dailyRef);
     if (!dailySnap.exists()) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
@@ -190,20 +190,22 @@ async function initTaskApp() {
     tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
     saveTasks(tasks);
     celebrationShown = false;
+    initialTotalTasks = tasks.length + (document.querySelectorAll('#ongoing-task-list h2').length);
     renderTasks();
+    updateProgressBar();
   };
 
   renderTasks();
 }
 
 async function loadTasks() {
-  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
+  const ref = doc(db, 'users', userId, 'dailyTasks', getEffectiveDay());
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
 }
 
 async function saveTasks(tasks) {
-  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
+  const ref = doc(db, 'users', userId, 'dailyTasks', getEffectiveDay());
   await setDoc(ref, { tasks });
 }
 
@@ -250,7 +252,9 @@ async function initOngoingTasks() {
     tasks = tasks.map(t => ({ ...t, done: false }));
     saveOngoingTasks(tasks);
     celebrationShown = false;
+    initialTotalTasks = (document.querySelectorAll('#task-list h2').length) + tasks.length;
     renderOngoing();
+    updateProgressBar();
   };
 
   renderOngoing();
@@ -271,9 +275,9 @@ async function saveOngoingTasks(tasks) {
 async function updateProgressBar() {
   const daily = await loadTasks();
   const ongoing = await loadOngoingTasks();
-  const total = daily.length + ongoing.length + (initialTotalTasks - (daily.length + ongoing.length));
-  const completed = initialTotalTasks - (daily.length + ongoing.length);
-  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const totalRemaining = daily.length + ongoing.length;
+  const completed = initialTotalTasks - totalRemaining;
+  const percent = initialTotalTasks > 0 ? Math.round((completed / initialTotalTasks) * 100) : 0;
 
   document.getElementById('progress-bar').style.width = `${percent}%`;
   document.getElementById('progress-text').textContent = `${percent}% Complete`;
@@ -287,7 +291,7 @@ async function updateProgressBar() {
 function showCelebration() {
   for (let i = 0; i < 30; i++) {
     const emoji = document.createElement('div');
-    emoji.textContent = ['🎉', '✨', '🌟', '🥳'][Math.floor(Math.random() * 4)];
+    emoji.textContent = ['🎉', '✨', '🌟', '🥳', '👍', '👏🏼', '🫶🏼', '🙌🏼', '⭐️', '💯',][Math.floor(Math.random() * 4)];
     emoji.style.position = 'fixed';
     emoji.style.left = Math.random() * 100 + 'vw';
     emoji.style.top = '-2rem';
