@@ -137,7 +137,7 @@ function getDefaultTasksForDay(day) {
 
 /* ---------------- Progress Bar ---------------- */
 function updateProgressBar() {
-  const totalRemaining = dailyTasks.length + ongoingTasks.length;
+  const totalRemaining = dailyTasks.filter(t => !t.done).length + ongoingTasks.filter(t => !t.done).length;
   const completed = initialTotalTasks - totalRemaining;
   const percent = initialTotalTasks > 0 ? Math.round((completed / initialTotalTasks) * 100) : 0;
 
@@ -161,36 +161,35 @@ async function initTaskApp() {
 function renderTasks() {
   const taskList = document.getElementById('task-list');
   taskList.innerHTML = '';
-  dailyTasks.forEach((task, i) => {
-    const h2 = document.createElement('h2');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = task.done;
+  dailyTasks
+    .filter(task => !task.done)
+    .forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
 
-    checkbox.onchange = () => {
-      dailyTasks[i].done = checkbox.checked;
-      saveTasks(dailyTasks);
-      if (checkbox.checked) {
-        yaySound.play();
-        const emoji = document.createElement('span');
-        emoji.textContent = '🎉';
-        emoji.className = 'celebration-emoji';
-        h2.appendChild(emoji);
-        setTimeout(() => {
-          dailyTasks.splice(i, 1);
-          saveTasks(dailyTasks);
-          renderTasks();
-        }, 800);
-      }
-      updateProgressBar();
-    };
+      checkbox.onchange = () => {
+        const indexInArray = dailyTasks.findIndex(t => t.text === task.text);
+        dailyTasks[indexInArray].done = checkbox.checked;
+        saveTasks(dailyTasks);
+        if (checkbox.checked) {
+          yaySound.play();
+          const emoji = document.createElement('span');
+          emoji.textContent = '🎉';
+          emoji.className = 'celebration-emoji';
+          h2.appendChild(emoji);
+          setTimeout(() => renderTasks(), 800);
+        }
+        updateProgressBar();
+      };
 
-    const span = document.createElement('span');
-    span.textContent = task.text;
-    h2.appendChild(checkbox);
-    h2.appendChild(span);
-    taskList.appendChild(h2);
-  });
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      taskList.appendChild(h2);
+    });
   updateProgressBar();
 }
 
@@ -205,7 +204,7 @@ window.addTask = () => {
 };
 
 window.resetTasks = async () => {
-  dailyTasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
+  dailyTasks = dailyTasks.map(t => ({ ...t, done: false }));
   await saveTasks(dailyTasks);
   celebrationShown = false;
   initialTotalTasks = dailyTasks.length + ongoingTasks.length;
@@ -222,36 +221,35 @@ async function initOngoingTasks() {
 function renderOngoing() {
   const ongoingList = document.getElementById('ongoing-task-list');
   ongoingList.innerHTML = '';
-  ongoingTasks.forEach((task, i) => {
-    const h2 = document.createElement('h2');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = task.done;
+  ongoingTasks
+    .filter(task => !task.done)
+    .forEach((task, i) => {
+      const h2 = document.createElement('h2');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
 
-    checkbox.onchange = () => {
-      ongoingTasks[i].done = checkbox.checked;
-      saveOngoingTasks(ongoingTasks);
-      if (checkbox.checked) {
-        yaySound.play();
-        const emoji = document.createElement('span');
-        emoji.textContent = '🎉';
-        emoji.className = 'celebration-emoji';
-        h2.appendChild(emoji);
-        setTimeout(() => {
-          ongoingTasks.splice(i, 1);
-          saveOngoingTasks(ongoingTasks);
-          renderOngoing();
-        }, 800);
-      }
-      updateProgressBar();
-    };
+      checkbox.onchange = () => {
+        const indexInArray = ongoingTasks.findIndex(t => t.text === task.text);
+        ongoingTasks[indexInArray].done = checkbox.checked;
+        saveOngoingTasks(ongoingTasks);
+        if (checkbox.checked) {
+          yaySound.play();
+          const emoji = document.createElement('span');
+          emoji.textContent = '🎉';
+          emoji.className = 'celebration-emoji';
+          h2.appendChild(emoji);
+          setTimeout(() => renderOngoing(), 800);
+        }
+        updateProgressBar();
+      };
 
-    const span = document.createElement('span');
-    span.textContent = task.text;
-    h2.appendChild(checkbox);
-    h2.appendChild(span);
-    ongoingList.appendChild(h2);
-  });
+      const span = document.createElement('span');
+      span.textContent = task.text;
+      h2.appendChild(checkbox);
+      h2.appendChild(span);
+      ongoingList.appendChild(h2);
+    });
   updateProgressBar();
 }
 
