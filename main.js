@@ -163,7 +163,7 @@ function renderTasks() {
   taskList.innerHTML = '';
   dailyTasks
     .filter(task => !task.done)
-    .forEach((task, i) => {
+    .forEach(task => {
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -204,6 +204,7 @@ window.addTask = () => {
 };
 
 window.resetTasks = async () => {
+  // Just mark all tasks as not done, don't delete any
   dailyTasks = dailyTasks.map(t => ({ ...t, done: false }));
   await saveTasks(dailyTasks);
   celebrationShown = false;
@@ -223,7 +224,7 @@ function renderOngoing() {
   ongoingList.innerHTML = '';
   ongoingTasks
     .filter(task => !task.done)
-    .forEach((task, i) => {
+    .forEach(task => {
       const h2 = document.createElement('h2');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -264,6 +265,7 @@ window.addOngoingTask = () => {
 };
 
 window.resetOngoingTasks = async () => {
+  // Just mark all as not done, don't delete any
   ongoingTasks = ongoingTasks.map(t => ({ ...t, done: false }));
   await saveOngoingTasks(ongoingTasks);
   celebrationShown = false;
