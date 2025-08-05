@@ -106,12 +106,12 @@ async function ensureAllDaysInitialized() {
     const dailySnap = await getDoc(dailyRef);
     if (!dailySnap.exists()) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
-      await setDoc(dailyRef, { tasks: defaults });
+      await setDoc(dailyRef, { tasks: defaults }, { merge: true });
     }
   }
   const ongoingRef = doc(db, 'users', userId, 'ongoing', 'tasks');
   const ongoingSnap = await getDoc(ongoingRef);
-  if (!ongoingSnap.exists()) await setDoc(ongoingRef, { tasks: [] });
+  if (!ongoingSnap.exists()) await setDoc(ongoingRef, { tasks: [] }, { merge: true });
 }
 
 function getDefaultTasksForDay(day) {
@@ -186,11 +186,11 @@ async function initTaskApp() {
     }
   };
 
-  window.resetTasks = () => {
+  window.resetTasks = async () => {
     tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
-    saveTasks(tasks);
+    await saveTasks(tasks);
     celebrationShown = false;
-    initialTotalTasks = tasks.length + (document.querySelectorAll('#ongoing-task-list h2').length);
+    initialTotalTasks = tasks.length + (await loadOngoingTasks()).length;
     renderTasks();
     updateProgressBar();
   };
@@ -201,12 +201,12 @@ async function initTaskApp() {
 async function loadTasks() {
   const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   const snap = await getDoc(ref);
-  return snap.exists() ? snap.data().tasks : [];
+  return snap.exists() ? snap.data().tasks || [] : [];
 }
 
 async function saveTasks(tasks) {
   const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
-  await setDoc(ref, { tasks });
+  await setDoc(ref, { tasks }, { merge: true });
 }
 
 /* ---------------- Ongoing Tasks ---------------- */
@@ -248,11 +248,11 @@ async function initOngoingTasks() {
     }
   };
 
-  window.resetOngoingTasks = () => {
+  window.resetOngoingTasks = async () => {
     tasks = tasks.map(t => ({ ...t, done: false }));
-    saveOngoingTasks(tasks);
+    await saveOngoingTasks(tasks);
     celebrationShown = false;
-    initialTotalTasks = (document.querySelectorAll('#task-list h2').length) + tasks.length;
+    initialTotalTasks = (await loadTasks()).length + tasks.length;
     renderOngoing();
     updateProgressBar();
   };
@@ -263,12 +263,12 @@ async function initOngoingTasks() {
 async function loadOngoingTasks() {
   const ref = doc(db, 'users', userId, 'ongoing', 'tasks');
   const snap = await getDoc(ref);
-  return snap.exists() ? snap.data().tasks : [];
+  return snap.exists() ? snap.data().tasks || [] : [];
 }
 
 async function saveOngoingTasks(tasks) {
   const ref = doc(db, 'users', userId, 'ongoing', 'tasks');
-  await setDoc(ref, { tasks });
+  await setDoc(ref, { tasks }, { merge: true });
 }
 
 /* ---------------- Progress Bar ---------------- */
