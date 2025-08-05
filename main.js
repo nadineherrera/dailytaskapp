@@ -102,7 +102,7 @@ async function loadJournalEntries() {
 async function ensureAllDaysInitialized() {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   for (const day of days) {
-    const dailyRef = doc(db, 'users', userId, 'dailyTasks', day);
+    const dailyRef = doc(db, 'users', userId, day, 'tasks');
     const dailySnap = await getDoc(dailyRef);
     if (!dailySnap.exists()) {
       const defaults = getDefaultTasksForDay(day).map(text => ({ text, done: false, manual: false }));
@@ -199,13 +199,13 @@ async function initTaskApp() {
 }
 
 async function loadTasks() {
-  const ref = doc(db, 'users', userId, 'dailyTasks', getEffectiveDay());
+  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   const snap = await getDoc(ref);
   return snap.exists() ? snap.data().tasks : [];
 }
 
 async function saveTasks(tasks) {
-  const ref = doc(db, 'users', userId, 'dailyTasks', getEffectiveDay());
+  const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   await setDoc(ref, { tasks });
 }
 
@@ -291,7 +291,7 @@ async function updateProgressBar() {
 function showCelebration() {
   for (let i = 0; i < 30; i++) {
     const emoji = document.createElement('div');
-    emoji.textContent = ['🎉', '✨', '🌟', '🥳', '👍', '👏🏼', '🫶🏼', '🙌🏼', '⭐️', '💯',][Math.floor(Math.random() * 4)];
+    emoji.textContent = ['🎉', '✨', '🌟', '🥳'][Math.floor(Math.random() * 4)];
     emoji.style.position = 'fixed';
     emoji.style.left = Math.random() * 100 + 'vw';
     emoji.style.top = '-2rem';
