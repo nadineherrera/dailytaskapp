@@ -19,6 +19,8 @@ const userId = 'djUVi4KmRVfQohInCiM6oVmbYx92';
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
 
+let dailyTasks = [];
+let ongoingTasks = [];
 let initialTotalTasks = 0;
 let celebrationShown = false;
 
@@ -71,7 +73,6 @@ async function saveJournalEntries() {
     gratitude: document.getElementById('gratitudeEntry')?.value.trim() || '',
     mood: document.getElementById('mood')?.value || ''
   };
-
   try {
     const ref = doc(db, 'users', userId, 'journals', day);
     await setDoc(ref, entry, { merge: true });
@@ -134,70 +135,145 @@ function getDefaultTasksForDay(day) {
   return [...base, ...(addOns[day] || [])];
 }
 
+/* ---------------- Progress Bar ---------------- */
+function updateProgressBar() {
+  const totalRemaining = dailyTasks.length + ongoingTasks.length;
+  const completed = initialTotalTasks - totalRemaining;
+  const percent = initialTotalTasks > 0 ? Math.round((completed / initialTotalTasks) * 100) : 0;
+
+  document.getElementById('progress-bar').style.width = `${percent}%`;
+  document.getElementById('progress-text').textContent = `${percent}% Complete`;
+
+  if (percent === 100 && !celebrationShown) {
+    celebrationShown = true;
+    showCelebration();
+  }
+}
+
 /* ---------------- Daily Tasks ---------------- */
 async function initTaskApp() {
-  const taskList = document.getElementById('task-list');
-  let tasks = await loadTasks();
-  initialTotalTasks = tasks.length + (await loadOngoingTasks()).length;
-
-  function renderTasks() {
-    taskList.innerHTML = '';
-    tasks.forEach((task, i) => {
-      const h2 = document.createElement('h2');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = task.done;
-
-      checkbox.onchange = () => {
-        tasks[i].done = checkbox.checked;
-        saveTasks(tasks);
-
-        if (checkbox.checked) {
-          yaySound.play();
-          const emoji = document.createElement('span');
-          emoji.textContent = '🎉';
-          emoji.className = 'celebration-emoji';
-          h2.appendChild(emoji);
-          setTimeout(() => {
-            tasks.splice(i, 1);
-            saveTasks(tasks);
-            renderTasks();
-          }, 800);
-        }
-        updateProgressBar();
-      };
-
-      const span = document.createElement('span');
-      span.textContent = task.text;
-      h2.appendChild(checkbox);
-      h2.appendChild(span);
-      taskList.appendChild(h2);
-    });
-    updateProgressBar();
-  }
-
-  window.addTask = () => {
-    const text = document.getElementById('new-task').value.trim();
-    if (text) {
-      tasks.push({ text, done: false, manual: true });
-      saveTasks(tasks);
-      document.getElementById('new-task').value = '';
-      renderTasks();
-    }
-  };
-
-  window.resetTasks = async () => {
-    tasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
-    await saveTasks(tasks);
-    celebrationShown = false;
-    initialTotalTasks = tasks.length + (await loadOngoingTasks()).length;
-    renderTasks();
-    updateProgressBar();
-  };
-
+  dailyTasks = await loadTasks();
+  ongoingTasks = await loadOngoingTasks();
+  initialTotalTasks = dailyTasks.length + ongoingTasks.length;
   renderTasks();
 }
 
+function renderTasks() {
+  const taskList = document.getElementById('task-list');
+  taskList.innerHTML = '';
+  dailyTasks.forEach((task, i) => {
+    const h2 = document.createElement('h2');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = task.done;
+
+    checkbox.onchange = () => {
+      dailyTasks[i].done = checkbox.checked;
+      saveTasks(dailyTasks);
+      if (checkbox.checked) {
+        yaySound.play();
+        const emoji = document.createElement('span');
+        emoji.textContent = '🎉';
+        emoji.className = 'celebration-emoji';
+        h2.appendChild(emoji);
+        setTimeout(() => {
+          dailyTasks.splice(i, 1);
+          saveTasks(dailyTasks);
+          renderTasks();
+        }, 800);
+      }
+      updateProgressBar();
+    };
+
+    const span = document.createElement('span');
+    span.textContent = task.text;
+    h2.appendChild(checkbox);
+    h2.appendChild(span);
+    taskList.appendChild(h2);
+  });
+  updateProgressBar();
+}
+
+window.addTask = () => {
+  const text = document.getElementById('new-task').value.trim();
+  if (text) {
+    dailyTasks.push({ text, done: false, manual: true });
+    saveTasks(dailyTasks);
+    document.getElementById('new-task').value = '';
+    renderTasks();
+  }
+};
+
+window.resetTasks = async () => {
+  dailyTasks = getDefaultTasksForDay(getEffectiveDay()).map(text => ({ text, done: false, manual: false }));
+  await saveTasks(dailyTasks);
+  celebrationShown = false;
+  initialTotalTasks = dailyTasks.length + ongoingTasks.length;
+  renderTasks();
+};
+
+/* ---------------- Ongoing Tasks ---------------- */
+async function initOngoingTasks() {
+  ongoingTasks = await loadOngoingTasks();
+  initialTotalTasks = dailyTasks.length + ongoingTasks.length;
+  renderOngoing();
+}
+
+function renderOngoing() {
+  const ongoingList = document.getElementById('ongoing-task-list');
+  ongoingList.innerHTML = '';
+  ongoingTasks.forEach((task, i) => {
+    const h2 = document.createElement('h2');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = task.done;
+
+    checkbox.onchange = () => {
+      ongoingTasks[i].done = checkbox.checked;
+      saveOngoingTasks(ongoingTasks);
+      if (checkbox.checked) {
+        yaySound.play();
+        const emoji = document.createElement('span');
+        emoji.textContent = '🎉';
+        emoji.className = 'celebration-emoji';
+        h2.appendChild(emoji);
+        setTimeout(() => {
+          ongoingTasks.splice(i, 1);
+          saveOngoingTasks(ongoingTasks);
+          renderOngoing();
+        }, 800);
+      }
+      updateProgressBar();
+    };
+
+    const span = document.createElement('span');
+    span.textContent = task.text;
+    h2.appendChild(checkbox);
+    h2.appendChild(span);
+    ongoingList.appendChild(h2);
+  });
+  updateProgressBar();
+}
+
+window.addOngoingTask = () => {
+  const text = document.getElementById('new-ongoing-task').value.trim();
+  if (text) {
+    ongoingTasks.push({ text, done: false, manual: true });
+    saveOngoingTasks(ongoingTasks);
+    document.getElementById('new-ongoing-task').value = '';
+    renderOngoing();
+  }
+};
+
+window.resetOngoingTasks = async () => {
+  ongoingTasks = ongoingTasks.map(t => ({ ...t, done: false }));
+  await saveOngoingTasks(ongoingTasks);
+  celebrationShown = false;
+  initialTotalTasks = dailyTasks.length + ongoingTasks.length;
+  renderOngoing();
+};
+
+/* ---------------- Firestore Helpers ---------------- */
 async function loadTasks() {
   const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   const snap = await getDoc(ref);
@@ -207,57 +283,6 @@ async function loadTasks() {
 async function saveTasks(tasks) {
   const ref = doc(db, 'users', userId, getEffectiveDay(), 'tasks');
   await setDoc(ref, { tasks }, { merge: true });
-}
-
-/* ---------------- Ongoing Tasks ---------------- */
-async function initOngoingTasks() {
-  const ongoingList = document.getElementById('ongoing-task-list');
-  let tasks = await loadOngoingTasks();
-  initialTotalTasks += tasks.length;
-
-  function renderOngoing() {
-    ongoingList.innerHTML = '';
-    tasks.forEach((task, i) => {
-      const h2 = document.createElement('h2');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = task.done;
-
-      checkbox.onchange = () => {
-        tasks[i].done = checkbox.checked;
-        saveOngoingTasks(tasks);
-        updateProgressBar();
-      };
-
-      const span = document.createElement('span');
-      span.textContent = task.text;
-      h2.appendChild(checkbox);
-      h2.appendChild(span);
-      ongoingList.appendChild(h2);
-    });
-    updateProgressBar();
-  }
-
-  window.addOngoingTask = () => {
-    const text = document.getElementById('new-ongoing-task').value.trim();
-    if (text) {
-      tasks.push({ text, done: false, manual: true });
-      saveOngoingTasks(tasks);
-      document.getElementById('new-ongoing-task').value = '';
-      renderOngoing();
-    }
-  };
-
-  window.resetOngoingTasks = async () => {
-    tasks = tasks.map(t => ({ ...t, done: false }));
-    await saveOngoingTasks(tasks);
-    celebrationShown = false;
-    initialTotalTasks = (await loadTasks()).length + tasks.length;
-    renderOngoing();
-    updateProgressBar();
-  };
-
-  renderOngoing();
 }
 
 async function loadOngoingTasks() {
@@ -271,23 +296,7 @@ async function saveOngoingTasks(tasks) {
   await setDoc(ref, { tasks }, { merge: true });
 }
 
-/* ---------------- Progress Bar ---------------- */
-async function updateProgressBar() {
-  const daily = await loadTasks();
-  const ongoing = await loadOngoingTasks();
-  const totalRemaining = daily.length + ongoing.length;
-  const completed = initialTotalTasks - totalRemaining;
-  const percent = initialTotalTasks > 0 ? Math.round((completed / initialTotalTasks) * 100) : 0;
-
-  document.getElementById('progress-bar').style.width = `${percent}%`;
-  document.getElementById('progress-text').textContent = `${percent}% Complete`;
-
-  if (percent === 100 && !celebrationShown) {
-    celebrationShown = true;
-    showCelebration();
-  }
-}
-
+/* ---------------- Celebration ---------------- */
 function showCelebration() {
   for (let i = 0; i < 30; i++) {
     const emoji = document.createElement('div');
