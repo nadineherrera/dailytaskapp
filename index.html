@@ -46,11 +46,15 @@
     #new-task, #new-ongoing-task { width: 70%; max-width: 400px; padding: 0.6rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
     button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
     footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
+
+    /* Old rectangular progress styles remain (unused) */
     #progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 1rem; overflow: hidden; }
     #progress-bar { height: 100%; width: 0%; background-color: #66B032; transition: width 0.3s ease; }
+
     #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
     .celebration-emoji { animation: pop-fade 2s ease forwards; font-size: 1.5rem; }
     @keyframes pop-fade { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.8); opacity: 1; } 70% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(0.5); opacity: 0; } }
+
     #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
     .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
     #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
@@ -59,6 +63,21 @@
     @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
     .breathe-animation { animation: breathe 6s ease-in-out infinite; }
     #breath-toggle-btn { margin-top: 0; padding: 0.8rem 1.4rem; font-size: 1rem; border-radius: 12px; background-color: #845EC2; color: white; border: none; cursor: pointer; text-align: center; }
+
+    /* NEW: circle progress styles */
+    #progress-ring-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 1rem auto;
+    }
+    #progress-ring {
+      transform: rotate(-90deg); /* start from 12 o'clock, fill clockwise */
+      overflow: visible;
+    }
+    #progress-ring-bar {
+      transition: stroke-dashoffset 0.4s ease;
+    }
   </style>
 </head>
 <body>
@@ -89,14 +108,67 @@
     <section id="breathing"><h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
       <div class="breathing-tile"><div id="breath-bubble-container"><div id="breath-bubble"></div><p id="breath-text">Inhale for <span id="countdown">4</span></p><button id="breath-toggle-btn">Start Breath</button></div></div>
     </section>
-    <h2 class="section-label">🌱 Today's Tasks</h2><div id="progress-container"><div id="progress-bar"></div></div><p id="progress-text">0% Complete</p>
+
+    <h2 class="section-label">🌱 Today's Tasks</h2>
+
+    <!-- NEW: Circular Progress Ring (replaces rectangular progress bar) -->
+    <div id="progress-ring-container" aria-label="Task progress">
+      <svg id="progress-ring" width="140" height="140" role="img" aria-hidden="true" focusable="false">
+        <circle
+          id="progress-ring-bg"
+          stroke="#e0e0e0"
+          stroke-width="12"
+          fill="transparent"
+          r="60"
+          cx="70"
+          cy="70"
+        ></circle>
+        <circle
+          id="progress-ring-bar"
+          stroke="#66B032"
+          stroke-width="12"
+          fill="transparent"
+          r="60"
+          cx="70"
+          cy="70"
+          stroke-linecap="round"
+          stroke-dasharray="377"
+          stroke-dashoffset="377"
+        ></circle>
+      </svg>
+    </div>
+
+    <p id="progress-text">0% Complete</p>
+
     <div id="task-list"></div>
     <div class="task-input-group"><input type="text" id="new-task" placeholder="Add new task"><button onclick="addTask()">Add Task</button><button onclick="resetTasks()">Reset All Tasks</button></div>
+
     <h2 class="section-label">♾ Ongoing Tasks</h2>
     <div id="ongoing-task-list"></div>
     <div class="task-input-group"><input type="text" id="new-ongoing-task" placeholder="Add new ongoing task"><button onclick="addOngoingTask()">Add Task</button><button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button></div>
+
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
+
+  <!-- Helper so your existing logic can set percent easily -->
+  <script>
+    (function () {
+      const radius = 60;
+      const circumference = 2 * Math.PI * radius;
+
+      // Expose a simple global for your main.js to call
+      window.updateProgressCircle = function (percent) {
+        const pct = Math.max(0, Math.min(100, Number(percent) || 0));
+        const circle = document.getElementById('progress-ring-bar');
+        if (!circle) return;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const label = document.getElementById('progress-text');
+        if (label) label.textContent = `${pct}% Complete`;
+      };
+    })();
+  </script>
+
   <script type="module" src="main.js"></script>
 </body>
 </html>
