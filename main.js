@@ -135,14 +135,20 @@ function getDefaultTasksForDay(day) {
   return [...base, ...(addOns[day] || [])];
 }
 
-/* ---------------- Progress Bar ---------------- */
+/* ---------------- Progress (Circular Ring) ---------------- */
 function updateProgressBar() {
   const totalRemaining = dailyTasks.filter(t => !t.done).length + ongoingTasks.filter(t => !t.done).length;
   const completed = initialTotalTasks - totalRemaining;
   const percent = initialTotalTasks > 0 ? Math.round((completed / initialTotalTasks) * 100) : 0;
 
-  document.getElementById('progress-bar').style.width = `${percent}%`;
-  document.getElementById('progress-text').textContent = `${percent}% Complete`;
+  // NEW: drive the circular progress ring (added in index.html)
+  if (typeof window.updateProgressCircle === 'function') {
+    window.updateProgressCircle(percent);
+  } else {
+    // graceful fallback: still update the label
+    const label = document.getElementById('progress-text');
+    if (label) label.textContent = `${percent}% Complete`;
+  }
 
   if (percent === 100 && !celebrationShown) {
     celebrationShown = true;
@@ -199,6 +205,8 @@ window.addTask = () => {
     dailyTasks.push({ text, done: false, manual: true });
     saveTasks(dailyTasks);
     document.getElementById('new-task').value = '';
+    // total task count changed; recompute base
+    initialTotalTasks = dailyTasks.length + ongoingTasks.length;
     renderTasks();
   }
 };
@@ -260,6 +268,8 @@ window.addOngoingTask = () => {
     ongoingTasks.push({ text, done: false, manual: true });
     saveOngoingTasks(ongoingTasks);
     document.getElementById('new-ongoing-task').value = '';
+    // total task count changed; recompute base
+    initialTotalTasks = dailyTasks.length + ongoingTasks.length;
     renderOngoing();
   }
 };
