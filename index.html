@@ -3,17 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
-  <link rel="manifest" href="/dailytaskapp/manifest.json">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
   <style>
-    :root{
+    :root {
       --brand-purple:#845EC2;
       --brand-green:#66B032;
       --accent:#008cba;
@@ -26,112 +18,77 @@
       --shadow:0 6px 20px rgba(0,0,0,.08);
       --border:#e7e7ef;
     }
-    html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden}
-    .container{max-width:980px;margin:0 auto;padding:1rem}
-
-    /* Header */
-    header{background:var(--yellow);padding:1rem 1.25rem;margin:0 auto 1.25rem;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
-    header img{max-width:80px;margin:0 auto;display:block}
-    .day-heading{font-size:1.9rem;font-weight:800;margin:.5rem 0 .25rem}
-    .weather-content{font-size:.95rem}
-    .weather-content .temp{font-weight:700}
-    .weather-content .desc{font-style:italic;color:#444}
-    #affirmation-box{margin-top:.5rem;font-style:italic;color:var(--muted);opacity:0;transition:opacity .8s ease}
-    #affirmation-box.visible{opacity:1}
-
-    /* Day nav */
-    .day-nav{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.25rem}
-    .day-nav a{color:#fff;text-decoration:none;background:var(--brand-purple);padding:.5rem .8rem;border-radius:999px;font-weight:700}
-
-    .section-label{text-align:center;font-size:1.25rem;color:var(--brand-green);margin:1.5rem 0 1rem;font-weight:800}
-
-    /* Journals + Gratitude cards (alignment fixed) */
-    .journal-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-      gap:1rem;
-      align-items:start;
+    html, body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      background: var(--bg);
+      color: var(--text);
     }
-    section#journals,section#gratitude{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:1rem 1rem 1.1rem;
-    }
-    section h2{margin:0 0 .6rem;font-size:1.2rem;color:var(--brand-purple)}
-    .field-stack{display:grid;gap:.75rem}
-    textarea{
-      width:100%;
-      min-height:110px;
-      padding:12px;
-      font:inherit;
-      background:#fff;
-      border:1px solid #d9d9e3;
-      border-radius:12px;
-      box-sizing:border-box;
-      margin:0;               /* remove stray margins that caused misalignment */
-    }
-    #save-journal-btn{justify-self:center}
+    .container { max-width: 960px; margin: 0 auto; padding: 1rem; }
 
-    /* Mood picker */
-    #mood{display:none} /* kept for compatibility with main.js */
-    .mood-grid{display:flex;flex-wrap:wrap;gap:.6rem}
-    .mood-chip{
-      font-size:1.45rem;padding:.35rem .55rem;border-radius:12px;
-      border:1px solid #d9d9e3;background:#fff;cursor:pointer;transition:all .15s ease
+    header {
+      background: var(--yellow);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
     }
-    .mood-chip[data-active="true"]{outline:2px solid var(--brand-purple);background:#f0eaff}
-    .mood-live{margin-top:.5rem;color:#555;font-weight:600;display:flex;align-items:center;gap:.45rem}
+    header img { max-width: 80px; display:block; margin: 0 auto; }
+    .day-heading { font-size: 1.8rem; font-weight: 800; margin: .5rem 0; }
+
+    /* Sections */
+    .section-label { text-align:center; font-size:1.25rem; font-weight:800; color:var(--brand-green); margin:1.5rem 0 1rem; }
+    .journal-grid { display:flex; flex-wrap:wrap; gap:1rem; }
+    section { flex:1 1 320px; background:var(--card); padding:1rem; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); }
+
+    section h2 { margin:0 0 .75rem; font-size:1.1rem; font-weight:800; color:var(--brand-purple); }
+    textarea {
+      width:100%; min-height:100px; margin-bottom:1rem;
+      padding:12px; font-family:inherit; border-radius:10px; border:1px solid #d9d9e3;
+    }
+
+    /* Mood */
+    .mood-grid { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .mood-chip {
+      font-size:1.5rem; padding:.4rem .6rem; border-radius:10px; border:2px solid transparent;
+      cursor:pointer; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.05);
+    }
+    .mood-chip.active { border-color: var(--brand-purple); background:#f8f6ff; }
+    .mood-live { margin-top:.5rem; text-align:center; color:var(--muted); font-weight:600; }
 
     /* Breathing */
-    #breathing .breathing-tile{
-      background:var(--card);padding:2rem 1.25rem;border-radius:var(--radius);
-      box-shadow:var(--shadow);border:1px solid var(--border);max-width:520px;margin:1rem auto;text-align:center
-    }
-    /* Reserve vertical space so the scaled bubble never overlaps text */
-    .bubble-wrap{
-      height:210px;                 /* enough room for max scale */
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;              /* guard rails */
-    }
-    #breath-bubble{
-      width:150px;height:150px;border-radius:50%;
-      background:radial-gradient(circle,#8fd7ff,var(--accent));
-      will-change:transform;
-    }
-    #breath-text{font-size:1.2rem;color:var(--accent);font-weight:800;margin:.5rem 0 .75rem}
-    /* Visual animation locked to 4-4-4-4 timing (16s) with safe peak scale */
-    @keyframes boxbreathe{
-      0%,12.5%   {transform:scale(1)}
-      25%,37.5%  {transform:scale(1.33)}
-      62.5%,75%  {transform:scale(1)}
-      100%       {transform:scale(1)}
-    }
-    .breathe-running #breath-bubble{animation:boxbreathe 16s ease-in-out infinite}
+    #breathing .breathing-tile { text-align:center; padding:1rem; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+    #breath-bubble { width:140px; height:140px; margin:0 auto 1rem; border-radius:50%; background:radial-gradient(circle,#8fd7ff,var(--accent)); }
+    #breath-text { font-size:1.3rem; font-weight:800; color:var(--accent); margin:.5rem 0; }
+    @keyframes breatheIn { 0%{transform:scale(1);} 100%{transform:scale(1.5);} }
+    @keyframes breatheOut { 0%{transform:scale(1.5);} 100%{transform:scale(1);} }
+    .inhale { animation:breatheIn 4s ease-in-out forwards; }
+    .exhale { animation:breatheOut 4s ease-in-out forwards; }
 
-    /* Progress ring */
-    #progress-ring-card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:var(--shadow);max-width:520px;margin:1rem auto}
-    #progress-text{text-align:center;font-weight:800;color:var(--brand-green)}
+    /* Tasks */
+    #task-card { margin-top:1rem; background:var(--card); padding:1rem; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
+    #task-list { display:flex; flex-direction:column; gap:.75rem; }
+    .task-item { display:flex; align-items:center; padding:.6rem .8rem; border:1px solid var(--border); border-radius:10px; background:var(--card); box-shadow:0 3px 8px rgba(0,0,0,.05); }
+    .task-item input { margin-right:.75rem; width:18px; height:18px; accent-color:var(--brand-green); }
+    .task-item label { flex:1; font-weight:600; }
 
-    /* Tasks (kept) */
-    #task-card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border)}
-    #task-list{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
-    #task-list > *{display:flex;align-items:center;gap:12px;padding:.75rem 1rem;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.05)}
-    #task-list > * label,#task-list > * .task-text,#task-list > * span{flex:1;font-size:1rem;font-weight:700}
-    #task-list input[type="checkbox"]{inline-size:20px;block-size:20px;border:2px solid var(--brand-green);border-radius:6px;appearance:none;display:grid;place-content:center;background:#fff;cursor:pointer}
-    #task-list input[type="checkbox"]::after{content:"✓";font-weight:900;transform:scale(0);transition:transform .12s ease;color:#fff}
-    #task-list input[type="checkbox"]:checked{background:var(--brand-green);border-color:var(--brand-green)}
-    #task-list input[type="checkbox"]:checked::after{transform:scale(1)}
-    #task-list > *.completed{background:#f6fff2;border-color:#d3efc7}
-    #task-list > *.completed label,#task-list > *.completed .task-text,#task-list > *.completed span{color:#6a6a6a;text-decoration:line-through}
-
-    footer#quote-footer{background:var(--card);padding:1rem;text-align:center;color:var(--muted);font-style:italic;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:1.25rem 0 0}
-
-    @media (max-width:420px){
-      .bubble-wrap{height:190px}
-      #breath-bubble{width:130px;height:130px}
+    /* Buttons */
+    .btn {
+      -webkit-appearance:none; appearance:none; border:0;
+      background: var(--brand-purple); color:#fff;
+      padding:.7rem 1.25rem; border-radius:14px; font-weight:700;
+      cursor:pointer; transition: all .2s ease;
+      display:inline-flex; align-items:center; justify-content:center;
+      box-shadow:0 8px 16px rgba(132,94,194,.25);
     }
+    .btn:hover { filter:brightness(1.05); }
+    .btn:active { transform:scale(.97); }
+    .btn-secondary { background:var(--accent); }
+    .btn-ghost { background:#fff; color:var(--brand-purple); border:1px solid #d9d9e3; }
+    .btn-block { width:100%; }
+
+    footer { margin:2rem 0 1rem; padding:1rem; text-align:center; font-style:italic; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); }
   </style>
 </head>
 <body>
@@ -139,262 +96,90 @@
     <header>
       <img src="apple-touch-icon.png" alt="App Logo">
       <h1 id="page-title" class="day-heading"></h1>
-      <div id="weather" class="weather-content"></div>
+      <div id="weather"></div>
       <div id="affirmation-box"></div>
     </header>
-
-    <div class="day-nav">
-      <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
-      <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
-    </div>
 
     <h2 class="section-label">🧘 Mindfulness Zone</h2>
     <div class="journal-grid">
       <section id="journals">
         <h2>Journals</h2>
-        <div class="field-stack">
-          <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
-          <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
-          <button id="save-journal-btn">Save Journals</button>
-        </div>
+        <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+        <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
+        <button id="save-journal-btn" class="btn btn-primary btn-block">Save Journals</button>
       </section>
-
       <section id="gratitude">
         <h2>Gratitude & Mood</h2>
-        <div class="field-stack">
-          <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
-
-          <div>
-            <h3 style="margin:.25rem 0 .5rem;">Your Mood</h3>
-
-            <!-- Compatibility select (hidden) -->
-            <select id="mood" style="display:none">
-              <option value="">How do you feel?</option>
-              <option value="😔">Sad</option>
-              <option value="😤">Stressed</option>
-              <option value="😐">Neutral</option>
-              <option value="🙂">Content</option>
-              <option value="😀">Happy</option>
-              <option value="😌">Peaceful</option>
-            </select>
-
-            <div class="mood-grid" aria-label="Mood picker">
-              <button class="mood-chip" data-emoji="😔" data-label="Sad">😔</button>
-              <button class="mood-chip" data-emoji="😤" data-label="Stressed">😤</button>
-              <button class="mood-chip" data-emoji="😐" data-label="Neutral">😐</button>
-              <button class="mood-chip" data-emoji="🙂" data-label="Content">🙂</button>
-              <button class="mood-chip" data-emoji="😀" data-label="Happy">😀</button>
-              <button class="mood-chip" data-emoji="😌" data-label="Peaceful">😌</button>
-            </div>
-            <div class="mood-live">
-              <span id="mood-emoji">—</span>
-              <span id="mood-label">How do you feel?</span>
-            </div>
-          </div>
+        <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
+        <h3>Your Mood</h3>
+        <div class="mood-grid">
+          <button class="mood-chip" data-label="Sad">😔</button>
+          <button class="mood-chip" data-label="Frustrated">😤</button>
+          <button class="mood-chip" data-label="Neutral">😐</button>
+          <button class="mood-chip" data-label="Okay">🙂</button>
+          <button class="mood-chip" data-label="Happy">😀</button>
+          <button class="mood-chip" data-label="Peaceful">😌</button>
         </div>
+        <div class="mood-live"><span id="mood-label">— How do you feel?</span></div>
       </section>
     </div>
 
-    <section id="breathing">
-      <h2 class="section-label">🫁 Breathing Exercise</h2>
-      <div class="breathing-tile">
-        <div class="bubble-wrap">
-          <div id="breath-bubble"></div>
-        </div>
-        <p id="breath-text">Paused</p>
-        <button id="breath-toggle-btn">Start Breath</button>
-      </div>
-    </section>
+    <h2 class="section-label">🫁 Breathing Exercise</h2>
+    <div class="breathing-tile">
+      <div id="breath-bubble"></div>
+      <p id="breath-text">Paused</p>
+      <button id="breath-toggle-btn" class="btn btn-primary">Start Breath</button>
+    </div>
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
-    <div id="progress-ring-card">
-      <div style="display:flex;justify-content:center;align-items:center;margin:.5rem auto;">
-        <svg id="progress-ring" width="140" height="140" style="transform:rotate(-90deg)">
-          <circle stroke="#e9e9f2" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
-          <circle id="progress-ring-bar" stroke="var(--brand-green)" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
-        </svg>
-      </div>
-      <p id="progress-text">0% Complete</p>
-    </div>
-
     <div id="task-card">
       <div id="task-list"></div>
-      <div class="task-input-group" style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:1rem;">
-        <input type="text" id="new-task" placeholder="Add new task" style="flex:1;min-width:220px;padding:.65rem;border:1px solid #d9d9e3;border-radius:10px;">
-        <button onclick="addTask()">Add Task</button>
-        <button class="secondary" onclick="resetTasks()">Reset All Tasks</button>
+      <div class="task-input-group">
+        <input type="text" id="new-task" placeholder="Add new task">
+        <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+        <button class="btn btn-ghost" onclick="resetTasks()">Reset All Tasks</button>
       </div>
     </div>
 
-    <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
+    <footer><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Box breathing with precise 4-4-4-4 timing & no overlap -->
   <script>
-    (function(){
-      const tile = document.querySelector('.breathing-tile');
-      const bubble = document.getElementById('breath-bubble');
-      const text = document.getElementById('breath-text');
-      const btn  = document.getElementById('breath-toggle-btn');
-
-      const phases = [
-        {label:'Inhale for', secs:4},
-        {label:'Hold for',   secs:4},
-        {label:'Exhale for', secs:4},
-        {label:'Hold for',   secs:4},
-      ];
-
-      let running=false, idx=0, remain=0, timer=null;
-
-      function showPhase(){
-        const p = phases[idx];
-        remain = p.secs;
-        text.innerHTML = `${p.label} <span id="count">4</span>`;
-      }
-
-      function stepTick(){
-        const c = document.getElementById('count');
-        if (!c) return;
-        if (remain>1){ remain--; c.textContent = remain; schedule(); return; }
-        // phase done -> next
-        idx = (idx+1)%phases.length;
-        showPhase();
-        schedule();
-      }
-
-      function schedule(){ timer = setTimeout(stepTick, 1000); }
-      function start(){
-        if(running) return;
-        running=true;
-        tile.classList.add('breathe-running');
-        idx=0; showPhase(); schedule();
-        btn.textContent='Stop Breath';
-      }
-      function stop(){
-        running=false;
-        tile.classList.remove('breathe-running');
-        clearTimeout(timer); timer=null;
-        text.textContent='Paused';
-        btn.textContent='Start Breath';
-      }
-      btn.addEventListener('click', ()=> running? stop(): start());
-    })();
-  </script>
-
-  <!-- Progress ring helper + celebrate at 100% -->
-  <script>
-    (function(){
-      const C = 2*Math.PI*60;
-      let done=false;
-      function chime(){
-        try{
-          const ctx = new (window.AudioContext||window.webkitAudioContext)();
-          const now = ctx.currentTime, g = ctx.createGain(); g.gain.value=.18; g.connect(ctx.destination);
-          [987.8,1318.5,1760].forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);o.start(now+i*.08);o.stop(now+i*.08+.35);});
-          g.gain.exponentialRampToValueAtTime(.001, now+.8);
-        }catch(e){}
-      }
-      window.updateProgressCircle = (percent)=>{
-        const pct = Math.max(0,Math.min(100,Number(percent)||0));
-        const circle = document.getElementById('progress-ring-bar');
-        if(circle) circle.style.strokeDashoffset = (C - (pct/100)*C);
-        const label = document.getElementById('progress-text');
-        if(label) label.textContent = `${pct}% Complete`;
-        if(pct>=100 && !done){ done=true; chime(); }
-        if(pct<100) done=false;
-      };
-    })();
-  </script>
-
-  <!-- Mood chips -> hidden select sync + label -->
-  <script>
-    (function(){
-      const select = document.getElementById('mood');
-      const chips = [...document.querySelectorAll('.mood-chip')];
-      const liveEmoji = document.getElementById('mood-emoji');
-      const liveLabel = document.getElementById('mood-label');
-      function setMood(emoji,label){
-        chips.forEach(c=>c.dataset.active = (c.dataset.emoji===emoji) ? 'true':'false');
-        if(select) select.value = emoji || '';
-        liveEmoji.textContent = emoji || '—';
-        liveLabel.textContent = emoji ? label : 'How do you feel?';
-      }
-      chips.forEach(c=>c.addEventListener('click',()=> setMood(c.dataset.emoji, c.dataset.label)));
-      setMood('', '');
-    })();
-  </script>
-
-  <!-- Task chime + completed visuals -->
-  <script>
-    (function(){
-      const list = document.getElementById('task-list');
-      function chime(){
-        try{
-          const ctx = new (window.AudioContext||window.webkitAudioContext)();
-          const now = ctx.currentTime, g = ctx.createGain(); g.gain.value=.15; g.connect(ctx.destination);
-          [880,1318.5].forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);o.start(now+i*.06);o.stop(now+i*.06+.35);});
-          g.gain.exponentialRampToValueAtTime(.001, now+.6);
-        }catch(e){}
-      }
-      list.addEventListener('change',e=>{
-        const cb=e.target;
-        if(cb && cb.matches('input[type="checkbox"]')){
-          const row = cb.closest('#task-list > *')||cb.parentElement;
-          if(row) row.classList.toggle('completed', cb.checked);
-          if(cb.checked) chime();
-        }
+    // Mood
+    document.querySelectorAll(".mood-chip").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        document.querySelectorAll(".mood-chip").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("mood-label").textContent = btn.textContent+" "+btn.dataset.label;
       });
-      // hydrate pre-checked after main.js renders
-      setTimeout(()=>{ list.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
-        const row=cb.closest('#task-list > *')||cb.parentElement;
-        if(row) row.classList.toggle('completed', cb.checked);
-      }); },0);
+    });
+
+    // Breathing
+    (()=>{
+      const bubble=document.getElementById("breath-bubble");
+      const text=document.getElementById("breath-text");
+      const btn=document.getElementById("breath-toggle-btn");
+      let cycle, step=0;
+      const phases=[
+        {label:"Inhale for 4",cls:"inhale",time:4000},
+        {label:"Hold for 4",cls:"",time:4000},
+        {label:"Exhale for 4",cls:"exhale",time:4000},
+        {label:"Hold for 4",cls:"",time:4000}
+      ];
+      btn.addEventListener("click",()=>{
+        if(cycle){ clearInterval(cycle); cycle=null; bubble.className=""; text.textContent="Paused"; btn.textContent="Start Breath"; return;}
+        btn.textContent="Stop Breath";
+        step=0;
+        function run(){
+          bubble.className=phases[step].cls;
+          text.textContent=phases[step].label;
+          setTimeout(()=>{step=(step+1)%phases.length; run();},phases[step].time);
+        }
+        run();
+      });
     })();
   </script>
 
-  <!-- Header: date/time, °F weather, affirmation, quote -->
-  <script>
-    (function(){
-      const $=id=>document.getElementById(id);
-      const weatherEl=$('weather'), titleEl=$('page-title'), quoteEl=$('quote-box'), affEl=$('affirmation-box');
-
-      function renderNow(){
-        const d=new Date();
-        const day=d.toLocaleDateString(undefined,{weekday:'long'});
-        const date=d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
-        const time=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-        if(titleEl) titleEl.textContent=`${day} • ${date} • ${time}`;
-      }
-      renderNow(); setInterval(renderNow,60e3);
-
-      const AFFS=["You’re doing better than you think.","One small step counts today.","You can handle this moment.","Breathe in calm, breathe out doubt.","Progress, not perfection.","Your effort matters."];
-      (function(){ if(affEl){ affEl.textContent=AFFS[Math.floor(Math.random()*AFFS.length)]; affEl.classList.add('visible'); } })();
-
-      async function loadQuote(){
-        try{ const r=await fetch("https://api.quotable.io/random?minLength=60&maxLength=160",{cache:'no-store'});
-          const q=await r.json(); if(quoteEl) quoteEl.textContent=`“${q.content}” — ${q.author}`;
-        }catch{ if(quoteEl) quoteEl.textContent="“Be kind to yourself — you’re learning as you go.”"; }
-      } loadQuote();
-
-      const WMAP={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Heavy freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Heavy rain showers",82:"Violent rain showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"};
-      function renderWeather({tempF,desc}){ if(!weatherEl) return; weatherEl.innerHTML=`<div class="temp">${Math.round(tempF)}°F</div><div class="desc">${desc}</div>`; }
-      async function getWeather(lat,lon){
-        const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=auto`;
-        const r=await fetch(url,{cache:'no-store'}); const j=await r.json(); const cur=j.current||j.current_weather||{};
-        const temp=cur.temperature_2m??cur.temperature; const code=cur.weather_code??cur.weathercode;
-        renderWeather({tempF:temp,desc:WMAP[code]||"Weather"});
-      }
-      function weatherFallback(){
-        const pick=[{lat:40.7128,lon:-74.0060},{lat:34.0522,lon:-118.2437},{lat:41.8781,lon:-87.6298}][Math.floor(Math.random()*3)];
-        getWeather(pick.lat,pick.lon).catch(()=>{ if(weatherEl) weatherEl.innerHTML='<div class="desc">Weather unavailable</div>'; });
-      }
-      if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(p=>getWeather(p.coords.latitude,p.coords.longitude).catch(weatherFallback),weatherFallback,{timeout:6000,maximumAge:1800000});
-      }else{ weatherFallback(); }
-    })();
-  </script>
-
-  <!-- Your app logic (tasks, saving, etc.) -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
