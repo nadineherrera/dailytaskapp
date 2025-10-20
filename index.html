@@ -35,19 +35,24 @@
     }
     .container { max-width: 980px; margin: 0 auto; padding: 1rem; }
 
+    /* Header */
     header {
       background: var(--yellow);
       padding: 1rem 1.25rem;
       margin: 0 auto 1.25rem auto;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      text-align:center;
     }
     header img { max-width: 80px; display:block; margin: 0 auto; }
-    .day-heading { text-align: center; font-size: 1.9rem; font-weight: 800; margin: .5rem 0 .25rem; color: #000; }
-    header .weather-content { text-align: center; font-size: 0.95rem; color: #333; }
-    #affirmation-box { text-align: center; margin-top: .5rem; font-style: italic; color: var(--muted); opacity: 0; transition: opacity .8s ease; }
+    .day-heading { font-size: 1.9rem; font-weight: 800; margin: .5rem 0 .25rem; color: #000; }
+    header .weather-content { font-size: 0.95rem; color: #333; }
+    header .weather-content .temp { font-size: 1.1rem; font-weight: 700; }
+    header .weather-content .desc { font-style: italic; color: #444; }
+    #affirmation-box { margin-top: .5rem; font-style: italic; color: var(--muted); opacity: 0; transition: opacity .8s ease; }
     #affirmation-box.visible { opacity: 1; }
 
+    /* Day nav */
     .day-nav {
       display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
       margin-bottom: 1.25rem;
@@ -58,95 +63,34 @@
       transition: filter .15s ease;
     }
 
+    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.75rem 0 1rem; font-weight: 800; }
+
+    /* Journals & Gratitude */
     .journal-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
     section#journals, section#gratitude {
       flex: 1 1 320px; background: var(--card); padding: 1rem;
       border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border);
+      display:flex; flex-direction:column;
     }
     section h2 { margin: 0 0 .6rem; font-size: 1.1rem; font-weight: 800; color: var(--brand-purple); }
     textarea {
       width: 100%; min-height: 100px; padding: 12px; margin-bottom: 1rem;
       font-family: inherit; font-size: 1rem; border-radius: 10px; border: 1px solid #d9d9e3; background: #fff;
     }
+    #save-journal-btn { align-self:center; }
     button { padding: 0.6rem 1.1rem; font-size: 1rem; border-radius: 10px; background-color: var(--brand-purple); color: white; border: none; cursor: pointer; font-weight:700; }
     button.secondary { background: var(--accent); }
 
-    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.75rem 0 1rem; font-weight: 800; }
-
-    /* ---------- Task styling (works with any markup from main.js) ---------- */
-    #task-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: .5rem;
+    /* Mood Picker */
+    #mood { display:none; } /* kept for compatibility with main.js */
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+    .mood-chip {
+      font-size:1.4rem; padding:.4rem .6rem; border-radius:10px;
+      border:1px solid #d9d9e3; background:#fff; cursor:pointer;
+      transition:all .15s ease;
     }
-    /* every direct child becomes a card row */
-    #task-list > * {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: .75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--card);
-      box-shadow: 0 3px 10px rgba(0,0,0,.05);
-    }
-    #task-list > * label,
-    #task-list > * .task-text,
-    #task-list > * span {
-      flex: 1;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    /* pretty checkbox */
-    #task-list input[type="checkbox"]{
-      inline-size: 20px;
-      block-size: 20px;
-      border: 2px solid var(--brand-green);
-      border-radius: 6px;
-      appearance: none;
-      display: grid;
-      place-content: center;
-      background: #fff;
-      cursor: pointer;
-    }
-    #task-list input[type="checkbox"]::after{
-      content: "✓";
-      font-weight: 900;
-      transform: scale(0);
-      transition: transform .12s ease;
-      color: #fff;
-    }
-    #task-list input[type="checkbox"]:checked{
-      background: var(--brand-green);
-      border-color: var(--brand-green);
-    }
-    #task-list input[type="checkbox"]:checked::after{ transform: scale(1); }
-
-    /* completed visuals */
-    #task-list > *.completed {
-      background: #f6fff2;
-      border-color: #d3efc7;
-      opacity: .96;
-    }
-    #task-list > *.completed label,
-    #task-list > *.completed .task-text,
-    #task-list > *.completed span{
-      color: #6a6a6a;
-      text-decoration: line-through;
-    }
-    /* optional delete button if main.js renders it */
-    #task-list .task-delete{
-      background: transparent; border: none; font-size: 1.1rem; color: #aaa; cursor: pointer;
-    }
-    #task-list .task-delete:hover{ color: #d33; }
-
-    footer#quote-footer {
-      background: var(--card); padding: 1rem; text-align: center; color: var(--muted);
-      font-style: italic; font-size: 1rem; margin: 1.5rem 0 0 0;
-      border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
-    }
+    .mood-chip[data-active="true"] { outline:2px solid var(--brand-purple); background:#f0eaff; }
+    .mood-live { margin-top:.6rem; text-align:center; color:#555; }
 
     /* Breathing */
     #breathing .breathing-tile {
@@ -162,6 +106,53 @@
     /* Progress ring card */
     #progress-ring-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 520px; margin: 1rem auto; }
     #progress-text { text-align: center; font-weight: 800; color: var(--brand-green); }
+
+    /* Tasks */
+    #task-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border); }
+    #task-list {
+      display: flex; flex-direction: column; gap: 0.75rem; margin-top: .5rem;
+    }
+    /* Any direct child becomes a card row (works with various main.js renderings) */
+    #task-list > * {
+      display: flex; align-items: center; gap: 12px;
+      padding: .75rem 1rem; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--card); box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+    #task-list > * label,
+    #task-list > * .task-text,
+    #task-list > * span { flex:1; font-size:1rem; font-weight:700; color:var(--text); }
+
+    /* Custom checkbox */
+    #task-list input[type="checkbox"]{
+      inline-size: 20px; block-size: 20px;
+      border: 2px solid var(--brand-green); border-radius: 6px;
+      appearance: none; display: grid; place-content: center;
+      background: #fff; cursor: pointer;
+    }
+    #task-list input[type="checkbox"]::after{
+      content: "✓"; font-weight: 900; transform: scale(0);
+      transition: transform .12s ease; color: #fff;
+    }
+    #task-list input[type="checkbox"]:checked{
+      background: var(--brand-green); border-color: var(--brand-green);
+    }
+    #task-list input[type="checkbox"]:checked::after{ transform: scale(1); }
+
+    /* Completed style */
+    #task-list > *.completed { background:#f6fff2; border-color:#d3efc7; opacity:.96; }
+    #task-list > *.completed label,
+    #task-list > *.completed .task-text,
+    #task-list > *.completed span { color:#6a6a6a; text-decoration:line-through; }
+
+    /* Optional delete button if main.js renders one */
+    #task-list .task-delete { background:transparent; border:none; font-size:1.1rem; color:#aaa; cursor:pointer; }
+    #task-list .task-delete:hover{ color:#d33; }
+
+    /* Footer */
+    footer#quote-footer {
+      background: var(--card); padding: 1rem; text-align: center; color: var(--muted);
+      font-style: italic; font-size: 1rem; margin: 1.5rem 0 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
+    }
   </style>
 </head>
 <body>
@@ -192,7 +183,7 @@
         <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
         <h3>Your Mood</h3>
 
-        <!-- hidden select for compatibility with main.js -->
+        <!-- Hidden select for compatibility with main.js -->
         <select id="mood" style="display:none">
           <option value="">How do you feel?</option>
           <option value="😔">Sad</option>
@@ -229,8 +220,8 @@
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
     <div id="progress-ring-card">
-      <div id="progress-ring-container">
-        <svg id="progress-ring" width="140" height="140">
+      <div id="progress-ring-container" style="display:flex;justify-content:center;align-items:center;margin:.5rem auto;">
+        <svg id="progress-ring" width="140" height="140" style="transform:rotate(-90deg)">
           <circle id="progress-ring-bg" stroke="#e9e9f2" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
           <circle id="progress-ring-bar" stroke="var(--brand-green)" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
         </svg>
@@ -273,7 +264,7 @@
     })();
   </script>
 
-  <!-- Progress ring helper expected by some main.js implementations -->
+  <!-- Progress ring helper for main.js -->
   <script>
     (function () {
       const r = 60, C = 2*Math.PI*r;
@@ -288,7 +279,7 @@
     })();
   </script>
 
-  <!-- Mood chips -> hidden select sync (for compatibility) -->
+  <!-- Mood chips -> hidden select sync -->
   <script>
     (function () {
       const select = document.getElementById('mood');
@@ -296,7 +287,7 @@
       const liveEmoji = document.getElementById('mood-emoji');
       const liveLabel = document.getElementById('mood-label');
       function selectMood(emoji){
-        chips.forEach(c=>c.toggleAttribute('data-active', c.dataset.emoji===emoji));
+        chips.forEach(c=>c.setAttribute('data-active', c.dataset.emoji===emoji ? 'true' : 'false'));
         if (select) select.value = emoji || '';
         liveEmoji.textContent = emoji || '—';
         liveLabel.textContent = emoji ? 'Mood selected' : 'How do you feel?';
@@ -306,7 +297,7 @@
     })();
   </script>
 
-  <!-- Task chime + completed visuals (no change to main.js needed) -->
+  <!-- Task chime + completed visuals -->
   <script>
     (function () {
       const list = document.getElementById('task-list');
@@ -327,12 +318,11 @@
             o.start(now + i*0.06);
             o.stop(now + i*0.06 + 0.35);
           });
-          // fade out
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
         } catch(e) {}
       }
 
-      // delegate checkbox changes
+      // Delegate checkbox changes from whatever markup main.js renders
       list.addEventListener('change', (e) => {
         const cb = e.target;
         if (cb && cb.matches('input[type="checkbox"]')) {
@@ -342,7 +332,7 @@
         }
       });
 
-      // hydrate existing checked state (after main.js renders)
+      // Hydrate any pre-checked tasks after main.js renders
       setTimeout(() => {
         list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
           const row = cb.closest('#task-list > *') || cb.parentElement;
@@ -352,6 +342,101 @@
     })();
   </script>
 
+  <!-- Header updater: date/time, weather, affirmation, quote -->
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const weatherEl = $("weather");
+      const titleEl = $("page-title");
+      const quoteEl = $("quote-box");
+      const affirmationEl = $("affirmation-box");
+
+      // Date/Time
+      function renderNow() {
+        const d = new Date();
+        const day = d.toLocaleDateString(undefined, { weekday: "long" });
+        const date = d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+        const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+        if (titleEl) titleEl.textContent = `${day} • ${date} • ${time}`;
+      }
+      renderNow();
+      setInterval(renderNow, 60 * 1000);
+
+      // Affirmation
+      const AFFIRMATIONS = [
+        "You’re doing better than you think.",
+        "One small step counts today.",
+        "You can handle this moment.",
+        "Breathe in calm, breathe out doubt.",
+        "Progress, not perfection.",
+        "Your effort matters."
+      ];
+      (function showAffirmation(){
+        const a = AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)];
+        if (affirmationEl) { affirmationEl.textContent = a; affirmationEl.classList.add("visible"); }
+      })();
+
+      // Quote
+      async function loadQuote() {
+        try {
+          const r = await fetch("https://api.quotable.io/random?minLength=60&maxLength=160", { cache: "no-store" });
+          if (!r.ok) throw new Error("quote fail");
+          const q = await r.json();
+          if (quoteEl) quoteEl.textContent = `“${q.content}” — ${q.author}`;
+        } catch {
+          if (quoteEl) quoteEl.textContent = "“Be kind to yourself — you’re learning as you go.”";
+        }
+      }
+      loadQuote();
+
+      // Weather (Open-Meteo)
+      const WMAP = {
+        0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
+        45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",
+        61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Heavy freezing rain",
+        71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",
+        80:"Rain showers",81:"Heavy rain showers",82:"Violent rain showers",
+        85:"Snow showers",86:"Heavy snow showers",
+        95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"
+      };
+      function renderWeather({ temp, desc }) {
+        if (!weatherEl) return;
+        weatherEl.innerHTML = `<div class="temp">${Math.round(temp)}°</div><div class="desc">${desc}</div>`;
+      }
+      async function getWeather(lat, lon) {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) throw new Error("weather fail");
+        const j = await r.json();
+        const cur = j.current || j.current_weather || {};
+        const temp = cur.temperature_2m ?? cur.temperature;
+        const code = cur.weather_code ?? cur.weathercode;
+        renderWeather({ temp, desc: WMAP[code] || "Weather" });
+      }
+      function weatherFallback() {
+        const guesses = [
+          { lat: 40.7128, lon: -74.0060 }, // NYC
+          { lat: 34.0522, lon: -118.2437 }, // LA
+          { lat: 41.8781, lon: -87.6298 }, // Chicago
+        ];
+        const pick = guesses[Math.floor(Math.random() * guesses.length)];
+        getWeather(pick.lat, pick.lon).catch(() => {
+          if (weatherEl) weatherEl.innerHTML = `<div class="desc">Weather unavailable</div>`;
+        });
+      }
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => getWeather(pos.coords.latitude, pos.coords.longitude).catch(weatherFallback),
+          weatherFallback,
+          { enableHighAccuracy: false, maximumAge: 30 * 60_000, timeout: 6000 }
+        );
+      } else {
+        weatherFallback();
+      }
+    })();
+  </script>
+
+  <!-- Your app logic that manages tasks/journals/etc. -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
