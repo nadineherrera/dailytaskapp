@@ -36,7 +36,7 @@
     body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
     .container { max-width: 980px; margin: 0 auto; padding: 1rem; }
 
-    /* Header: flat, bright */
+    /* Header */
     header {
       background: var(--yellow);
       padding: 1rem 1.25rem;
@@ -46,106 +46,70 @@
     }
     header img { max-width: 80px; display:block; margin: 0 auto; }
     .day-heading { text-align: center; font-size: 1.9rem; font-weight: 800; margin: .5rem 0 .25rem; color: #000; }
-    header .weather-content {
-      display: flex; flex-direction: column; align-items: center;
-      text-align: center; gap: 0.25rem; font-size: 0.95rem; color: #333;
-    }
+    header .weather-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.25rem; font-size: 0.95rem; color: #333; }
     header .weather-content .temp { font-size: 1.1rem; font-weight: 700; }
     header .weather-content .desc { font-style: italic; color: #444; }
     #affirmation-box { text-align: center; margin-top: .5rem; font-style: italic; color: var(--muted); opacity: 0; transition: opacity .8s ease; }
     #affirmation-box.visible { opacity: 1; }
 
     /* Day nav */
-    .day-nav {
-      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
-      margin-bottom: 1.25rem;
-    }
-    .day-nav a {
-      text-decoration:none; color:#fff; background: var(--brand-purple);
-      padding:.5rem .8rem; border-radius: 999px; font-weight:700; font-size:.95rem;
-      transition: filter .15s ease;
-    }
+    .day-nav { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; margin-bottom: 1.25rem; }
+    .day-nav a { text-decoration:none; color:#fff; background: var(--brand-purple); padding:.5rem .8rem; border-radius: 999px; font-weight:700; font-size:.95rem; transition: filter .15s ease; }
     .day-nav a:hover { filter: brightness(1.05); }
 
-    /* Card layout */
-    .journal-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1rem; }
+    /* Section labels */
+    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.75rem 0 1rem; font-weight: 800; }
+
+    /* Journals + Gratitude cards */
+    .journal-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; align-items: stretch; margin-top: 1rem; }
     section#journals, section#gratitude {
-      flex: 1 1 320px; background: var(--card); padding: 1rem 1rem 1.25rem;
+      flex: 1 1 320px; display:flex; flex-direction:column;
+      background: var(--card); padding: 1.25rem;
       border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border);
     }
     section#journals h2, section#gratitude h2 { margin: 0 0 .6rem; font-size: 1.1rem; font-weight: 800; color: var(--brand-purple); }
-    section#journals textarea, section#gratitude textarea {
-      width: 100%; min-height: 110px; padding: 12px; margin-bottom: 1rem;
-      font-family: inherit; font-size: 1rem; border-radius: 10px; border: 1px solid #d9d9e3; background: #fff;
-    }
+    section#journals textarea, section#gratitude textarea { flex:1; min-height:100px; margin-bottom:1rem; padding: 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #d9d9e3; }
     section#journals button, section#gratitude button {
-      display: block; margin: .25rem auto 0; padding: 0.65rem 1.1rem;
-      background: var(--brand-purple); color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
-      box-shadow: 0 6px 14px rgba(132,94,194,.25);
+      margin-top:auto; align-self:center; padding:0.65rem 1.2rem;
+      background: var(--brand-purple); color:#fff; border:none; border-radius:8px; font-weight:700;
+      cursor:pointer; box-shadow:0 4px 10px rgba(132,94,194,.25);
     }
-
-    /* Section titles */
-    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.75rem 0 1rem; font-weight: 800; }
-
-    /* Tasks card */
-    #task-card {
-      background: var(--card); border:1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem;
-      margin-top: .75rem;
-    }
-    #task-list h2 { display: flex; align-items: center; gap: 10px; padding: .75rem 1rem; background: var(--brand-green); margin: 0 0 10px; border-radius: 8px; color: white; font-weight: 800; font-size: 1.05rem; }
-    .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 0; justify-content: center; max-width: 640px; margin-left:auto; margin-right:auto; }
-    .task-input-group input, .task-input-group button { flex: 1 1 100%; max-width: 100%; }
-    #new-task { width: 72%; max-width: 420px; padding: 0.65rem .8rem; font-size: 1rem; border-radius: 10px; border: 1px solid #d9d9e3; box-sizing: border-box; background:#fff; }
-    button { padding: 0.6rem 1.1rem; font-size: 1rem; border-radius: 10px; background-color: var(--brand-purple); color: white; border: none; cursor: pointer; font-weight:700; }
-    button.secondary { background: var(--accent); }
-
-    footer#quote-footer {
-      background-color: var(--card); padding: 1rem; text-align: center; color: var(--muted);
-      font-style: italic; font-size: 1rem; margin: 1.5rem 0 0 0; width: 100%; box-sizing: border-box;
-      border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
-    }
-
-    /* Breathing */
-    #breathing .breathing-tile {
-      background: var(--card); padding: 1.25rem 1rem; border-radius: var(--radius);
-      box-shadow: var(--shadow); border:1px solid var(--border); max-width: 520px; margin: 1.25rem auto;
-    }
-    #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 0.5rem 1rem; gap: 1rem; }
-    #breath-bubble { width: 140px; height: 140px; background: radial-gradient(circle, #8fd7ff, var(--accent)); border-radius: 50%; box-shadow: 0 0 16px rgba(0, 140, 186, 0.35), 0 8px 20px rgba(0, 0, 0, 0.08); transform-origin: center; margin: 0 auto .5rem; }
-    #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; text-align: center; margin: .25rem 0 .25rem; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
-    #breath-text span#countdown { font-size: 1.6rem; color: var(--brand-green); font-weight: 800; }
-    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
-    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
-    #breath-toggle-btn { margin-top: 0; padding: 0.7rem 1.1rem; font-size: 1rem; border-radius: 10px; background-color: var(--brand-purple); color: white; border: none; cursor: pointer; text-align: center; font-weight:700; }
-
-    /* Progress ring */
-    #progress-ring-card {
-      background: var(--card); border:1px solid var(--border); border-radius: var(--radius);
-      box-shadow: var(--shadow); padding: 1rem; margin: 1rem auto; max-width: 520px;
-    }
-    #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: .5rem auto; }
-    #progress-ring { transform: rotate(-90deg); overflow: visible; }
-    #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
-    #progress-text { text-align: center; font-weight: 800; color: var(--brand-green); margin-bottom: .5rem; }
 
     /* Mood Picker */
-    #mood { display: none; } /* keep for compatibility, hide visually */
-    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
-    .mood-chip { font-size:1.5rem; padding:.45rem .6rem; border-radius:10px; border:1px solid #d9d9e3; background:#fff; cursor:pointer; }
-    .mood-chip[aria-checked="true"] { outline:2px solid var(--brand-purple); outline-offset:2px; background:#f5f1ff; }
-    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.25rem; color: var(--muted); }
-    .mood-label { font-weight: 700; color: #333; }
+    #mood { display: none; }
+    .mood-grid { display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center; margin-top:0.5rem; }
+    .mood-chip { font-size:1.4rem; padding:0.4rem 0.6rem; border-radius:10px; border:1px solid #d9d9e3; background:#fff; cursor:pointer; transition:all .15s ease; }
+    .mood-chip:hover { background:#f5f1ff; }
+    .mood-chip[aria-checked="true"] { outline:2px solid var(--brand-purple); background:#f0eaff; }
+    .mood-live { margin-top:0.6rem; text-align:center; font-size:0.95rem; color:#555; }
+    #mood-emoji { font-size:1.5rem; }
 
-    /* Hidden compat block so old queries in main.js don't crash */
-    .compat-hidden { display:none !important; visibility:hidden !important; }
+    /* Breathing */
+    #breathing .breathing-tile { background: var(--card); padding: 1.25rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border); max-width: 520px; margin: 1.25rem auto; }
+    #breath-bubble-container { display:flex; flex-direction:column; align-items:center; gap:1rem; }
+    #breath-bubble { width:140px; height:140px; background: radial-gradient(circle, #8fd7ff, var(--accent)); border-radius: 50%; box-shadow: 0 0 16px rgba(0,140,186,.35), 0 8px 20px rgba(0,0,0,.08); transform-origin:center; margin-bottom:.5rem; }
+    #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; display:flex; gap:0.4rem; }
+    #breath-text span#countdown { font-size: 1.6rem; color: var(--brand-green); }
+    @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
+    #breath-toggle-btn { padding:0.7rem 1.1rem; font-size:1rem; border-radius:10px; background:var(--brand-purple); color:#fff; border:none; cursor:pointer; font-weight:700; }
 
-    /* Responsive tweaks */
-    @media (max-width: 768px) {
-      #breath-bubble { width: 120px; height: 120px; }
-      .task-input-group { gap:.5rem; }
-      #new-task { width: 100%; }
-    }
+    /* Progress ring + tasks */
+    #progress-ring-card { background: var(--card); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; margin: 1rem auto; max-width: 520px; }
+    #progress-ring-container { display:flex; justify-content:center; align-items:center; margin:.5rem auto; }
+    #progress-ring { transform:rotate(-90deg); }
+    #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
+    #progress-text { text-align:center; font-weight:800; color:var(--brand-green); margin-bottom:.5rem; }
+    #task-card { background: var(--card); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; margin-top:.75rem; }
+    .task-input-group { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; justify-content:center; }
+    #new-task { flex:1; min-width:200px; padding:0.65rem; font-size:1rem; border-radius:10px; border:1px solid #d9d9e3; }
+    button { padding:0.6rem 1.1rem; border-radius:10px; font-weight:700; }
+    button.secondary { background: var(--accent); color:#fff; }
+
+    /* Footer */
+    footer#quote-footer { background: var(--card); padding: 1rem; text-align: center; color: var(--muted); font-style: italic; font-size: 1rem; margin: 1.5rem 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow); }
+
+    .compat-hidden { display:none !important; }
   </style>
 </head>
 <body>
@@ -166,61 +130,44 @@
     <div class="journal-grid">
       <section id="journals">
         <h2>Journals</h2>
-        <label for="dream-journal" style="font-weight:700;color:#444;">Dream Journal</label>
+        <label for="dream-journal">Dream Journal</label>
         <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
-        <label for="daily-journal" style="font-weight:700;color:#444;">Daily Journal</label>
+        <label for="daily-journal">Daily Journal</label>
         <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
         <button id="save-journal-btn">Save Journals</button>
       </section>
 
       <section id="gratitude">
         <h2>Gratitude & Mood</h2>
-        <label for="gratitudeEntry" style="font-weight:700;color:#444;">Gratitude Prompt</label>
+        <label for="gratitudeEntry">Gratitude Prompt</label>
         <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
 
-        <h3 style="margin:.75rem 0 .25rem; color:#444;">Your Mood</h3>
-        <!-- ORIGINAL select kept for compatibility (hidden via CSS) -->
-        <select id="mood">
-          <option value="">How do you feel?</option>
-          <option value="😀">Happy</option>
-          <option value="😐">Neutral</option>
-          <option value="😔">Sad</option>
-          <option value="😤">Frustrated</option>
-          <option value="😴">Tired</option>
-          <option value="😌">Peaceful</option>
-        </select>
-
-        <!-- Emoji chip picker -->
-        <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😐" data-label="Neutral">😐</button>
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="🙂" data-label="Okay">🙂</button>
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😀" data-label="Happy">😀</button>
-          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😌" data-label="Peaceful">😌</button>
+        <h3 style="margin:.75rem 0 .25rem;">Your Mood</h3>
+        <select id="mood"><option value="">How do you feel?</option><option value="😀">Happy</option><option value="😐">Neutral</option><option value="😔">Sad</option><option value="😤">Frustrated</option><option value="😴">Tired</option><option value="😌">Peaceful</option></select>
+        <div class="mood-grid" role="radiogroup">
+          <button class="mood-chip" data-emoji="😔" data-label="Sad">😔</button>
+          <button class="mood-chip" data-emoji="😤" data-label="Frustrated">😤</button>
+          <button class="mood-chip" data-emoji="😐" data-label="Neutral">😐</button>
+          <button class="mood-chip" data-emoji="🙂" data-label="Okay">🙂</button>
+          <button class="mood-chip" data-emoji="😀" data-label="Happy">😀</button>
+          <button class="mood-chip" data-emoji="😌" data-label="Peaceful">😌</button>
         </div>
-
-        <div class="mood-live">
-          <span id="mood-emoji" style="font-size:1.6rem; opacity:.6;">—</span>
-          <span id="mood-label" class="mood-label" style="opacity:.85;">How do you feel?</span>
-        </div>
+        <div class="mood-live"><span id="mood-emoji">—</span><span id="mood-label">How do you feel?</span></div>
       </section>
     </div>
 
-    <section id="breathing">
-      <h2 class="section-label">🫁 Breathing Exercise</h2>
-      <div class="breathing-tile">
-        <div id="breath-bubble-container">
-          <div id="breath-bubble"></div>
-          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
-          <button id="breath-toggle-btn">Start Breath</button>
-        </div>
+    <h2 class="section-label">🫁 Breathing Exercise</h2>
+    <div class="breathing-tile">
+      <div id="breath-bubble-container">
+        <div id="breath-bubble"></div>
+        <p id="breath-text">Inhale for <span id="countdown">4</span></p>
+        <button id="breath-toggle-btn">Start Breath</button>
       </div>
-    </section>
+    </div>
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
     <div id="progress-ring-card">
-      <div id="progress-ring-container" aria-label="Task progress">
+      <div id="progress-ring-container">
         <svg id="progress-ring" width="140" height="140">
           <circle id="progress-ring-bg" stroke="#e9e9f2" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
           <circle id="progress-ring-bar" stroke="var(--brand-green)" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
@@ -241,34 +188,18 @@
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- ========== Legacy/compat placeholders (hidden) so main.js doesn't error ========== -->
-  <div class="compat-hidden">
-    <!-- Old rectangular progress bar some scripts might touch -->
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <!-- Ongoing tasks artifacts (IDs only; safely hidden) -->
-    <h2 class="section-label">♾ Ongoing Tasks</h2>
-    <div id="ongoing-task-list"></div>
-    <div class="task-input-group">
-      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
-      <button id="add-ongoing-task-btn">Add Task</button>
-      <button id="reset-ongoing-tasks-btn">Reset Ongoing Tasks</button>
-    </div>
-  </div>
-
-  <!-- ========== Safe guards: define no-op functions if main.js expects them ========== -->
+  <!-- Helpers -->
   <script>
-    // Prevent ReferenceErrors if inline handlers or main.js call these
-    window.addOngoingTask = window.addOngoingTask || function(){};
-    window.resetOngoingTasks = window.resetOngoingTasks || function(){};
-    // If legacy code tries to set rectangular progress, keep it harmless
-    window.updateLegacyProgress = window.updateLegacyProgress || function(pct){
-      const bar = document.getElementById('progress-bar');
-      if (bar) bar.style.width = (Number(pct)||0) + '%';
+    // Safe guards so main.js never breaks
+    window.addOngoingTask = () => {};
+    window.resetOngoingTasks = () => {};
+    window.updateLegacyProgress = pct => {
+      const bar=document.getElementById('progress-bar');
+      if(bar) bar.style.width=(Number(pct)||0)+'%';
     };
   </script>
-
-  <!-- Progress ring helper -->
   <script>
+    // Progress ring helper
     (function () {
       const radius = 60;
       const circumference = 2 * Math.PI * radius;
@@ -278,51 +209,23 @@
         if (!circle) return;
         const offset = circumference - (pct / 100) * circumference;
         circle.style.strokeDashoffset = offset;
-        const label = document.getElementById('progress-text');
-        if (label) label.textContent = `${pct}% Complete`;
+        document.getElementById('progress-text').textContent = `${pct}% Complete`;
       };
     })();
   </script>
-
-  <!-- Mood control behavior -->
   <script>
+    // Mood control
     (function () {
-      const moodSelect = document.getElementById("mood");
-      const chips = Array.from(document.querySelectorAll(".mood-chip"));
-      const liveEmoji = document.getElementById("mood-emoji");
-      const liveLabel = document.getElementById("mood-label");
-
-      function clearSelection() {
-        chips.forEach(c => c.setAttribute("aria-checked", "false"));
-        if (moodSelect) moodSelect.value = "";
-        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".6"; }
-        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".85"; }
-      }
-      function setSelection(emoji, label) {
-        chips.forEach(c => c.setAttribute("aria-checked", c.dataset.emoji === emoji ? "true" : "false"));
-        if (moodSelect) moodSelect.value = emoji;
-        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
-        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
-      }
-      const prefill = moodSelect?.value || "";
-      if (prefill) {
-        const chip = chips.find(c => c.dataset.emoji === prefill);
-        if (chip) setSelection(chip.dataset.emoji, chip.dataset.label);
-        else clearSelection();
-      } else { clearSelection(); }
-      chips.forEach(chip => {
-        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
-        chip.addEventListener("keydown", (e) => {
-          if (e.key === " " || e.key === "Enter") {
-            e.preventDefault();
-            setSelection(chip.dataset.emoji, chip.dataset.label);
-          }
-        });
-      });
+      const moodSelect=document.getElementById("mood");
+      const chips=[...document.querySelectorAll(".mood-chip")];
+      const liveEmoji=document.getElementById("mood-emoji");
+      const liveLabel=document.getElementById("mood-label");
+      function clearSel(){chips.forEach(c=>c.setAttribute("aria-checked","false"));moodSelect.value="";liveEmoji.textContent="—";liveLabel.textContent="How do you feel?";}
+      function setSel(e,l){chips.forEach(c=>c.setAttribute("aria-checked",c.dataset.emoji===e?"true":"false"));moodSelect.value=e;liveEmoji.textContent=e;liveLabel.textContent=l;}
+      clearSel();
+      chips.forEach(chip=>{chip.addEventListener("click",()=>setSel(chip.dataset.emoji,chip.dataset.label));});
     })();
   </script>
-
-  <!-- Your app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
