@@ -22,7 +22,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     .container{max-width:960px;margin:0 auto;padding:16px}
 
-    /* Header */
+    /* Header (IDs kept for main.js) */
     header{
       background:var(--yellow);
       border-radius:16px;
@@ -33,18 +33,18 @@
     }
     header img{max-width:80px;display:block;margin:0 auto}
     .day-heading{margin:.3rem 0 6px 0;font-weight:800}
-    /* Weather compat: many scripts expect these sub-ids/classes */
+
+    /* Weather compat */
     #weather{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
     #weather .temp,#weather .desc,#weather .loc{font-weight:600}
     #weather .temp{color:#333}
     #weather .desc{color:#444;font-style:italic}
     #weather .loc{color:#555}
-    #weather-temp{display:inline}
-    #weather-desc{display:inline}
-    #weather-loc{display:inline}
+    #weather-temp,#weather-desc,#weather-loc{display:inline}
 
     .section-label{text-align:center;color:var(--brand-green);font-weight:800;margin:20px 0 12px}
 
+    /* Cards & grid */
     .grid{display:flex;flex-wrap:wrap;gap:14px}
     .card{flex:1 1 320px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
     .card h2{margin:0 0 .6rem 0;color:var(--brand-purple);font-size:1.1rem}
@@ -53,13 +53,6 @@
       width:100%;min-height:110px;border-radius:12px;border:1px solid #d9d9e3;background:#fff;
       font-family:inherit;padding:12px;box-sizing:border-box;margin-bottom:10px
     }
-
-    .btn{appearance:none;border:0;border-radius:12px;padding:.65rem 1rem;background:var(--brand-purple);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 8px 14px rgba(132,94,194,.2);transition:filter .2s ease,transform .06s ease}
-    .btn:hover{filter:brightness(1.05)}
-    .btn:active{transform:translateY(1px)}
-    .btn-ghost{background:#fff;color:var(--brand-purple);border:1px solid #d9d9e3;box-shadow:0 6px 12px rgba(0,0,0,.05)}
-    .btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-    .btn-block{width:100%}
 
     /* Mood chips */
     .mood-wrap{margin-top:6px}
@@ -72,7 +65,7 @@
     #breathing-card{text-align:center}
     #breath-bubble-wrap{
       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-      padding:20px 16px 22px;  /* extra padding so the bubble never overlaps */
+      padding:20px 16px 22px; /* extra space so bubble never overlaps */
     }
     #breath-bubble{
       width:150px;height:150px;border-radius:50%;
@@ -85,7 +78,7 @@
     .inhale{animation:inhaleK 4s ease-in-out forwards}
     .exhale{animation:exhaleK 4s ease-in-out forwards}
 
-    /* Tasks */
+    /* Tasks (works with your existing DOM) */
     #task-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px}
     #task-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
     #task-list > *{
@@ -97,21 +90,24 @@
     #task-list input[type="checkbox"]:checked + label,
     #task-list input[type="checkbox"]:checked ~ .task-text,
     #task-list input[type="checkbox"]:checked ~ .taskTitle{color:#9aa0a6;text-decoration:line-through}
+
     .task-input-group{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
     #new-task{flex:1 1 260px;padding:.6rem .8rem;border-radius:10px;border:1px solid #d9d9e3;background:#fff;box-sizing:border-box}
 
+    /* Footer */
     footer{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin:18px 0 6px;text-align:center;font-style:italic}
+
     @media (max-width:768px){#breath-bubble{width:130px;height:130px}}
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- HEADER: keep IDs that main.js expects -->
+    <!-- HEADER: main.js fills these -->
     <header>
       <img src="apple-touch-icon.png" alt="App Logo">
       <h1 id="page-title" class="day-heading"></h1>
 
-      <!-- Weather compat block -->
+      <!-- Weather compat -->
       <div id="weather">
         <span class="temp" id="weather-temp"></span>
         <span class="desc" id="weather-desc"></span>
@@ -128,8 +124,9 @@
         <h2>Journals</h2>
         <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
         <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
-        <div class="btn-row">
-          <button id="save-journal-btn" class="btn btn-block">Save Journals</button>
+        <!-- plain system button -->
+        <div style="text-align:center;margin-top:6px">
+          <button id="save-journal-btn">Save Journals</button>
         </div>
       </section>
 
@@ -161,8 +158,8 @@
       <div id="breath-bubble-wrap">
         <div id="breath-bubble"></div>
         <p id="breath-text">Paused</p>
-        <div class="btn-row">
-          <button id="breath-toggle-btn" class="btn">Start Breath</button>
+        <div style="text-align:center">
+          <button id="breath-toggle-btn">Start Breath</button>
         </div>
       </div>
     </section>
@@ -173,8 +170,8 @@
       <div id="task-list"></div>
       <div class="task-input-group">
         <input type="text" id="new-task" placeholder="Add new task">
-        <button class="btn" onclick="addTask()">Add Task</button>
-        <button class="btn btn-ghost" onclick="resetTasks()">Reset All Tasks</button>
+        <button onclick="addTask()">Add Task</button>
+        <button onclick="resetTasks()">Reset All Tasks</button>
       </div>
     </section>
 
@@ -201,7 +198,7 @@
     })();
   </script>
 
-  <!-- Breathing: 4/4/4/4 with countdown and safe spacing -->
+  <!-- Breathing 4/4/4/4 with countdown and safe spacing -->
   <script>
     (function(){
       const bubble=document.getElementById('breath-bubble');
@@ -236,7 +233,7 @@
     })();
   </script>
 
-  <!-- Your app logic (kept as module if that's what you use) -->
+  <!-- Your existing app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
