@@ -35,7 +35,6 @@
     section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
     section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
     section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
-    #gratitude select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #bcaecf; font-size: 1rem; margin-bottom: 2rem; }
     .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
     #task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-weight: bold; font-size: 1.1rem; }
     .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; max-width: 600px; }
@@ -45,15 +44,13 @@
     footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
 
     #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
-    .celebration-emoji { animation: pop-fade 2s ease forwards; font-size: 1.5rem; }
 
     #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
     .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
-    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; }
     #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
     #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
     .breathe-animation { animation: breathe 6s ease-in-out infinite; }
-    #breath-toggle-btn { margin-top: 0; padding: 0.8rem 1.4rem; font-size: 1rem; border-radius: 12px; background-color: #845EC2; color: white; border: none; cursor: pointer; text-align: center; }
 
     #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: 1rem auto; }
     #progress-ring { transform: rotate(-90deg); overflow: visible; }
@@ -120,8 +117,15 @@
       </section>
     </div>
 
-    <section id="breathing"><h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
-      <div class="breathing-tile"><div id="breath-bubble-container"><div id="breath-bubble"></div><p id="breath-text">Inhale for <span id="countdown">4</span></p><button id="breath-toggle-btn">Start Breath</button></div></div>
+    <section id="breathing">
+      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
+      <div class="breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
+          <button id="breath-toggle-btn">Start Breath</button>
+        </div>
+      </div>
     </section>
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
@@ -134,7 +138,11 @@
     <p id="progress-text">0% Complete</p>
 
     <div id="task-list"></div>
-    <div class="task-input-group"><input type="text" id="new-task" placeholder="Add new task"><button onclick="addTask()">Add Task</button><button onclick="resetTasks()">Reset All Tasks</button></div>
+    <div class="task-input-group">
+      <input type="text" id="new-task" placeholder="Add new task">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="resetTasks()">Reset All Tasks</button>
+    </div>
 
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
