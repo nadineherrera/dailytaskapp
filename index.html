@@ -13,7 +13,7 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
   <style>
-    :root {
+    :root{
       --brand-purple:#845EC2;
       --brand-green:#66B032;
       --accent:#008cba;
@@ -26,165 +26,111 @@
       --shadow:0 6px 20px rgba(0,0,0,.08);
       --border:#e7e7ef;
     }
-    html, body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      margin: 0; padding: 0; height: 100%; width: 100%;
-      background: var(--bg);
-      color: var(--text);
-      box-sizing: border-box; overflow-x: hidden;
-    }
-    .container { max-width: 980px; margin: 0 auto; padding: 1rem; }
+    html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden}
+    .container{max-width:980px;margin:0 auto;padding:1rem}
 
     /* Header */
-    header {
-      background: var(--yellow);
-      padding: 1rem 1.25rem;
-      margin: 0 auto 1.25rem auto;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      text-align:center;
-    }
-    header img { max-width: 80px; display:block; margin: 0 auto; }
-    .day-heading { font-size: 1.9rem; font-weight: 800; margin: .5rem 0 .25rem; color: #000; }
-    header .weather-content { font-size: 0.95rem; color: #333; }
-    header .weather-content .temp { font-size: 1.1rem; font-weight: 700; }
-    header .weather-content .desc { font-style: italic; color: #444; }
-    #affirmation-box { margin-top: .5rem; font-style: italic; color: var(--muted); opacity: 0; transition: opacity .8s ease; }
-    #affirmation-box.visible { opacity: 1; }
+    header{background:var(--yellow);padding:1rem 1.25rem;margin:0 auto 1.25rem;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center}
+    header img{max-width:80px;margin:0 auto;display:block}
+    .day-heading{font-size:1.9rem;font-weight:800;margin:.5rem 0 .25rem}
+    .weather-content{font-size:.95rem}
+    .weather-content .temp{font-weight:700}
+    .weather-content .desc{font-style:italic;color:#444}
+    #affirmation-box{margin-top:.5rem;font-style:italic;color:var(--muted);opacity:0;transition:opacity .8s ease}
+    #affirmation-box.visible{opacity:1}
 
     /* Day nav */
-    .day-nav {
-      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
-      margin-bottom: 1.25rem;
-    }
-    .day-nav a {
-      text-decoration:none; color:#fff; background: var(--brand-purple);
-      padding:.5rem .8rem; border-radius: 999px; font-weight:700;
-      transition: filter .15s ease;
-    }
+    .day-nav{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.25rem}
+    .day-nav a{color:#fff;text-decoration:none;background:var(--brand-purple);padding:.5rem .8rem;border-radius:999px;font-weight:700}
 
-    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.5rem 0 1rem; font-weight: 800; }
+    .section-label{text-align:center;font-size:1.25rem;color:var(--brand-green);margin:1.5rem 0 1rem;font-weight:800}
 
-    /* Journals & Gratitude */
-    .journal-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 1rem;
-      align-items: start;
+    /* Journals + Gratitude cards (alignment fixed) */
+    .journal-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:1rem;
+      align-items:start;
     }
-    section#journals, section#gratitude {
-      background: var(--card);
+    section#journals,section#gratitude{
+      background:var(--card);
       border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1rem 1rem 1.1rem;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:1rem 1rem 1.1rem;
     }
-    section h2 { margin: 0 0 .5rem; font-size: 1.2rem; font-weight: 800; color: var(--brand-purple); }
-    .field-stack {
-      display: grid;
-      gap: .75rem;  /* consistent, tight spacing */
+    section h2{margin:0 0 .6rem;font-size:1.2rem;color:var(--brand-purple)}
+    .field-stack{display:grid;gap:.75rem}
+    textarea{
+      width:100%;
+      min-height:110px;
+      padding:12px;
+      font:inherit;
+      background:#fff;
+      border:1px solid #d9d9e3;
+      border-radius:12px;
+      box-sizing:border-box;
+      margin:0;               /* remove stray margins that caused misalignment */
     }
-    textarea {
-      width: 100%;
-      min-height: 110px;
-      padding: 12px;
-      font-family: inherit; font-size: 1rem;
-      border-radius: 12px; border: 1px solid #d9d9e3; background: #fff;
-    }
-    #save-journal-btn { display:block; margin:.25rem auto 0; }
-    button { padding: 0.6rem 1.1rem; font-size: 1rem; border-radius: 10px; background-color: var(--brand-purple); color: white; border: none; cursor: pointer; font-weight:700; }
-    button.secondary { background: var(--accent); }
+    #save-journal-btn{justify-self:center}
 
-    /* Mood Picker */
-    #mood { display:none; } /* keep for compatibility */
-    .mood-grid { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:flex-start; }
-    .mood-chip {
-      font-size:1.45rem; padding:.35rem .55rem; border-radius:12px;
-      border:1px solid #d9d9e3; background:#fff; cursor:pointer;
-      transition:all .15s ease;
+    /* Mood picker */
+    #mood{display:none} /* kept for compatibility with main.js */
+    .mood-grid{display:flex;flex-wrap:wrap;gap:.6rem}
+    .mood-chip{
+      font-size:1.45rem;padding:.35rem .55rem;border-radius:12px;
+      border:1px solid #d9d9e3;background:#fff;cursor:pointer;transition:all .15s ease
     }
-    .mood-chip[data-active="true"] { outline:2px solid var(--brand-purple); background:#f0eaff; }
-    .mood-live { margin-top:.5rem; color:#555; font-weight:600; display:flex; align-items:center; gap:.45rem; }
+    .mood-chip[data-active="true"]{outline:2px solid var(--brand-purple);background:#f0eaff}
+    .mood-live{margin-top:.5rem;color:#555;font-weight:600;display:flex;align-items:center;gap:.45rem}
 
     /* Breathing */
-    #breathing .breathing-tile {
-      background: var(--card);
-      padding: 2rem 1.25rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border:1px solid var(--border);
-      max-width: 520px;
-      margin: 1rem auto;
-      text-align:center;
-      overflow: hidden;     /* keeps scaled bubble within rounded card */
+    #breathing .breathing-tile{
+      background:var(--card);padding:2rem 1.25rem;border-radius:var(--radius);
+      box-shadow:var(--shadow);border:1px solid var(--border);max-width:520px;margin:1rem auto;text-align:center
     }
-    #breath-bubble {
-      width: 140px; height: 140px;
-      background: radial-gradient(circle, #8fd7ff, var(--accent));
-      border-radius: 50%;
-      margin: 0 auto .5rem;
-      will-change: transform;
+    /* Reserve vertical space so the scaled bubble never overlaps text */
+    .bubble-wrap{
+      height:210px;                 /* enough room for max scale */
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;              /* guard rails */
     }
-    #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; margin:.25rem 0 .5rem; }
-    /* Box-breathing 4-4-4-4 animation (16s) */
-    @keyframes boxbreathe {
-      0%   { transform: scale(1); }      /* start (hold min) */
-      12.5%{ transform: scale(1); }      /* hold 4s */
-      25%  { transform: scale(1.4); }    /* inhale 4s -> max */
-      37.5%{ transform: scale(1.4); }    /* hold max 4s */
-      62.5%{ transform: scale(1); }      /* exhale 4s -> min (ends at 62.5%) */
-      75%  { transform: scale(1); }      /* hold min 4s */
-      100% { transform: scale(1); }
+    #breath-bubble{
+      width:150px;height:150px;border-radius:50%;
+      background:radial-gradient(circle,#8fd7ff,var(--accent));
+      will-change:transform;
     }
-    .breathe-running { animation: boxbreathe 16s ease-in-out infinite; }
+    #breath-text{font-size:1.2rem;color:var(--accent);font-weight:800;margin:.5rem 0 .75rem}
+    /* Visual animation locked to 4-4-4-4 timing (16s) with safe peak scale */
+    @keyframes boxbreathe{
+      0%,12.5%   {transform:scale(1)}
+      25%,37.5%  {transform:scale(1.33)}
+      62.5%,75%  {transform:scale(1)}
+      100%       {transform:scale(1)}
+    }
+    .breathe-running #breath-bubble{animation:boxbreathe 16s ease-in-out infinite}
 
-    /* Progress ring card */
-    #progress-ring-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 520px; margin: 1rem auto; }
-    #progress-text { text-align: center; font-weight: 800; color: var(--brand-green); }
+    /* Progress ring */
+    #progress-ring-card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:var(--shadow);max-width:520px;margin:1rem auto}
+    #progress-text{text-align:center;font-weight:800;color:var(--brand-green)}
 
-    /* Tasks */
-    #task-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border); }
-    #task-list { display:flex; flex-direction:column; gap:.75rem; margin-top:.5rem; }
-    #task-list > * {
-      display:flex; align-items:center; gap:12px;
-      padding:.75rem 1rem; border:1px solid var(--border); border-radius:12px;
-      background:var(--card); box-shadow:0 3px 10px rgba(0,0,0,.05);
-    }
-    #task-list > * label,
-    #task-list > * .task-text,
-    #task-list > * span { flex:1; font-size:1rem; font-weight:700; color:var(--text); }
+    /* Tasks (kept) */
+    #task-card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border)}
+    #task-list{display:flex;flex-direction:column;gap:.75rem;margin-top:.5rem}
+    #task-list > *{display:flex;align-items:center;gap:12px;padding:.75rem 1rem;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.05)}
+    #task-list > * label,#task-list > * .task-text,#task-list > * span{flex:1;font-size:1rem;font-weight:700}
+    #task-list input[type="checkbox"]{inline-size:20px;block-size:20px;border:2px solid var(--brand-green);border-radius:6px;appearance:none;display:grid;place-content:center;background:#fff;cursor:pointer}
+    #task-list input[type="checkbox"]::after{content:"✓";font-weight:900;transform:scale(0);transition:transform .12s ease;color:#fff}
+    #task-list input[type="checkbox"]:checked{background:var(--brand-green);border-color:var(--brand-green)}
+    #task-list input[type="checkbox"]:checked::after{transform:scale(1)}
+    #task-list > *.completed{background:#f6fff2;border-color:#d3efc7}
+    #task-list > *.completed label,#task-list > *.completed .task-text,#task-list > *.completed span{color:#6a6a6a;text-decoration:line-through}
 
-    /* Custom checkbox */
-    #task-list input[type="checkbox"]{
-      inline-size: 20px; block-size: 20px;
-      border: 2px solid var(--brand-green); border-radius: 6px;
-      appearance: none; display: grid; place-content: center;
-      background: #fff; cursor: pointer;
-    }
-    #task-list input[type="checkbox"]::after{
-      content: "✓"; font-weight: 900; transform: scale(0);
-      transition: transform .12s ease; color: #fff;
-    }
-    #task-list input[type="checkbox"]:checked{
-      background: var(--brand-green); border-color: var(--brand-green);
-    }
-    #task-list input[type="checkbox"]:checked::after{ transform: scale(1); }
+    footer#quote-footer{background:var(--card);padding:1rem;text-align:center;color:var(--muted);font-style:italic;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin:1.25rem 0 0}
 
-    /* Completed style */
-    #task-list > *.completed { background:#f6fff2; border-color:#d3efc7; }
-    #task-list > *.completed label,
-    #task-list > *.completed .task-text,
-    #task-list > *.completed span { color:#6a6a6a; text-decoration:line-through; }
-
-    /* Footer */
-    footer#quote-footer {
-      background: var(--card); padding: 1rem; text-align: center; color: var(--muted);
-      font-style: italic; font-size: 1rem; margin: 1.25rem 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
-    }
-
-    /* Mobile tweak */
-    @media (max-width: 420px){
-      #breath-bubble { width: 120px; height: 120px; }
+    @media (max-width:420px){
+      .bubble-wrap{height:190px}
+      #breath-bubble{width:130px;height:130px}
     }
   </style>
 </head>
@@ -221,7 +167,7 @@
           <div>
             <h3 style="margin:.25rem 0 .5rem;">Your Mood</h3>
 
-            <!-- Hidden select for compatibility with main.js -->
+            <!-- Compatibility select (hidden) -->
             <select id="mood" style="display:none">
               <option value="">How do you feel?</option>
               <option value="😔">Sad</option>
@@ -252,7 +198,9 @@
     <section id="breathing">
       <h2 class="section-label">🫁 Breathing Exercise</h2>
       <div class="breathing-tile">
-        <div id="breath-bubble"></div>
+        <div class="bubble-wrap">
+          <div id="breath-bubble"></div>
+        </div>
         <p id="breath-text">Paused</p>
         <button id="breath-toggle-btn">Start Breath</button>
       </div>
@@ -260,9 +208,9 @@
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
     <div id="progress-ring-card">
-      <div id="progress-ring-container" style="display:flex;justify-content:center;align-items:center;margin:.5rem auto;">
+      <div style="display:flex;justify-content:center;align-items:center;margin:.5rem auto;">
         <svg id="progress-ring" width="140" height="140" style="transform:rotate(-90deg)">
-          <circle id="progress-ring-bg" stroke="#e9e9f2" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
+          <circle stroke="#e9e9f2" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
           <circle id="progress-ring-bar" stroke="var(--brand-green)" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
         </svg>
       </div>
@@ -281,257 +229,172 @@
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Breathing: box-breathing logic with countdown -->
+  <!-- Box breathing with precise 4-4-4-4 timing & no overlap -->
   <script>
-    (function () {
-      const bubble = document.getElementById("breath-bubble");
-      const text = document.getElementById("breath-text");
-      const btn = document.getElementById("breath-toggle-btn");
+    (function(){
+      const tile = document.querySelector('.breathing-tile');
+      const bubble = document.getElementById('breath-bubble');
+      const text = document.getElementById('breath-text');
+      const btn  = document.getElementById('breath-toggle-btn');
 
-      // 4-4-4-4 box breathing
-      const steps = [
-        { label: "Inhale for", secs: 4 },
-        { label: "Hold for",   secs: 4 },
-        { label: "Exhale for", secs: 4 },
-        { label: "Hold for",   secs: 4 },
+      const phases = [
+        {label:'Inhale for', secs:4},
+        {label:'Hold for',   secs:4},
+        {label:'Exhale for', secs:4},
+        {label:'Hold for',   secs:4},
       ];
-      let running = false, stepIdx = 0, t = null, remaining = 0;
 
-      function showStep() {
-        const s = steps[stepIdx];
-        remaining = s.secs;
-        text.innerHTML = `${s.label} <span id="countdown">${remaining}</span>`;
+      let running=false, idx=0, remain=0, timer=null;
+
+      function showPhase(){
+        const p = phases[idx];
+        remain = p.secs;
+        text.innerHTML = `${p.label} <span id="count">4</span>`;
       }
-      function tick() {
-        const el = document.getElementById('countdown');
-        if (!el) return;
-        remaining -= 1;
-        if (remaining >= 0) el.textContent = remaining;
-        if (remaining <= 0) {
-          stepIdx = (stepIdx + 1) % steps.length;
-          showStep();
-        }
+
+      function stepTick(){
+        const c = document.getElementById('count');
+        if (!c) return;
+        if (remain>1){ remain--; c.textContent = remain; schedule(); return; }
+        // phase done -> next
+        idx = (idx+1)%phases.length;
+        showPhase();
+        schedule();
       }
-      function start() {
-        if (running) return;
-        running = true;
-        bubble.classList.add("breathe-running");
-        stepIdx = 0;
-        showStep();
-        t = setInterval(tick, 1000);
-        btn.textContent = "Stop Breath";
+
+      function schedule(){ timer = setTimeout(stepTick, 1000); }
+      function start(){
+        if(running) return;
+        running=true;
+        tile.classList.add('breathe-running');
+        idx=0; showPhase(); schedule();
+        btn.textContent='Stop Breath';
       }
-      function stop() {
-        running = false;
-        bubble.classList.remove("breathe-running");
-        clearInterval(t); t = null;
-        text.textContent = "Paused";
-        btn.textContent = "Start Breath";
+      function stop(){
+        running=false;
+        tile.classList.remove('breathe-running');
+        clearTimeout(timer); timer=null;
+        text.textContent='Paused';
+        btn.textContent='Start Breath';
       }
-      btn.addEventListener('click', () => running ? stop() : start());
+      btn.addEventListener('click', ()=> running? stop(): start());
     })();
   </script>
 
-  <!-- Progress ring helper with 100% chime -->
+  <!-- Progress ring helper + celebrate at 100% -->
   <script>
-    (function () {
-      const r = 60, C = 2*Math.PI*r;
-      let ringCelebrated = false;
-
-      function playChime() {
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const now = ctx.currentTime;
-          const gain = ctx.createGain();
-          gain.gain.value = 0.18;
-          gain.connect(ctx.destination);
-          const tones = [987.8, 1318.5, 1760]; // B5 -> E6 -> A6
-          tones.forEach((f, i) => {
-            const o = ctx.createOscillator();
-            o.type = 'sine';
-            o.frequency.value = f;
-            o.connect(gain);
-            o.start(now + i*0.08);
-            o.stop(now + i*0.08 + 0.35);
-          });
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-        } catch(e) {}
+    (function(){
+      const C = 2*Math.PI*60;
+      let done=false;
+      function chime(){
+        try{
+          const ctx = new (window.AudioContext||window.webkitAudioContext)();
+          const now = ctx.currentTime, g = ctx.createGain(); g.gain.value=.18; g.connect(ctx.destination);
+          [987.8,1318.5,1760].forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);o.start(now+i*.08);o.stop(now+i*.08+.35);});
+          g.gain.exponentialRampToValueAtTime(.001, now+.8);
+        }catch(e){}
       }
-
-      window.updateProgressCircle = function (percent) {
-        const pct = Math.max(0, Math.min(100, Number(percent)||0));
+      window.updateProgressCircle = (percent)=>{
+        const pct = Math.max(0,Math.min(100,Number(percent)||0));
         const circle = document.getElementById('progress-ring-bar');
-        if (circle) circle.style.strokeDashoffset = (C - (pct/100)*C);
+        if(circle) circle.style.strokeDashoffset = (C - (pct/100)*C);
         const label = document.getElementById('progress-text');
-        if (label) label.textContent = `${pct}% Complete`;
-
-        if (pct >= 100 && !ringCelebrated) {
-          ringCelebrated = true;
-          playChime();
-        }
-        if (pct < 100) ringCelebrated = false;
+        if(label) label.textContent = `${pct}% Complete`;
+        if(pct>=100 && !done){ done=true; chime(); }
+        if(pct<100) done=false;
       };
     })();
   </script>
 
-  <!-- Mood chips -> hidden select sync (shows emoji + label) -->
+  <!-- Mood chips -> hidden select sync + label -->
   <script>
-    (function () {
+    (function(){
       const select = document.getElementById('mood');
-      const chips = Array.from(document.querySelectorAll('.mood-chip'));
+      const chips = [...document.querySelectorAll('.mood-chip')];
       const liveEmoji = document.getElementById('mood-emoji');
       const liveLabel = document.getElementById('mood-label');
-
-      function selectMood(emoji, label){
-        chips.forEach(c=>c.setAttribute('data-active', c.dataset.emoji===emoji ? 'true' : 'false'));
-        if (select) select.value = emoji || '';
+      function setMood(emoji,label){
+        chips.forEach(c=>c.dataset.active = (c.dataset.emoji===emoji) ? 'true':'false');
+        if(select) select.value = emoji || '';
         liveEmoji.textContent = emoji || '—';
         liveLabel.textContent = emoji ? label : 'How do you feel?';
       }
-      chips.forEach(c=>c.addEventListener('click', ()=>selectMood(c.dataset.emoji, c.dataset.label)));
-      selectMood('', '');
+      chips.forEach(c=>c.addEventListener('click',()=> setMood(c.dataset.emoji, c.dataset.label)));
+      setMood('', '');
     })();
   </script>
 
   <!-- Task chime + completed visuals -->
   <script>
-    (function () {
+    (function(){
       const list = document.getElementById('task-list');
-
-      function playCompleteChime() {
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const now = ctx.currentTime;
-          const gain = ctx.createGain();
-          gain.gain.value = 0.15;
-          gain.connect(ctx.destination);
-          const tones = [880, 1318.5]; // A5 -> E6
-          tones.forEach((f, i) => {
-            const o = ctx.createOscillator();
-            o.type = 'sine';
-            o.frequency.value = f;
-            o.connect(gain);
-            o.start(now + i*0.06);
-            o.stop(now + i*0.06 + 0.35);
-          });
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        } catch(e) {}
+      function chime(){
+        try{
+          const ctx = new (window.AudioContext||window.webkitAudioContext)();
+          const now = ctx.currentTime, g = ctx.createGain(); g.gain.value=.15; g.connect(ctx.destination);
+          [880,1318.5].forEach((f,i)=>{const o=ctx.createOscillator();o.type='sine';o.frequency.value=f;o.connect(g);o.start(now+i*.06);o.stop(now+i*.06+.35);});
+          g.gain.exponentialRampToValueAtTime(.001, now+.6);
+        }catch(e){}
       }
-
-      list.addEventListener('change', (e) => {
-        const cb = e.target;
-        if (cb && cb.matches('input[type="checkbox"]')) {
-          const row = cb.closest('#task-list > *') || cb.parentElement;
-          if (row) row.classList.toggle('completed', cb.checked);
-          if (cb.checked) playCompleteChime();
+      list.addEventListener('change',e=>{
+        const cb=e.target;
+        if(cb && cb.matches('input[type="checkbox"]')){
+          const row = cb.closest('#task-list > *')||cb.parentElement;
+          if(row) row.classList.toggle('completed', cb.checked);
+          if(cb.checked) chime();
         }
       });
-
-      // hydrate any pre-checked items (from your main.js render)
-      setTimeout(() => {
-        list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-          const row = cb.closest('#task-list > *') || cb.parentElement;
-          if (row) row.classList.toggle('completed', cb.checked);
-        });
-      }, 0);
+      // hydrate pre-checked after main.js renders
+      setTimeout(()=>{ list.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+        const row=cb.closest('#task-list > *')||cb.parentElement;
+        if(row) row.classList.toggle('completed', cb.checked);
+      }); },0);
     })();
   </script>
 
-  <!-- Header: date/time, weather (°F), affirmation, quote -->
+  <!-- Header: date/time, °F weather, affirmation, quote -->
   <script>
-    (function () {
-      const $ = (id) => document.getElementById(id);
-      const weatherEl = $("weather");
-      const titleEl = $("page-title");
-      const quoteEl = $("quote-box");
-      const affirmationEl = $("affirmation-box");
+    (function(){
+      const $=id=>document.getElementById(id);
+      const weatherEl=$('weather'), titleEl=$('page-title'), quoteEl=$('quote-box'), affEl=$('affirmation-box');
 
-      /* Date/Time */
-      function renderNow() {
-        const d = new Date();
-        const day = d.toLocaleDateString(undefined, { weekday: "long" });
-        const date = d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-        const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-        if (titleEl) titleEl.textContent = `${day} • ${date} • ${time}`;
+      function renderNow(){
+        const d=new Date();
+        const day=d.toLocaleDateString(undefined,{weekday:'long'});
+        const date=d.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+        const time=d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+        if(titleEl) titleEl.textContent=`${day} • ${date} • ${time}`;
       }
-      renderNow();
-      setInterval(renderNow, 60 * 1000);
+      renderNow(); setInterval(renderNow,60e3);
 
-      /* Affirmation */
-      const AFFIRMATIONS = [
-        "You’re doing better than you think.",
-        "One small step counts today.",
-        "You can handle this moment.",
-        "Breathe in calm, breathe out doubt.",
-        "Progress, not perfection.",
-        "Your effort matters."
-      ];
-      (function showAffirmation(){
-        const a = AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)];
-        if (affirmationEl) { affirmationEl.textContent = a; affirmationEl.classList.add("visible"); }
-      })();
+      const AFFS=["You’re doing better than you think.","One small step counts today.","You can handle this moment.","Breathe in calm, breathe out doubt.","Progress, not perfection.","Your effort matters."];
+      (function(){ if(affEl){ affEl.textContent=AFFS[Math.floor(Math.random()*AFFS.length)]; affEl.classList.add('visible'); } })();
 
-      /* Quote */
-      async function loadQuote() {
-        try {
-          const r = await fetch("https://api.quotable.io/random?minLength=60&maxLength=160", { cache: "no-store" });
-          if (!r.ok) throw new Error("quote fail");
-          const q = await r.json();
-          if (quoteEl) quoteEl.textContent = `“${q.content}” — ${q.author}`;
-        } catch {
-          if (quoteEl) quoteEl.textContent = "“Be kind to yourself — you’re learning as you go.”";
-        }
-      }
-      loadQuote();
+      async function loadQuote(){
+        try{ const r=await fetch("https://api.quotable.io/random?minLength=60&maxLength=160",{cache:'no-store'});
+          const q=await r.json(); if(quoteEl) quoteEl.textContent=`“${q.content}” — ${q.author}`;
+        }catch{ if(quoteEl) quoteEl.textContent="“Be kind to yourself — you’re learning as you go.”"; }
+      } loadQuote();
 
-      /* Weather (Open-Meteo in Fahrenheit) */
-      const WMAP = {
-        0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
-        45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",
-        61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Heavy freezing rain",
-        71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",
-        80:"Rain showers",81:"Heavy rain showers",82:"Violent rain showers",
-        85:"Snow showers",86:"Heavy snow showers",
-        95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"
-      };
-      function renderWeather({ tempF, desc }) {
-        if (!weatherEl) return;
-        weatherEl.innerHTML = `<div class="temp">${Math.round(tempF)}°F</div><div class="desc">${desc}</div>`;
+      const WMAP={0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Heavy freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Heavy rain showers",82:"Violent rain showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"};
+      function renderWeather({tempF,desc}){ if(!weatherEl) return; weatherEl.innerHTML=`<div class="temp">${Math.round(tempF)}°F</div><div class="desc">${desc}</div>`; }
+      async function getWeather(lat,lon){
+        const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=auto`;
+        const r=await fetch(url,{cache:'no-store'}); const j=await r.json(); const cur=j.current||j.current_weather||{};
+        const temp=cur.temperature_2m??cur.temperature; const code=cur.weather_code??cur.weathercode;
+        renderWeather({tempF:temp,desc:WMAP[code]||"Weather"});
       }
-      async function getWeather(lat, lon) {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=auto`;
-        const r = await fetch(url, { cache: "no-store" });
-        if (!r.ok) throw new Error("weather fail");
-        const j = await r.json();
-        const cur = j.current || j.current_weather || {};
-        const temp = cur.temperature_2m ?? cur.temperature;
-        const code = cur.weather_code ?? cur.weathercode;
-        renderWeather({ tempF: temp, desc: WMAP[code] || "Weather" });
+      function weatherFallback(){
+        const pick=[{lat:40.7128,lon:-74.0060},{lat:34.0522,lon:-118.2437},{lat:41.8781,lon:-87.6298}][Math.floor(Math.random()*3)];
+        getWeather(pick.lat,pick.lon).catch(()=>{ if(weatherEl) weatherEl.innerHTML='<div class="desc">Weather unavailable</div>'; });
       }
-      function weatherFallback() {
-        const guesses = [
-          { lat: 40.7128, lon: -74.0060 }, // NYC
-          { lat: 34.0522, lon: -118.2437 }, // LA
-          { lat: 41.8781, lon: -87.6298 }, // Chicago
-        ];
-        const pick = guesses[Math.floor(Math.random() * guesses.length)];
-        getWeather(pick.lat, pick.lon).catch(() => {
-          if (weatherEl) weatherEl.innerHTML = `<div class="desc">Weather unavailable</div>`;
-        });
-      }
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => getWeather(pos.coords.latitude, pos.coords.longitude).catch(weatherFallback),
-          weatherFallback,
-          { enableHighAccuracy: false, maximumAge: 30 * 60_000, timeout: 6000 }
-        );
-      } else {
-        weatherFallback();
-      }
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(p=>getWeather(p.coords.latitude,p.coords.longitude).catch(weatherFallback),weatherFallback,{timeout:6000,maximumAge:1800000});
+      }else{ weatherFallback(); }
     })();
   </script>
 
-  <!-- Your app logic that manages tasks/journals/etc. -->
+  <!-- Your app logic (tasks, saving, etc.) -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
