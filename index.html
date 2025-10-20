@@ -28,41 +28,50 @@
     header .weather-content .desc { font-style: italic; color: #444; }
     #affirmation-box { text-align: center; margin-top: 0.75rem; font-style: italic; color: #666; opacity: 0; transition: opacity 1.2s ease-in-out; }
     #affirmation-box.visible { opacity: 1; }
+
     .day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
     .day-nav a { margin: 0 5px; text-decoration: none; color: white; font-weight: bold; }
+
     .journal-grid { background-color: white; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 2rem; }
     section#journals, section#gratitude { flex: 1 1 300px; background: #CBC3E3; padding: 1rem 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
     section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
     section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
+
     .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
     #task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-weight: bold; font-size: 1.1rem; }
     .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; max-width: 600px; }
     .task-input-group input, .task-input-group button { flex: 1 1 100%; max-width: 100%; }
     #new-task { width: 70%; max-width: 400px; padding: 0.6rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
     button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
+
     footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
 
-    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
-
+    /* Breathing */
     #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
     .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
-    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
     #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
     #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
     .breathe-animation { animation: breathe 6s ease-in-out infinite; }
 
+    /* Progress ring */
     #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: 1rem auto; }
     #progress-ring { transform: rotate(-90deg); overflow: visible; }
     #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
+    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
 
     /* Mood Picker */
-    #mood { display: none; }
+    #mood { display: none; } /* keep for compatibility, hide visually */
     .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
     .mood-chip { font-size:1.5rem; padding:.45rem .6rem; border-radius:12px; border:1px solid #bcaecf; background:#fff; cursor:pointer; }
     .mood-chip[aria-checked="true"] { outline:2px solid #845EC2; outline-offset:2px; }
     .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.25rem; }
     .mood-label { font-weight: 600; color: #333; }
+
+    /* Hidden compat block so old queries in main.js don't crash */
+    .compat-hidden { display:none !important; visibility:hidden !important; }
   </style>
 </head>
 <body>
@@ -91,6 +100,7 @@
         <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry"></textarea>
 
         <h2>Your Mood</h2>
+        <!-- ORIGINAL select kept for compatibility (hidden via CSS) -->
         <select id="mood">
           <option value="">How do you feel?</option>
           <option value="😀">Happy</option>
@@ -101,6 +111,7 @@
           <option value="😌">Peaceful</option>
         </select>
 
+        <!-- Emoji chip picker -->
         <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
           <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
           <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
@@ -147,6 +158,34 @@
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
+  <!-- ========== Legacy/compat placeholders (hidden) so main.js doesn't error ========== -->
+  <div class="compat-hidden">
+    <!-- Old rectangular progress bar some scripts might touch -->
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <!-- Ongoing task artifacts (IDs only; safely hidden) -->
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button id="add-ongoing-task-btn">Add Task</button>
+      <button id="reset-ongoing-tasks-btn">Reset Ongoing Tasks</button>
+    </div>
+  </div>
+
+  <!-- ========== Safe guards: define no-op functions if main.js expects them ========== -->
+  <script>
+    // Prevent ReferenceErrors if inline handlers or main.js call these
+    window.addOngoingTask = window.addOngoingTask || function(){};
+    window.resetOngoingTasks = window.resetOngoingTasks || function(){};
+    // If legacy code tries to set rectangular progress, keep it harmless
+    window.updateLegacyProgress = window.updateLegacyProgress || function(pct){
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.width = (Number(pct)||0) + '%';
+    };
+  </script>
+
+  <!-- Progress ring helper (unchanged) -->
   <script>
     (function () {
       const radius = 60;
@@ -163,6 +202,7 @@
     })();
   </script>
 
+  <!-- Mood control behavior (single layout) -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -173,21 +213,25 @@
       function clearSelection() {
         chips.forEach(c => c.setAttribute("aria-checked", "false"));
         if (moodSelect) moodSelect.value = "";
-        liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".5";
-        liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".5"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7"; }
       }
       function setSelection(emoji, label) {
         chips.forEach(c => c.setAttribute("aria-checked", c.dataset.emoji === emoji ? "true" : "false"));
         if (moodSelect) moodSelect.value = emoji;
-        liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1";
-        liveLabel.textContent = label; liveLabel.style.opacity = "1";
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
       }
+
       const prefill = moodSelect?.value || "";
       if (prefill) {
         const chip = chips.find(c => c.dataset.emoji === prefill);
         if (chip) setSelection(chip.dataset.emoji, chip.dataset.label);
         else clearSelection();
-      } else { clearSelection(); }
+      } else {
+        clearSelection();
+      }
+
       chips.forEach(chip => {
         chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
         chip.addEventListener("keydown", (e) => {
@@ -200,6 +244,7 @@
     })();
   </script>
 
+  <!-- Your app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
