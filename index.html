@@ -94,13 +94,25 @@
 
     /* Breathing */
     #breathing .breathing-tile {
-      background: var(--card); padding: 1rem; border-radius: var(--radius);
-      box-shadow: var(--shadow); border:1px solid var(--border); max-width: 520px; margin: 1.25rem auto;
+      background: var(--card);
+      padding: 2rem 1.25rem;               /* more vertical padding */
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border:1px solid var(--border);
+      max-width: 520px;
+      margin: 1.25rem auto;
       text-align:center;
+      overflow: hidden;                    /* keep bubble inside card while scaling */
     }
-    #breath-bubble { width: 140px; height: 140px; background: radial-gradient(circle, #8fd7ff, var(--accent)); border-radius: 50%; margin: 0 auto .5rem; }
+    #breath-bubble {
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, #8fd7ff, var(--accent));
+      border-radius: 50%;
+      margin: 0 auto .75rem;
+      will-change: transform;
+    }
     #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; }
-    @keyframes breathe { 0%,100%{transform:scale(1);}50%{transform:scale(1.5);} }
+    @keyframes breathe { 0%,100%{transform:scale(1);}50%{transform:scale(1.4);} } /* slightly smaller peak */
     .breathe-animation { animation: breathe 6s ease-in-out infinite; }
 
     /* Progress ring card */
@@ -152,6 +164,11 @@
     footer#quote-footer {
       background: var(--card); padding: 1rem; text-align: center; color: var(--muted);
       font-style: italic; font-size: 1rem; margin: 1.5rem 0 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
+    }
+
+    /* Mobile tweak */
+    @media (max-width: 420px){
+      #breath-bubble { width: 120px; height: 120px; }
     }
   </style>
 </head>
@@ -264,17 +281,44 @@
     })();
   </script>
 
-  <!-- Progress ring helper for main.js -->
+  <!-- Progress ring helper for main.js + 100% chime -->
   <script>
     (function () {
       const r = 60, C = 2*Math.PI*r;
+      let ringCelebrated = false;
+
+      function playChime() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const now = ctx.currentTime;
+          const gain = ctx.createGain();
+          gain.gain.value = 0.18;
+          gain.connect(ctx.destination);
+          const tones = [987.8, 1318.5, 1760]; // B5 -> E6 -> A6
+          tones.forEach((f, i) => {
+            const o = ctx.createOscillator();
+            o.type = 'sine';
+            o.frequency.value = f;
+            o.connect(gain);
+            o.start(now + i*0.08);
+            o.stop(now + i*0.08 + 0.35);
+          });
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        } catch(e) {}
+      }
+
       window.updateProgressCircle = function (percent) {
         const pct = Math.max(0, Math.min(100, Number(percent)||0));
         const circle = document.getElementById('progress-ring-bar');
-        if (!circle) return;
-        circle.style.strokeDashoffset = (C - (pct/100)*C);
+        if (circle) circle.style.strokeDashoffset = (C - (pct/100)*C);
         const label = document.getElementById('progress-text');
         if (label) label.textContent = `${pct}% Complete`;
+
+        if (pct >= 100 && !ringCelebrated) {
+          ringCelebrated = true;
+          playChime();
+        }
+        if (pct < 100) ringCelebrated = false; // allow future celebrations after reset
       };
     })();
   </script>
@@ -342,7 +386,7 @@
     })();
   </script>
 
-  <!-- Header updater: date/time, weather, affirmation, quote -->
+  <!-- Header: date/time, weather (°F), affirmation, quote -->
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
@@ -351,7 +395,7 @@
       const quoteEl = $("quote-box");
       const affirmationEl = $("affirmation-box");
 
-      // Date/Time
+      /* Date/Time */
       function renderNow() {
         const d = new Date();
         const day = d.toLocaleDateString(undefined, { weekday: "long" });
@@ -362,7 +406,7 @@
       renderNow();
       setInterval(renderNow, 60 * 1000);
 
-      // Affirmation
+      /* Affirmation */
       const AFFIRMATIONS = [
         "You’re doing better than you think.",
         "One small step counts today.",
@@ -376,7 +420,7 @@
         if (affirmationEl) { affirmationEl.textContent = a; affirmationEl.classList.add("visible"); }
       })();
 
-      // Quote
+      /* Quote */
       async function loadQuote() {
         try {
           const r = await fetch("https://api.quotable.io/random?minLength=60&maxLength=160", { cache: "no-store" });
@@ -389,7 +433,7 @@
       }
       loadQuote();
 
-      // Weather (Open-Meteo)
+      /* Weather (Open-Meteo in Fahrenheit) */
       const WMAP = {
         0:"Clear sky",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",
         45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",
@@ -399,19 +443,19 @@
         85:"Snow showers",86:"Heavy snow showers",
         95:"Thunderstorm",96:"Thunderstorm w/ hail",99:"Thunderstorm w/ heavy hail"
       };
-      function renderWeather({ temp, desc }) {
+      function renderWeather({ tempF, desc }) {
         if (!weatherEl) return;
-        weatherEl.innerHTML = `<div class="temp">${Math.round(temp)}°</div><div class="desc">${desc}</div>`;
+        weatherEl.innerHTML = `<div class="temp">${Math.round(tempF)}°F</div><div class="desc">${desc}</div>`;
       }
       async function getWeather(lat, lon) {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=auto`;
         const r = await fetch(url, { cache: "no-store" });
         if (!r.ok) throw new Error("weather fail");
         const j = await r.json();
         const cur = j.current || j.current_weather || {};
         const temp = cur.temperature_2m ?? cur.temperature;
         const code = cur.weather_code ?? cur.weathercode;
-        renderWeather({ temp, desc: WMAP[code] || "Weather" });
+        renderWeather({ tempF: temp, desc: WMAP[code] || "Weather" });
       }
       function weatherFallback() {
         const guesses = [
