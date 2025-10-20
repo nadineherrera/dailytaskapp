@@ -79,25 +79,20 @@
       transition: stroke-dashoffset 0.4s ease;
     }
 
-    /* ===== ADDITIONS: Mood Picker UI ===== */
-    /* keep original #mood select for compatibility but hide it */
+    /* ===== Mood Picker (single layout, no slider) ===== */
+    /* keep original select for compatibility but hide it visually */
     #mood { display: none; }
 
-    .mood-control { display: grid; gap: 0.75rem; align-items: center; }
-    .mood-slider-wrap { display: grid; gap: 0.5rem; }
-    #mood-slider { width: 100%; }
-    .mood-scale { display: flex; justify-content: space-between; font-size: 1rem; opacity: 0.8; }
-    .mood-live { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
-    .mood-label { font-weight: 600; color: #333; }
-    .mood-quick { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
-    .emoji-btn {
-      font-size: 1.2rem; line-height: 1;
-      padding: 0.4rem 0.55rem; border-radius: 10px; border: 1px solid #bcaecf;
-      background: #fff; cursor: pointer;
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+    .mood-chip {
+      font-size:1.5rem; line-height:1; padding:.45rem .6rem; border-radius:12px;
+      border:1px solid #bcaecf; background:#fff; cursor:pointer;
     }
-    .emoji-btn.active { outline: 2px solid #845EC2; outline-offset: 2px; }
+    .mood-chip[aria-checked="true"] { outline:2px solid #845EC2; outline-offset:2px; }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.25rem; }
+    .mood-label { font-weight: 600; color: #333; }
 
-    /* ===== Compact breathing bubble overrides (no removals; just overrides) ===== */
+    /* (Optional) Compact breathing bubble on small screens: only overrides, no removals */
     @media (max-width: 768px) {
       #breath-bubble-container { padding: 1.25rem 1rem; gap: 1rem; }
       #breath-bubble { width: 130px; height: 130px; }
@@ -129,7 +124,7 @@
         <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry"></textarea>
 
         <h2>Your Mood</h2>
-        <!-- keep ORIGINAL select for compatibility (hidden by CSS above) -->
+        <!-- ORIGINAL select (kept for compatibility; hidden in CSS) -->
         <select id="mood">
           <option value="">How do you feel?</option>
           <option value="😀">Happy</option>
@@ -140,39 +135,25 @@
           <option value="😌">Peaceful</option>
         </select>
 
-        <!-- NEW: Emoji mood picker UI -->
-        <div class="mood-control" role="group" aria-label="Mood picker">
-          <div class="mood-slider-wrap">
-            <input id="mood-slider" type="range" min="0" max="5" step="1" value="2" aria-label="Select mood from very sad to very peaceful">
-            <div class="mood-scale">
-              <span>😔</span><span>😤</span><span>😐</span><span>🙂</span><span>😀</span><span>😌</span>
-            </div>
-          </div>
-          <div class="mood-live">
-            <span id="mood-emoji" aria-live="polite" aria-atomic="true" style="font-size:2rem;">😐</span>
-            <span id="mood-label" class="mood-label">Neutral</span>
-          </div>
-          <div class="mood-quick">
-            <button type="button" class="emoji-btn" data-index="0">😔</button>
-            <button type="button" class="emoji-btn" data-index="1">😤</button>
-            <button type="button" class="emoji-btn" data-index="2">😐</button>
-            <button type="button" class="emoji-btn" data-index="3">🙂</button>
-            <button type="button" class="emoji-btn" data-index="4">😀</button>
-            <button type="button" class="emoji-btn" data-index="5">😌</button>
-          </div>
+        <!-- NEW: single-layout emoji grid -->
+        <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😐" data-label="Neutral">😐</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="🙂" data-label="Okay">🙂</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😀" data-label="Happy">😀</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😌" data-label="Peaceful">😌</button>
+        </div>
+
+        <div class="mood-live">
+          <span id="mood-emoji" style="font-size:2rem; opacity:.5;">—</span>
+          <span id="mood-label" class="mood-label" style="opacity:.7;">How do you feel?</span>
         </div>
       </section>
     </div>
 
-    <section id="breathing">
-      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
-      <div class="breathing-tile">
-        <div id="breath-bubble-container">
-          <div id="breath-bubble"></div>
-          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
-          <button id="breath-toggle-btn">Start Breath</button>
-        </div>
-      </div>
+    <section id="breathing"><h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
+      <div class="breathing-tile"><div id="breath-bubble-container"><div id="breath-bubble"></div><p id="breath-text">Inhale for <span id="countdown">4</span></p><button id="breath-toggle-btn">Start Breath</button></div></div>
     </section>
 
     <h2 class="section-label">🌱 Today's Tasks</h2>
@@ -207,19 +188,11 @@
     <p id="progress-text">0% Complete</p>
 
     <div id="task-list"></div>
-    <div class="task-input-group">
-      <input type="text" id="new-task" placeholder="Add new task">
-      <button onclick="addTask()">Add Task</button>
-      <button onclick="resetTasks()">Reset All Tasks</button>
-    </div>
+    <div class="task-input-group"><input type="text" id="new-task" placeholder="Add new task"><button onclick="addTask()">Add Task</button><button onclick="resetTasks()">Reset All Tasks</button></div>
 
     <h2 class="section-label">♾ Ongoing Tasks</h2>
     <div id="ongoing-task-list"></div>
-    <div class="task-input-group">
-      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
-      <button onclick="addOngoingTask()">Add Task</button>
-      <button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button>
-    </div>
+    <div class="task-input-group"><input type="text" id="new-ongoing-task" placeholder="Add new ongoing task"><button onclick="addOngoingTask()">Add Task</button><button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button></div>
 
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
@@ -243,52 +216,49 @@
     })();
   </script>
 
-  <!-- ADD: Mood control behavior (keeps #mood in sync) -->
+  <!-- Mood control behavior (single layout, no slider; keeps #mood in sync) -->
   <script>
-    const MOODS = [
-      { emoji: "😔", label: "Sad" },
-      { emoji: "😤", label: "Frustrated" },
-      { emoji: "😐", label: "Neutral" },
-      { emoji: "🙂", label: "Okay" },
-      { emoji: "😀", label: "Happy" },
-      { emoji: "😌", label: "Peaceful" }
-    ];
+    (function () {
+      const moodSelect = document.getElementById("mood"); // original (hidden) select
+      const chips = Array.from(document.querySelectorAll(".mood-chip"));
+      const liveEmoji = document.getElementById("mood-emoji");
+      const liveLabel = document.getElementById("mood-label");
 
-    function setMoodByIndex(i) {
-      const { emoji, label } = MOODS[i];
-      // Update live UI
-      const emojiEl = document.getElementById("mood-emoji");
-      const labelEl = document.getElementById("mood-label");
-      if (emojiEl) emojiEl.textContent = emoji;
-      if (labelEl) labelEl.textContent = label;
-      const slider = document.getElementById("mood-slider");
-      if (slider) slider.value = i;
-      // Write into ORIGINAL hidden select (#mood)
-      const moodSelect = document.getElementById("mood");
-      if (moodSelect) {
-        // Ensure the value exists among options; if not, set directly
-        moodSelect.value = emoji;
+      function clearSelection() {
+        chips.forEach(c => c.setAttribute("aria-checked", "false"));
+        if (moodSelect) moodSelect.value = "";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".5"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7"; }
       }
-      // Button active state
-      document.querySelectorAll(".emoji-btn").forEach(btn => {
-        btn.classList.toggle("active", Number(btn.dataset.index) === Number(i));
+
+      function setSelection(emoji, label) {
+        chips.forEach(c => c.setAttribute("aria-checked", c.dataset.emoji === emoji ? "true" : "false"));
+        if (moodSelect) moodSelect.value = emoji; // your save logic can keep reading #mood.value
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
+      }
+
+      // Init: reflect a prefilled mood if present; otherwise stay unselected
+      const prefill = moodSelect?.value || "";
+      if (prefill) {
+        const chip = chips.find(c => c.dataset.emoji === prefill);
+        if (chip) setSelection(chip.dataset.emoji, chip.dataset.label);
+        else clearSelection();
+      } else {
+        clearSelection();
+      }
+
+      // Interactions
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setSelection(chip.dataset.emoji, chip.dataset.label);
+          }
+        });
       });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const slider = document.getElementById("mood-slider");
-      const buttons = document.querySelectorAll(".emoji-btn");
-      // Initialize from #mood (if your code pre-fills it) or default Neutral (2)
-      const initialEmoji = (document.getElementById("mood")?.value) || "😐";
-      const initialIndex = Math.max(0, MOODS.findIndex(m => m.emoji === initialEmoji));
-      setMoodByIndex(initialIndex === -1 ? 2 : initialIndex);
-
-      slider?.addEventListener("input", (e) => setMoodByIndex(Number(e.target.value)));
-
-      buttons.forEach(btn => {
-        btn.addEventListener("click", () => setMoodByIndex(Number(btn.dataset.index)));
-      });
-    });
+    })();
   </script>
 
   <script type="module" src="main.js"></script>
