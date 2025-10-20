@@ -63,57 +63,80 @@
       transition: filter .15s ease;
     }
 
-    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.75rem 0 1rem; font-weight: 800; }
+    .section-label { text-align: center; font-size: 1.25rem; color: var(--brand-green); margin: 1.5rem 0 1rem; font-weight: 800; }
 
     /* Journals & Gratitude */
-    .journal-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+    .journal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1rem;
+      align-items: start;
+    }
     section#journals, section#gratitude {
-      flex: 1 1 320px; background: var(--card); padding: 1rem;
-      border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border);
-      display:flex; flex-direction:column;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem 1rem 1.1rem;
     }
-    section h2 { margin: 0 0 .6rem; font-size: 1.1rem; font-weight: 800; color: var(--brand-purple); }
+    section h2 { margin: 0 0 .5rem; font-size: 1.2rem; font-weight: 800; color: var(--brand-purple); }
+    .field-stack {
+      display: grid;
+      gap: .75rem;  /* consistent, tight spacing */
+    }
     textarea {
-      width: 100%; min-height: 100px; padding: 12px; margin-bottom: 1rem;
-      font-family: inherit; font-size: 1rem; border-radius: 10px; border: 1px solid #d9d9e3; background: #fff;
+      width: 100%;
+      min-height: 110px;
+      padding: 12px;
+      font-family: inherit; font-size: 1rem;
+      border-radius: 12px; border: 1px solid #d9d9e3; background: #fff;
     }
-    #save-journal-btn { align-self:center; }
+    #save-journal-btn { display:block; margin:.25rem auto 0; }
     button { padding: 0.6rem 1.1rem; font-size: 1rem; border-radius: 10px; background-color: var(--brand-purple); color: white; border: none; cursor: pointer; font-weight:700; }
     button.secondary { background: var(--accent); }
 
     /* Mood Picker */
-    #mood { display:none; } /* kept for compatibility with main.js */
-    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+    #mood { display:none; } /* keep for compatibility */
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:flex-start; }
     .mood-chip {
-      font-size:1.4rem; padding:.4rem .6rem; border-radius:10px;
+      font-size:1.45rem; padding:.35rem .55rem; border-radius:12px;
       border:1px solid #d9d9e3; background:#fff; cursor:pointer;
       transition:all .15s ease;
     }
     .mood-chip[data-active="true"] { outline:2px solid var(--brand-purple); background:#f0eaff; }
-    .mood-live { margin-top:.6rem; text-align:center; color:#555; }
+    .mood-live { margin-top:.5rem; color:#555; font-weight:600; display:flex; align-items:center; gap:.45rem; }
 
     /* Breathing */
     #breathing .breathing-tile {
       background: var(--card);
-      padding: 2rem 1.25rem;               /* more vertical padding */
+      padding: 2rem 1.25rem;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       border:1px solid var(--border);
       max-width: 520px;
-      margin: 1.25rem auto;
+      margin: 1rem auto;
       text-align:center;
-      overflow: hidden;                    /* keep bubble inside card while scaling */
+      overflow: hidden;     /* keeps scaled bubble within rounded card */
     }
     #breath-bubble {
       width: 140px; height: 140px;
       background: radial-gradient(circle, #8fd7ff, var(--accent));
       border-radius: 50%;
-      margin: 0 auto .75rem;
+      margin: 0 auto .5rem;
       will-change: transform;
     }
-    #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; }
-    @keyframes breathe { 0%,100%{transform:scale(1);}50%{transform:scale(1.4);} } /* slightly smaller peak */
-    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
+    #breath-text { font-size: 1.2rem; color: var(--accent); font-weight: 800; margin:.25rem 0 .5rem; }
+    /* Box-breathing 4-4-4-4 animation (16s) */
+    @keyframes boxbreathe {
+      0%   { transform: scale(1); }      /* start (hold min) */
+      12.5%{ transform: scale(1); }      /* hold 4s */
+      25%  { transform: scale(1.4); }    /* inhale 4s -> max */
+      37.5%{ transform: scale(1.4); }    /* hold max 4s */
+      62.5%{ transform: scale(1); }      /* exhale 4s -> min (ends at 62.5%) */
+      75%  { transform: scale(1); }      /* hold min 4s */
+      100% { transform: scale(1); }
+    }
+    .breathe-running { animation: boxbreathe 16s ease-in-out infinite; }
 
     /* Progress ring card */
     #progress-ring-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 520px; margin: 1rem auto; }
@@ -121,14 +144,11 @@
 
     /* Tasks */
     #task-card { background: var(--card); padding: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); border:1px solid var(--border); }
-    #task-list {
-      display: flex; flex-direction: column; gap: 0.75rem; margin-top: .5rem;
-    }
-    /* Any direct child becomes a card row (works with various main.js renderings) */
+    #task-list { display:flex; flex-direction:column; gap:.75rem; margin-top:.5rem; }
     #task-list > * {
-      display: flex; align-items: center; gap: 12px;
-      padding: .75rem 1rem; border: 1px solid var(--border); border-radius: 12px;
-      background: var(--card); box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:flex; align-items:center; gap:12px;
+      padding:.75rem 1rem; border:1px solid var(--border); border-radius:12px;
+      background:var(--card); box-shadow:0 3px 10px rgba(0,0,0,.05);
     }
     #task-list > * label,
     #task-list > * .task-text,
@@ -151,19 +171,15 @@
     #task-list input[type="checkbox"]:checked::after{ transform: scale(1); }
 
     /* Completed style */
-    #task-list > *.completed { background:#f6fff2; border-color:#d3efc7; opacity:.96; }
+    #task-list > *.completed { background:#f6fff2; border-color:#d3efc7; }
     #task-list > *.completed label,
     #task-list > *.completed .task-text,
     #task-list > *.completed span { color:#6a6a6a; text-decoration:line-through; }
 
-    /* Optional delete button if main.js renders one */
-    #task-list .task-delete { background:transparent; border:none; font-size:1.1rem; color:#aaa; cursor:pointer; }
-    #task-list .task-delete:hover{ color:#d33; }
-
     /* Footer */
     footer#quote-footer {
       background: var(--card); padding: 1rem; text-align: center; color: var(--muted);
-      font-style: italic; font-size: 1rem; margin: 1.5rem 0 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
+      font-style: italic; font-size: 1rem; margin: 1.25rem 0 0; border-radius: var(--radius); border:1px solid var(--border); box-shadow: var(--shadow);
     }
 
     /* Mobile tweak */
@@ -190,38 +206,45 @@
     <div class="journal-grid">
       <section id="journals">
         <h2>Journals</h2>
-        <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
-        <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
-        <button id="save-journal-btn">Save Journals</button>
+        <div class="field-stack">
+          <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+          <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
+          <button id="save-journal-btn">Save Journals</button>
+        </div>
       </section>
 
       <section id="gratitude">
         <h2>Gratitude & Mood</h2>
-        <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
-        <h3>Your Mood</h3>
+        <div class="field-stack">
+          <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
 
-        <!-- Hidden select for compatibility with main.js -->
-        <select id="mood" style="display:none">
-          <option value="">How do you feel?</option>
-          <option value="😔">Sad</option>
-          <option value="😤">Frustrated</option>
-          <option value="😐">Neutral</option>
-          <option value="🙂">Okay</option>
-          <option value="😀">Happy</option>
-          <option value="😌">Peaceful</option>
-        </select>
+          <div>
+            <h3 style="margin:.25rem 0 .5rem;">Your Mood</h3>
 
-        <div class="mood-grid">
-          <button class="mood-chip" data-emoji="😔">😔</button>
-          <button class="mood-chip" data-emoji="😤">😤</button>
-          <button class="mood-chip" data-emoji="😐">😐</button>
-          <button class="mood-chip" data-emoji="🙂">🙂</button>
-          <button class="mood-chip" data-emoji="😀">😀</button>
-          <button class="mood-chip" data-emoji="😌">😌</button>
-        </div>
-        <div class="mood-live">
-          <span id="mood-emoji">—</span>
-          <span id="mood-label">How do you feel?</span>
+            <!-- Hidden select for compatibility with main.js -->
+            <select id="mood" style="display:none">
+              <option value="">How do you feel?</option>
+              <option value="😔">Sad</option>
+              <option value="😤">Stressed</option>
+              <option value="😐">Neutral</option>
+              <option value="🙂">Content</option>
+              <option value="😀">Happy</option>
+              <option value="😌">Peaceful</option>
+            </select>
+
+            <div class="mood-grid" aria-label="Mood picker">
+              <button class="mood-chip" data-emoji="😔" data-label="Sad">😔</button>
+              <button class="mood-chip" data-emoji="😤" data-label="Stressed">😤</button>
+              <button class="mood-chip" data-emoji="😐" data-label="Neutral">😐</button>
+              <button class="mood-chip" data-emoji="🙂" data-label="Content">🙂</button>
+              <button class="mood-chip" data-emoji="😀" data-label="Happy">😀</button>
+              <button class="mood-chip" data-emoji="😌" data-label="Peaceful">😌</button>
+            </div>
+            <div class="mood-live">
+              <span id="mood-emoji">—</span>
+              <span id="mood-label">How do you feel?</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -230,7 +253,7 @@
       <h2 class="section-label">🫁 Breathing Exercise</h2>
       <div class="breathing-tile">
         <div id="breath-bubble"></div>
-        <p id="breath-text">Inhale for <span id="countdown">4</span></p>
+        <p id="breath-text">Paused</p>
         <button id="breath-toggle-btn">Start Breath</button>
       </div>
     </section>
@@ -258,30 +281,58 @@
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Breathing Toggle -->
+  <!-- Breathing: box-breathing logic with countdown -->
   <script>
     (function () {
       const bubble = document.getElementById("breath-bubble");
       const text = document.getElementById("breath-text");
-      const button = document.getElementById("breath-toggle-btn");
-      let isRunning = false;
-      button.addEventListener("click", () => {
-        if (!isRunning) {
-          isRunning = true;
-          bubble.classList.add("breathe-animation");
-          text.textContent = "Breathing…";
-          button.textContent = "Stop Breath";
-        } else {
-          isRunning = false;
-          bubble.classList.remove("breathe-animation");
-          text.textContent = "Paused";
-          button.textContent = "Start Breath";
+      const btn = document.getElementById("breath-toggle-btn");
+
+      // 4-4-4-4 box breathing
+      const steps = [
+        { label: "Inhale for", secs: 4 },
+        { label: "Hold for",   secs: 4 },
+        { label: "Exhale for", secs: 4 },
+        { label: "Hold for",   secs: 4 },
+      ];
+      let running = false, stepIdx = 0, t = null, remaining = 0;
+
+      function showStep() {
+        const s = steps[stepIdx];
+        remaining = s.secs;
+        text.innerHTML = `${s.label} <span id="countdown">${remaining}</span>`;
+      }
+      function tick() {
+        const el = document.getElementById('countdown');
+        if (!el) return;
+        remaining -= 1;
+        if (remaining >= 0) el.textContent = remaining;
+        if (remaining <= 0) {
+          stepIdx = (stepIdx + 1) % steps.length;
+          showStep();
         }
-      });
+      }
+      function start() {
+        if (running) return;
+        running = true;
+        bubble.classList.add("breathe-running");
+        stepIdx = 0;
+        showStep();
+        t = setInterval(tick, 1000);
+        btn.textContent = "Stop Breath";
+      }
+      function stop() {
+        running = false;
+        bubble.classList.remove("breathe-running");
+        clearInterval(t); t = null;
+        text.textContent = "Paused";
+        btn.textContent = "Start Breath";
+      }
+      btn.addEventListener('click', () => running ? stop() : start());
     })();
   </script>
 
-  <!-- Progress ring helper for main.js + 100% chime -->
+  <!-- Progress ring helper with 100% chime -->
   <script>
     (function () {
       const r = 60, C = 2*Math.PI*r;
@@ -318,26 +369,27 @@
           ringCelebrated = true;
           playChime();
         }
-        if (pct < 100) ringCelebrated = false; // allow future celebrations after reset
+        if (pct < 100) ringCelebrated = false;
       };
     })();
   </script>
 
-  <!-- Mood chips -> hidden select sync -->
+  <!-- Mood chips -> hidden select sync (shows emoji + label) -->
   <script>
     (function () {
       const select = document.getElementById('mood');
       const chips = Array.from(document.querySelectorAll('.mood-chip'));
       const liveEmoji = document.getElementById('mood-emoji');
       const liveLabel = document.getElementById('mood-label');
-      function selectMood(emoji){
+
+      function selectMood(emoji, label){
         chips.forEach(c=>c.setAttribute('data-active', c.dataset.emoji===emoji ? 'true' : 'false'));
         if (select) select.value = emoji || '';
         liveEmoji.textContent = emoji || '—';
-        liveLabel.textContent = emoji ? 'Mood selected' : 'How do you feel?';
+        liveLabel.textContent = emoji ? label : 'How do you feel?';
       }
-      chips.forEach(c=>c.addEventListener('click', ()=>selectMood(c.dataset.emoji)));
-      selectMood(''); // start blank
+      chips.forEach(c=>c.addEventListener('click', ()=>selectMood(c.dataset.emoji, c.dataset.label)));
+      selectMood('', '');
     })();
   </script>
 
@@ -366,7 +418,6 @@
         } catch(e) {}
       }
 
-      // Delegate checkbox changes from whatever markup main.js renders
       list.addEventListener('change', (e) => {
         const cb = e.target;
         if (cb && cb.matches('input[type="checkbox"]')) {
@@ -376,7 +427,7 @@
         }
       });
 
-      // Hydrate any pre-checked tasks after main.js renders
+      // hydrate any pre-checked items (from your main.js render)
       setTimeout(() => {
         list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
           const row = cb.closest('#task-list > *') || cb.parentElement;
