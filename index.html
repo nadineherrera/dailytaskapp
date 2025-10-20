@@ -12,152 +12,59 @@
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
-
   <style>
-    :root {
-      --primary: #845EC2;
-      --success: #66B032;
-      --accent: #008cba;
-      --yellow: #FFD966;
-      --text: #222;
-      --text-light: #666;
-      --bg: #fafafa;
-      --card-bg: #fff;
-      --radius: 14px;
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    html, body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      background-color: #ffffff; box-sizing: border-box; overflow-x: hidden;
     }
-
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+    header { background-color: #FFD966; padding: 1rem; margin: 0 auto 1rem auto; }
+    header img { max-width: 100px; display: block; margin: 0 auto; }
+    .day-heading { text-align: center; font-size: 2rem; font-weight: bold; margin: 0.50rem 0 0.25rem; color: white; visibility: visible; }
+    header .weather-content {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 0.25rem; font-size: 0.95rem; color: #333;
     }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-
-    header {
-      background: var(--yellow);
-      padding: 1.25rem;
-      border-radius: var(--radius);
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    header img { width: 70px; }
-    .day-heading {
-      margin: 0.5rem 0;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #000;
-    }
-    .weather-content { font-size: .95rem; color: #333; }
-    #affirmation-box { font-style: italic; color: var(--text-light); opacity: 0; transition: opacity .8s; }
+    header .weather-content .temp { font-size: 1.2rem; font-weight: bold; color: #333; }
+    header .weather-content .desc { font-style: italic; color: #444; }
+    #affirmation-box { text-align: center; margin-top: 0.75rem; font-style: italic; color: #666; opacity: 0; transition: opacity 1.2s ease-in-out; }
     #affirmation-box.visible { opacity: 1; }
+    .day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
+    .day-nav a { margin: 0 5px; text-decoration: none; color: white; font-weight: bold; }
+    .journal-grid { background-color: white; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 2rem; }
+    section#journals, section#gratitude { flex: 1 1 300px; background: #CBC3E3; padding: 1rem 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
+    section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
+    section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
+    #gratitude select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #bcaecf; font-size: 1rem; margin-bottom: 2rem; }
+    .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
 
-    .day-nav {
-      display: flex; justify-content: center; gap: .5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .day-nav a {
-      text-decoration: none;
-      padding: .5rem .8rem;
-      border-radius: 8px;
-      font-weight: 600;
-      color: #fff;
-      background: var(--primary);
-    }
+    /* Rectangular progress bar (original) */
+    #progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 1rem; overflow: hidden; }
+    #progress-bar { height: 100%; width: 0%; background-color: #66B032; transition: width 0.3s ease; }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 1rem;
-      box-shadow: var(--shadow);
-      margin-bottom: 1.5rem;
-    }
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.1rem;
-      color: var(--primary);
-    }
-    textarea {
-      width: 100%;
-      min-height: 100px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      padding: .75rem;
-      font-family: inherit;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-    .btn {
-      display: inline-block;
-      padding: .6rem 1rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      background: var(--primary);
-      color: #fff;
-    }
-    .btn-secondary {
-      background: var(--accent);
-    }
+    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
+    .celebration-emoji { animation: pop-fade 2s ease forwards; font-size: 1.5rem; }
+    @keyframes pop-fade { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.8); opacity: 1; } 70% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(0.5); opacity: 0; } }
 
-    /* Mood Picker */
-    #mood { display:none; }
-    .mood-grid {
-      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
-    }
-    .mood-chip {
-      font-size:1.4rem;
-      padding:.5rem;
-      border:1px solid #ddd;
-      border-radius: 8px;
-      cursor:pointer;
-      background:#f5f5f5;
-    }
-    .mood-chip[aria-checked="true"] {
-      border-color: var(--primary);
-      background: #eee;
-    }
-    .mood-live { text-align:center; margin:.5rem 0; color: var(--text-light); }
+    /* Breathing (original sizes) */
+    #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
+    .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
+    #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
+    #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
+    #breath-toggle-btn { margin-top: 0; padding: 0.8rem 1.4rem; font-size: 1rem; border-radius: 12px; background-color: #845EC2; color: white; border: none; cursor: pointer; text-align: center; }
 
-    /* Breathing */
-    #breath-bubble {
-      width:100px; height:100px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #8fd7ff, var(--accent));
-      margin: 0 auto 1rem;
-    }
-
-    /* Progress */
-    #progress-ring { transform: rotate(-90deg); }
-    #progress-ring-bar { transition: stroke-dashoffset .4s ease; }
-    #progress-text { text-align:center; font-weight:600; color: var(--success); }
-
-    /* Tasks */
-    .task-input-group {
-      display:flex; gap:.5rem; margin-top:.75rem;
-    }
-    #new-task {
-      flex:1; padding:.6rem; border:1px solid #ccc;
-      border-radius:8px;
-    }
-
-    footer {
-      text-align:center;
-      margin-top: 2rem;
-      padding: 1rem;
-      font-style: italic;
-      color: var(--text-light);
-    }
+    /* Circular progress ring (you added) — keep it too */
+    #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: 1rem auto; }
+    #progress-ring { transform: rotate(-90deg); overflow: visible; }
+    #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
   </style>
 </head>
-
 <body>
   <div class="container">
     <header>
@@ -167,74 +74,122 @@
       <div id="affirmation-box"></div>
     </header>
 
-    <nav class="day-nav">
-      <a href="?day=Mon">Mon</a><a href="?day=Tue">Tue</a><a href="?day=Wed">Wed</a>
-      <a href="?day=Thu">Thu</a><a href="?day=Fri">Fri</a><a href="?day=Sat">Sat</a><a href="?day=Sun">Sun</a>
-    </nav>
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
+    </div>
 
-    <section id="journals" class="card">
-      <h2>📝 Journals</h2>
-      <textarea id="dream-journal" placeholder="Dream journal..."></textarea>
-      <textarea id="daily-journal" placeholder="Daily journal..."></textarea>
-      <button id="save-journal-btn" class="btn">Save Journals</button>
-    </section>
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
+    <div class="journal-grid">
+      <section id="journals">
+        <h2>Dream Journal</h2>
+        <textarea id="dream-journal"></textarea>
+        <h2>Daily Journal</h2>
+        <textarea id="daily-journal"></textarea>
+        <button id="save-journal-btn">Save Journals</button>
+      </section>
 
-    <section id="gratitude" class="card">
-      <h2>🌸 Gratitude & Mood</h2>
-      <textarea id="gratitudeEntry" placeholder="What are you grateful for?"></textarea>
-      <div class="mood-live">
-        <span id="mood-emoji">—</span> <span id="mood-label">How do you feel?</span>
+      <section id="gratitude">
+        <h2>Gratitude Prompt</h2>
+        <textarea id="gratitudeEntry"></textarea>
+
+        <h2>Your Mood</h2>
+        <!-- ORIGINAL select (kept exactly) -->
+        <select id="mood">
+          <option value="">How do you feel?</option>
+          <option value="😀">Happy</option>
+          <option value="😐">Neutral</option>
+          <option value="😔">Sad</option>
+          <option value="😤">Frustrated</option>
+          <option value="😴">Tired</option>
+          <option value="😌">Peaceful</option>
+        </select>
+      </section>
+    </div>
+
+    <section id="breathing">
+      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
+      <div class="breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
+          <button id="breath-toggle-btn">Start Breath</button>
+        </div>
       </div>
-      <select id="mood">
-        <option value="">How do you feel?</option>
-        <option value="😀">Happy</option>
-        <option value="😐">Neutral</option>
-        <option value="😔">Sad</option>
-        <option value="😤">Frustrated</option>
-        <option value="😴">Tired</option>
-        <option value="😌">Peaceful</option>
-      </select>
-      <div class="mood-grid">
-        <button type="button" class="mood-chip" data-emoji="😀" data-label="Happy">😀</button>
-        <button type="button" class="mood-chip" data-emoji="😐" data-label="Neutral">😐</button>
-        <button type="button" class="mood-chip" data-emoji="😔" data-label="Sad">😔</button>
-        <button type="button" class="mood-chip" data-emoji="😤" data-label="Frustrated">😤</button>
-        <button type="button" class="mood-chip" data-emoji="😴" data-label="Tired">😴</button>
-        <button type="button" class="mood-chip" data-emoji="😌" data-label="Peaceful">😌</button>
-      </div>
     </section>
 
-    <section id="breathing" class="card">
-      <h2>🧘 Breathing</h2>
-      <div id="breath-bubble"></div>
-      <p id="breath-text">Inhale for <span id="countdown">4</span></p>
-      <button id="breath-toggle-btn" class="btn btn-secondary">Start Breath</button>
-    </section>
+    <h2 class="section-label">🌱 Today's Tasks</h2>
 
-    <section id="progress" class="card">
-      <h2>📈 Progress</h2>
-      <svg id="progress-ring" width="140" height="140">
-        <circle stroke="#eee" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
-        <circle id="progress-ring-bar" stroke="#66B032" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"
-          stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
+    <!-- Keep both: rectangular bar (legacy) and ring (new) -->
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+
+    <div id="progress-ring-container" aria-label="Task progress">
+      <svg id="progress-ring" width="140" height="140" role="img" aria-hidden="true" focusable="false">
+        <circle
+          id="progress-ring-bg"
+          stroke="#e0e0e0"
+          stroke-width="12"
+          fill="transparent"
+          r="60"
+          cx="70"
+          cy="70"
+        ></circle>
+        <circle
+          id="progress-ring-bar"
+          stroke="#66B032"
+          stroke-width="12"
+          fill="transparent"
+          r="60"
+          cx="70"
+          cy="70"
+          stroke-linecap="round"
+          stroke-dasharray="377"
+          stroke-dashoffset="377"
+        ></circle>
       </svg>
-      <p id="progress-text">0% Complete</p>
-    </section>
+    </div>
 
-    <section id="tasks" class="card">
-      <h2>🌱 Today’s Tasks</h2>
-      <div id="task-list"></div>
-      <div class="task-input-group">
-        <input type="text" id="new-task" placeholder="Add new task">
-        <button class="btn" onclick="addTask()">Add</button>
-        <button class="btn btn-secondary" onclick="resetTasks()">Reset</button>
-      </div>
-    </section>
+    <p id="progress-text">0% Complete</p>
 
-    <footer>
+    <div id="task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-task" placeholder="Add new task">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="resetTasks()">Reset All Tasks</button>
+    </div>
+
+    <!-- ORIGINAL Ongoing Tasks (restore so main.js doesn’t break and items show) -->
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button onclick="addOngoingTask()">Add Task</button>
+      <button onclick="resetOngoingTasks()">Reset Ongoing Tasks</button>
+    </div>
+
+    <footer id="quote-footer">
       <p id="quote-box">Loading quote...</p>
     </footer>
   </div>
+
+  <!-- Progress ring helper (you added earlier) -->
+  <script>
+    (function () {
+      const radius = 60;
+      const circumference = 2 * Math.PI * radius;
+      window.updateProgressCircle = function (percent) {
+        const pct = Math.max(0, Math.min(100, Number(percent) || 0));
+        const circle = document.getElementById('progress-ring-bar');
+        if (!circle) return;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const label = document.getElementById('progress-text');
+        if (label) label.textContent = `${pct}% Complete`;
+      };
+    })();
+  </script>
 
   <script type="module" src="main.js"></script>
 </body>
