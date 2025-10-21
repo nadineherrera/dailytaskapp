@@ -1,9 +1,10 @@
+code once i took out ongoing tasks
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0A0A0A">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Daily Tasks">
   <link rel="manifest" href="/dailytaskapp/manifest.json">
@@ -12,335 +13,66 @@
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
-
-  <!-- Modern type + smooth text rendering -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
   <style>
-    /* =========================
-       THEME TOKENS (Brand vibe)
-       ========================= */
-    :root{
-      --ink:#0A0A0A;           /* deep black */
-      --cream:#F8EDCC;         /* warm cream */
-      --gold:#CBA135;          /* luxe gold */
-      --card: rgba(255,255,255,0.75);
-      --stroke: rgba(10,10,10,0.08);
-      --muted:#5f5f5f;
-      --good:#66B032;
-      --accent: var(--gold);
-      --bg-grad: radial-gradient(1200px 900px at 10% 10%, rgba(203,161,53,0.16), transparent 50%),
-                 radial-gradient(900px 900px at 90% 0%, rgba(248,237,204,0.35), transparent 60%),
-                 radial-gradient(700px 700px at 50% 100%, rgba(10,10,10,0.6), rgba(10,10,10,0.9));
-      --card-blur: saturate(140%) blur(8px);
-      --radius-xl: 20px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --shadow-soft: 0 10px 30px rgba(0,0,0,0.12);
-      --shadow-hover: 0 14px 40px rgba(0,0,0,0.18);
-      --ring: 2px solid rgba(203,161,53,0.35);
+    html, body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      background-color: #ffffff; box-sizing: border-box; overflow-x: hidden;
     }
-    @media (prefers-color-scheme: light){
-      :root{
-        --bg-grad:
-          radial-gradient(1200px 900px at 10% 10%, rgba(203,161,53,0.12), transparent 50%),
-          radial-gradient(900px 900px at 90% 0%, rgba(248,237,204,0.6), transparent 60%),
-          linear-gradient(180deg, #ffffff, #faf8f2);
-        --ink:#121212;
-        --card: rgba(255,255,255,0.85);
-        --stroke: rgba(0,0,0,0.06);
-      }
-    }
+    body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+    header { background-color: #FFD966; padding: 1rem; margin: 0 auto 1rem auto; }
+    header img { max-width: 100px; display: block; margin: 0 auto; }
+    .day-heading { text-align: center; font-size: 2rem; font-weight: bold; margin: 0.50rem 0 0.25rem; color: white; visibility: visible; }
+    header .weather-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.25rem; font-size: 0.95rem; color: #333; }
+    header .weather-content .temp { font-size: 1.2rem; font-weight: bold; color: #333; }
+    header .weather-content .desc { font-style: italic; color: #444; }
+    #affirmation-box { text-align: center; margin-top: 0.75rem; font-style: italic; color: #666; opacity: 0; transition: opacity 1.2s ease-in-out; }
+    #affirmation-box.visible { opacity: 1; }
 
-    /* ============ Base ============ */
-    *{box-sizing:border-box}
-    html, body{
-      margin:0; padding:0; height:100%; width:100%;
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      background: var(--bg-grad);
-      color: var(--ink);
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-    }
-    body{
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    }
-    .container{ max-width: 980px; margin: 0 auto; padding: clamp(16px, 3vw, 28px); }
+    .day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
+    .day-nav a { margin: 0 5px; text-decoration: none; color: white; font-weight: bold; }
 
-    /* ============ Header ============ */
-    header{
-      position:relative;
-      border-radius: var(--radius-xl);
-      padding: clamp(16px, 3vw, 28px);
-      background: var(--card);
-      backdrop-filter: var(--card-blur);
-      -webkit-backdrop-filter: var(--card-blur);
-      box-shadow: var(--shadow-soft);
-      border:1px solid var(--stroke);
-      overflow:hidden;
-    }
-    header::after{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(600px 120px at 50% 0%, rgba(203,161,53,0.25), transparent 60%);
-      pointer-events:none;
-    }
-    header img{ width:64px; height:64px; object-fit:contain; display:block; margin: 0 auto 8px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }
-    .day-heading{
-      text-align:center;
-      font-weight:800;
-      font-size: clamp(28px, 4.8vw, 42px);
-      letter-spacing:.2px;
-      margin: 4px 0 10px;
-      background: linear-gradient(100deg, var(--ink), var(--gold));
-      -webkit-background-clip: text;
-      background-clip:text;
-      color: transparent;
-    }
-    .weather-content{
-      display:flex; flex-direction:column; align-items:center; gap:4px;
-      font-size: 0.98rem; color: var(--ink);
-      opacity:.9;
-    }
-    .weather-content .temp{ font-weight:700; font-size:1.15rem }
-    .weather-content .desc{ font-style: italic; color: var(--muted) }
+    .journal-grid { background-color: white; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 2rem; }
+    section#journals, section#gratitude { flex: 1 1 300px; background: #CBC3E3; padding: 1rem 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
+    section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
+    section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
 
-    #affirmation-box{
-      text-align:center; margin-top:10px; font-style:italic; opacity:0;
-      transition: opacity .9s ease;
-      font-size: clamp(0.95rem, 1.2vw, 1.05rem);
-      color: var(--ink);
-    }
-    #affirmation-box.visible{ opacity:1 }
+    .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
+    #task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-weight: bold; font-size: 1.1rem; }
+    .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; max-width: 600px; }
+    .task-input-group input, .task-input-group button { flex: 1 1 100%; max-width: 100%; }
+    #new-task { width: 70%; max-width: 400px; padding: 0.6rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
 
-    /* ============ Sticky Day Nav ============ */
-    .day-nav{
-      position: sticky; top: 8px; z-index: 999;
-      margin: 18px 0 10px;
-      display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
-      padding: 8px;
-      background: rgba(255,255,255,0.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border:1px solid var(--stroke);
-      border-radius: 999px;
-      box-shadow: var(--shadow-soft);
-    }
-    .day-nav a{
-      text-decoration:none;
-      color: var(--ink);
-      padding: 8px 14px;
-      border-radius: 999px;
-      border:1px solid transparent;
-      font-weight: 600;
-      font-size:.95rem;
-      transition: transform .18s ease, box-shadow .18s ease, background .2s;
-      background: rgba(248,237,204,0.55);
-    }
-    .day-nav a:hover{ transform: translateY(-1px); box-shadow: var(--shadow-soft) }
-    .day-nav a:active{ transform: translateY(0) scale(.98) }
-    
-    /* ======= Section Title Pills ======= */
-    .pill-title{
-      text-align:center;
-      margin: 28px auto 8px;
-      width: fit-content;
-      padding: 8px 16px;
-      font-weight: 700;
-      border-radius: 999px;
-      border:1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      box-shadow: var(--shadow-soft);
-    }
+    footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
 
-    /* ============ Cards Grid ============ */
-    .journal-grid{
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: clamp(16px, 2.2vw, 24px);
-      margin-top: 18px;
-    }
-    section#journals, section#gratitude{
-      grid-column: span 6;
-      background: var(--card);
-      border:1px solid var(--stroke);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: var(--card-blur);
-      -webkit-backdrop-filter: var(--card-blur);
-      padding: clamp(16px, 2vw, 22px);
-    }
-    @media (max-width: 860px){
-      section#journals, section#gratitude{ grid-column: 1 / -1 }
-    }
-    section#journals h2, section#gratitude h2{
-      margin: 2px 0 8px; font-size: 1.05rem; font-weight: 700; letter-spacing:.2px;
-      color: var(--ink);
-    }
-    section#journals textarea, section#gratitude textarea{
-      width: 100%; min-height: 120px;
-      padding: 12px 14px;
-      font-family: Inter, Arial, sans-serif; font-size: 0.98rem; line-height: 1.45;
-      border-radius: var(--radius-lg);
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,0.9);
-      outline: none;
-      transition: box-shadow .2s ease, border-color .2s ease;
-    }
-    section#journals textarea:focus, section#gratitude textarea:focus{
-      border-color: rgba(203,161,53,0.45);
-      box-shadow: 0 0 0 4px rgba(203,161,53,0.16);
-    }
+    /* Breathing */
+    #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
+    .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
+    #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
+    #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
 
-    /* Primary buttons */
-    button, .btn{
-      appearance:none; -webkit-appearance:none;
-      border:none; cursor:pointer; user-select:none;
-      border-radius: 999px;
-      padding: 10px 16px;
-      font-weight: 700; font-size: .98rem;
-      color: #111;
-      background: linear-gradient(180deg, #FFD261, #E8B94A);
-      box-shadow: 0 6px 14px rgba(203,161,53,0.28), inset 0 1px 0 rgba(255,255,255,0.6);
-      transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
-    }
-    button:hover{ transform: translateY(-1px); box-shadow: 0 10px 20px rgba(203,161,53,0.36) }
-    button:active{ transform: translateY(0) scale(.98) }
+    /* Progress ring */
+    #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: 1rem auto; }
+    #progress-ring { transform: rotate(-90deg); overflow: visible; }
+    #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
+    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
 
-    #save-journal-btn{ display:block; margin: 12px 0 0 auto; }
+    /* Mood Picker */
+    #mood { display: none; } /* keep for compatibility, hide visually */
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+    .mood-chip { font-size:1.5rem; padding:.45rem .6rem; border-radius:12px; border:1px solid #bcaecf; background:#fff; cursor:pointer; }
+    .mood-chip[aria-checked="true"] { outline:2px solid #845EC2; outline-offset:2px; }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.25rem; }
+    .mood-label { font-weight: 600; color: #333; }
 
-    /* ============ Mood Picker ============ */
-    #mood{ display:none } /* keep legacy select hidden */
-    .mood-grid{ display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-start; }
-    .mood-chip{
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,0.85);
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 1.35rem;
-      line-height:1;
-      box-shadow: var(--shadow-soft);
-      transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
-    }
-    .mood-chip:hover{ transform: translateY(-1px); box-shadow: var(--shadow-hover) }
-    .mood-chip[aria-checked="true"]{
-      outline: none; border:1px solid rgba(203,161,53,0.5);
-      background: linear-gradient(180deg, rgba(248,237,204,0.9), rgba(255,255,255,0.85));
-      box-shadow: 0 0 0 4px rgba(203,161,53,0.18), var(--shadow-soft);
-    }
-    .mood-live{
-      display:flex; align-items:center; gap:10px; justify-content:flex-start; margin-top:6px;
-      font-weight:600; color: var(--ink);
-    }
-    .mood-label{ font-weight:600; color: var(--muted) }
-
-    /* ============ Breathing ============ */
-    #breathing .breathing-tile{
-      max-width: 720px; margin: 22px auto;
-      background: var(--card);
-      border:1px solid var(--stroke);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: var(--card-blur);
-      -webkit-backdrop-filter: var(--card-blur);
-      padding: clamp(18px, 3vw, 28px);
-    }
-    #breath-bubble-container{
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap: 18px;
-      padding: 10px 8px 8px;
-    }
-    /* bubble never bleeds out */
-    #breath-bubble{
-      width: clamp(160px, 28vw, 220px);
-      height: clamp(160px, 28vw, 220px);
-      border-radius: 50%;
-      background: radial-gradient(circle at 40% 30%, #ffffff, #CFE7FF 45%, #9EC9FF 70%, #5FA8FF 100%);
-      box-shadow: 0 15px 40px rgba(95,168,255,0.35), inset 0 -6px 16px rgba(0,0,0,0.12);
-      transform-origin:center;
-      will-change: transform;
-    }
-    #breath-text{
-      font-size: clamp(18px, 2.6vw, 22px);
-      font-weight: 700;
-      color: var(--ink);
-      display:flex; align-items:baseline; gap:8px;
-    }
-    #breath-text #countdown{ font-size: 1.4em; color: var(--good) }
-    @keyframes breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.35) } }
-    .breathe-animation{ animation: breathe 8s ease-in-out infinite } /* smoother & a touch slower */
-
-    /* ============ Progress Ring ============ */
-    .section-label{
-      text-align:center; font-weight:800; color: var(--ink);
-      margin: 38px 0 6px; letter-spacing:.2px;
-    }
-    #progress-ring-container{
-      display:flex; justify-content:center; align-items:center; margin: 8px auto;
-      background: var(--card);
-      border:1px solid var(--stroke);
-      border-radius: var(--radius-xl);
-      padding: 16px;
-      width: fit-content;
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: var(--card-blur);
-      -webkit-backdrop-filter: var(--card-blur);
-    }
-    #progress-ring{ transform: rotate(-90deg); overflow:visible; }
-    #progress-ring-bar{ transition: stroke-dashoffset .4s ease }
-    #progress-text{
-      text-align:center; font-weight:800; letter-spacing:.3px; margin: 10px 0 6px;
-      background: linear-gradient(100deg, var(--ink), var(--gold));
-      -webkit-background-clip:text; background-clip:text; color: transparent;
-    }
-
-    /* ============ Tasks ============ */
-    #task-list{
-      margin: 12px auto 2px; max-width: 760px;
-      background: var(--card);
-      border:1px solid var(--stroke);
-      border-radius: var(--radius-xl);
-      padding: 12px;
-      box-shadow: var(--shadow-soft);
-      min-height: 10px;
-    }
-    .task-input-group{
-      display:flex; gap: 10px; flex-wrap: wrap; justify-content:center;
-      margin: 14px auto 10px; max-width: 760px;
-    }
-    #new-task{
-      flex: 1 1 380px; max-width: 520px; min-width: 220px;
-      padding: 12px 14px; border-radius: 999px; border:1px solid var(--stroke);
-      outline:none; font-size: 1rem; background: rgba(255,255,255,0.92);
-      transition: box-shadow .2s ease, border-color .2s ease;
-    }
-    #new-task:focus{ border-color: rgba(203,161,53,0.45); box-shadow: 0 0 0 4px rgba(203,161,53,0.16) }
-
-    /* ============ Quote Footer ============ */
-    footer#quote-footer{
-      margin: 22px 0 6px;
-      background: var(--card);
-      border:1px solid var(--stroke);
-      border-radius: var(--radius-xl);
-      padding: 16px 18px;
-      text-align:center; color: var(--ink);
-      font-style: italic;
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: var(--card-blur);
-      -webkit-backdrop-filter: var(--card-blur);
-    }
-    #quote-box{ margin: 0; opacity:.9 }
-
-    /* ======= Hidden legacy placeholders ======= */
-    .compat-hidden{ display:none !important; visibility:hidden !important; }
-
-    /* ======= Motion sensitivity ======= */
-    @media (prefers-reduced-motion: reduce){
-      .breathe-animation{ animation-duration: 14s }
-      .day-nav a:hover, button:hover{ transform:none }
-    }
+    /* Hidden compat block so old queries in main.js don't crash */
+    .compat-hidden { display:none !important; visibility:hidden !important; }
   </style>
 </head>
 <body>
@@ -352,29 +84,24 @@
       <div id="affirmation-box"></div>
     </header>
 
-    <nav class="day-nav" aria-label="Select day">
+    <div class="day-nav">
       <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
       <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
-    </nav>
+    </div>
 
-    <div class="pill-title">🧘 Mindfulness Zone</div>
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
     <div class="journal-grid">
       <section id="journals">
-        <h2>Dream Journal</h2>
-        <textarea id="dream-journal" placeholder="What did you notice in your dreams?"></textarea>
-
-        <h2>Daily Journal</h2>
-        <textarea id="daily-journal" placeholder="Let it out. One thought, one breath, one day at a time."></textarea>
-
+        <h2>Dream Journal</h2><textarea id="dream-journal"></textarea>
+        <h2>Daily Journal</h2><textarea id="daily-journal"></textarea>
         <button id="save-journal-btn">Save Journals</button>
       </section>
 
       <section id="gratitude">
-        <h2>Gratitude Prompt</h2>
-        <textarea id="gratitudeEntry" placeholder="Today I’m grateful for…"></textarea>
+        <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry"></textarea>
 
         <h2>Your Mood</h2>
-        <!-- Hidden legacy select (kept for compatibility) -->
+        <!-- ORIGINAL select kept for compatibility (hidden via CSS) -->
         <select id="mood">
           <option value="">How do you feel?</option>
           <option value="😀">Happy</option>
@@ -385,7 +112,7 @@
           <option value="😌">Peaceful</option>
         </select>
 
-        <!-- Emoji chips -->
+        <!-- Emoji chip picker -->
         <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
           <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
           <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
@@ -403,7 +130,7 @@
     </div>
 
     <section id="breathing">
-      <div class="pill-title">Breathing Exercise</div>
+      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
       <div class="breathing-tile">
         <div id="breath-bubble-container">
           <div id="breath-bubble"></div>
@@ -413,25 +140,18 @@
       </div>
     </section>
 
-    <h2 class="section-label">🌱 Today’s Tasks</h2>
+    <h2 class="section-label">🌱 Today's Tasks</h2>
     <div id="progress-ring-container" aria-label="Task progress">
-      <svg id="progress-ring" width="160" height="160" role="img" aria-label="Progress ring">
-        <defs>
-          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#F8EDCC"></stop>
-            <stop offset="60%" stop-color="#CBA135"></stop>
-            <stop offset="100%" stop-color="#7A5B1F"></stop>
-          </linearGradient>
-        </defs>
-        <circle stroke="#e8e6df" stroke-width="12" fill="transparent" r="68" cx="80" cy="80"></circle>
-        <circle id="progress-ring-bar" stroke="url(#grad)" stroke-width="12" fill="transparent" r="68" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427"></circle>
+      <svg id="progress-ring" width="140" height="140">
+        <circle id="progress-ring-bg" stroke="#e0e0e0" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
+        <circle id="progress-ring-bar" stroke="#66B032" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
       </svg>
     </div>
     <p id="progress-text">0% Complete</p>
 
     <div id="task-list"></div>
     <div class="task-input-group">
-      <input type="text" id="new-task" placeholder="Add a new task…">
+      <input type="text" id="new-task" placeholder="Add new task">
       <button onclick="addTask()">Add Task</button>
       <button onclick="resetTasks()">Reset All Tasks</button>
     </div>
@@ -439,9 +159,12 @@
     <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Legacy/compat placeholders (hidden) -->
+  <!-- ========== Legacy/compat placeholders (hidden) so main.js doesn't error ========== -->
   <div class="compat-hidden">
+    <!-- Old rectangular progress bar some scripts might touch -->
     <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <!-- Ongoing task artifacts (IDs only; safely hidden) -->
     <h2 class="section-label">♾ Ongoing Tasks</h2>
     <div id="ongoing-task-list"></div>
     <div class="task-input-group">
@@ -451,21 +174,23 @@
     </div>
   </div>
 
-  <!-- Guards for legacy calls -->
+  <!-- ========== Safe guards: define no-op functions if main.js expects them ========== -->
   <script>
+    // Prevent ReferenceErrors if inline handlers or main.js call these
     window.addOngoingTask = window.addOngoingTask || function(){};
     window.resetOngoingTasks = window.resetOngoingTasks || function(){};
+    // If legacy code tries to set rectangular progress, keep it harmless
     window.updateLegacyProgress = window.updateLegacyProgress || function(pct){
       const bar = document.getElementById('progress-bar');
       if (bar) bar.style.width = (Number(pct)||0) + '%';
     };
   </script>
 
-  <!-- Progress ring helper (updated circumference for r=68) -->
+  <!-- Progress ring helper (unchanged) -->
   <script>
     (function () {
-      const radius = 68;
-      const circumference = 2 * Math.PI * radius; // ~427
+      const radius = 60;
+      const circumference = 2 * Math.PI * radius;
       window.updateProgressCircle = function (percent) {
         const pct = Math.max(0, Math.min(100, Number(percent) || 0));
         const circle = document.getElementById('progress-ring-bar');
@@ -478,7 +203,7 @@
     })();
   </script>
 
-  <!-- Mood control behavior (unchanged logic; modern visuals) -->
+  <!-- Mood control behavior (single layout) -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -490,13 +215,13 @@
         chips.forEach(c => c.setAttribute("aria-checked", "false"));
         if (moodSelect) moodSelect.value = "";
         if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".5"; }
-        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7"; liveLabel.style.color = ""; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7"; }
       }
       function setSelection(emoji, label) {
         chips.forEach(c => c.setAttribute("aria-checked", c.dataset.emoji === emoji ? "true" : "false"));
         if (moodSelect) moodSelect.value = emoji;
         if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
-        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; liveLabel.style.color = "var(--ink)"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
       }
 
       const prefill = moodSelect?.value || "";
@@ -520,130 +245,8 @@
     })();
   </script>
 
-  <!-- Replace your current breathing script with this -->
-<script>
-(() => {
-  const bubble = document.getElementById('breath-bubble');
-  const toggle = document.getElementById('breath-toggle-btn');
-  const textEl = document.getElementById('breath-text');
-  const countEl = document.getElementById('countdown');
-
-  if (!bubble || !toggle || !textEl || !countEl) return;
-
-  const DUR = 4000;           // 4 seconds per phase
-  const SCALE_MIN = 1.0;
-  const SCALE_MAX = 1.35;
-
-  let running = false;
-  let rafAnim;                // active Web Animations object
-  let intervalId;             // for the per-second "one-thousand" count
-  let loopToken = 0;          // guards against overlapping loops
-
-  const numWord = n => `${n} one-thousand`;
-
-  function setLabel(label){
-    // "Inhale for", "Hold for", "Exhale for"
-    textEl.firstChild.nodeValue = `${label} `;
-  }
-
-  function clearTimers(){
-    if (intervalId) { clearInterval(intervalId); intervalId = null; }
-    if (rafAnim) { rafAnim.cancel(); rafAnim = null; }
-  }
-
-  function speakCount(seconds){
-    // Shows 1→4 with "one-thousand" phrasing, precisely once per second
-    countEl.textContent = numWord(1);
-    let t = 1;
-    clearTimers();
-    intervalId = setInterval(() => {
-      t++;
-      if (t <= seconds) {
-        countEl.textContent = numWord(t);
-      } else {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-    }, 1000);
-  }
-
-  function wait(ms){ return new Promise(res => setTimeout(res, ms)); }
-
-  function animateScale(from, to, ms){
-    // Smooth, drift-free scale using Web Animations API
-    rafAnim = bubble.animate(
-      [{ transform: `scale(${from})` }, { transform: `scale(${to})` }],
-      { duration: ms, easing: 'ease-in-out', fill: 'forwards' }
-    );
-    return rafAnim.finished.catch(() => {}); // ignore cancel rejections
-  }
-
-  async function phase(label, type){
-    // type: 'inhale' | 'holdExpanded' | 'exhale' | 'holdBase'
-    setLabel(label);
-    speakCount(4);
-
-    switch(type){
-      case 'inhale':
-        await animateScale(SCALE_MIN, SCALE_MAX, DUR);
-        break;
-      case 'holdExpanded':
-        // hold at expanded size
-        bubble.style.transform = `scale(${SCALE_MAX})`;
-        await wait(DUR);
-        break;
-      case 'exhale':
-        await animateScale(SCALE_MAX, SCALE_MIN, DUR);
-        break;
-      case 'holdBase':
-        bubble.style.transform = `scale(${SCALE_MIN})`;
-        await wait(DUR);
-        break;
-    }
-  }
-
-  async function loop(startToken){
-    while (running && startToken === loopToken){
-      await phase('Inhale for', 'inhale');
-      if (!running || startToken !== loopToken) break;
-
-      await phase('Hold for', 'holdExpanded');
-      if (!running || startToken !== loopToken) break;
-
-      await phase('Exhale for', 'exhale');
-      if (!running || startToken !== loopToken) break;
-
-      await phase('Hold for', 'holdBase');
-    }
-  }
-
-  function start(){
-    if (running) return;
-    running = true;
-    loopToken++;
-    toggle.textContent = 'Pause';
-    loop(loopToken);
-  }
-
-  function pause(){
-    running = false;
-    toggle.textContent = 'Resume';
-    clearTimers();
-    // Freeze the bubble where it is now
-    const cs = getComputedStyle(bubble).transform;
-    bubble.style.transform = cs === 'none' ? `scale(${SCALE_MIN})` : cs;
-  }
-
-  toggle.addEventListener('click', () => running ? pause() : start());
-
-  // Initialize display
-  setLabel('Inhale for');
-  countEl.textContent = numWord(4);
-})();
-</script>
-
-
   <!-- Your app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
+
