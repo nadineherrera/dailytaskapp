@@ -261,7 +261,7 @@
   let intervalId;             // for the per-second "one-thousand" count
   let loopToken = 0;          // guards against overlapping loops
 
-  const numWord = n => `${n} one-thousand`;
+  const numWord = n => `${n} 4 seconds`;
 
   function setLabel(label){
     // "Inhale for 4 seconds", "Hold for 4 seconds", "Exhale for 4 seconds"
@@ -326,16 +326,16 @@
 
   async function loop(startToken){
     while (running && startToken === loopToken){
-      await phase('Inhale for', 'inhale');
+      await phase('Inhale for 4 seconds', 'inhale');
       if (!running || startToken !== loopToken) break;
 
-      await phase('Hold for', 'holdExpanded');
+      await phase('Hold for 4 seconds', 'holdExpanded');
       if (!running || startToken !== loopToken) break;
 
-      await phase('Exhale for', 'exhale');
+      await phase('Exhale for 4 seconds', 'exhale');
       if (!running || startToken !== loopToken) break;
 
-      await phase('Hold for', 'holdBase');
+      await phase('Hold for 4 seconds', 'holdBase');
     }
   }
 
@@ -359,7 +359,7 @@
   toggle.addEventListener('click', () => running ? pause() : start());
 
   // Initialize display
-  setLabel('Inhale for');
+  setLabel('Inhale for 4 seconds');
   countEl.textContent = numWord(4);
 })();
 </script>
