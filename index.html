@@ -242,104 +242,128 @@
     })();
   </script>
 
-  <!-- NEW: Smooth breathing module (doesn't touch tasks/design) -->
-  <script>
-    (function(){
-      const bubble = document.getElementById('breath-bubble');
-      const label  = document.getElementById('breath-text');
-      const counter= document.getElementById('countdown');
-      const btn    = document.getElementById('breath-toggle-btn');
+ <!-- Replace your current breathing script with this -->
+<script>
+(() => {
+  const bubble = document.getElementById('breath-bubble');
+  const toggle = document.getElementById('breath-toggle-btn');
+  const textEl = document.getElementById('breath-text');
+  const countEl = document.getElementById('countdown');
 
-      // Protocols: targetScale is absolute at end of step
-      const PROTOCOLS = {
-        BOX_4_4_4_4: [
-          { name: 'Inhale', seconds: 4, targetScale: 1.45 },
-          { name: 'Hold',   seconds: 4, targetScale: 1.45 },
-          { name: 'Exhale', seconds: 4, targetScale: 1.00 },
-          { name: 'Hold',   seconds: 4, targetScale: 1.00 },
-        ],
-        COHERENT_6BPM: [
-          { name: 'Inhale', seconds: 5, targetScale: 1.45 },
-          { name: 'Exhale', seconds: 5, targetScale: 1.00 },
-        ]
-      };
-      let ACTIVE = PROTOCOLS.BOX_4_4_4_4; // default
+  if (!bubble || !toggle || !textEl || !countEl) return;
 
-      // Ease in/out for smoothness
-      const easeInOut = (t)=> t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
-      const roundSec  = (ms)=> Math.max(0, Math.ceil(ms/1000));
+  const DUR = 4000;           // 4 seconds per phase
+  const SCALE_MIN = 1.0;
+  const SCALE_MAX = 1.35;
 
-      let running=false, stepIdx=0, rafId=null, stepStart=0, currScale=1;
+  let running = false;
+  let rafAnim;                // active Web Animations object
+  let intervalId;             // for the per-second "one-thousand" count
+  let loopToken = 0;          // guards against overlapping loops
 
-      function setScale(s){
-        currScale = s;
-        bubble.style.transform = `scale(${s})`;
-        bubble.style.opacity = (0.85 + (s-1)*0.3).toFixed(3);
+  const numWord = n => `${n} one-thousand`;
+
+  function setLabel(label){
+    // "Inhale for", "Hold for", "Exhale for"
+    textEl.firstChild.nodeValue = `${label} `;
+  }
+
+  function clearTimers(){
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+    if (rafAnim) { rafAnim.cancel(); rafAnim = null; }
+  }
+
+  function speakCount(seconds){
+    // Shows 1→4 with "one-thousand" phrasing, precisely once per second
+    countEl.textContent = numWord(1);
+    let t = 1;
+    clearTimers();
+    intervalId = setInterval(() => {
+      t++;
+      if (t <= seconds) {
+        countEl.textContent = numWord(t);
+      } else {
+        clearInterval(intervalId);
+        intervalId = null;
       }
+    }, 1000);
+  }
 
-      function tick(now){
-        const step = ACTIVE[stepIdx];
-        const durMs = step.seconds * 1000;
-        const elapsed = now - stepStart;
-        const t = Math.min(1, elapsed / durMs);
+  function wait(ms){ return new Promise(res => setTimeout(res, ms)); }
 
-        const prev = ACTIVE[(stepIdx - 1 + ACTIVE.length) % ACTIVE.length];
-        const startScale = (stepIdx === 0 && prev) ? prev.targetScale : currScale;
-        const endScale   = step.targetScale;
+  function animateScale(from, to, ms){
+    // Smooth, drift-free scale using Web Animations API
+    rafAnim = bubble.animate(
+      [{ transform: `scale(${from})` }, { transform: `scale(${to})` }],
+      { duration: ms, easing: 'ease-in-out', fill: 'forwards' }
+    );
+    return rafAnim.finished.catch(() => {}); // ignore cancel rejections
+  }
 
-        const eased = (step.name === 'Hold') ? 1 : easeInOut(t);
-        const s = startScale + (endScale - startScale) * eased;
-        setScale(s);
+  async function phase(label, type){
+    // type: 'inhale' | 'holdExpanded' | 'exhale' | 'holdBase'
+    setLabel(label);
+    speakCount(4);
 
-        const remain = Math.max(0, durMs - elapsed);
-        const sec = roundSec(remain);
-        label.firstChild.nodeValue = `${step.name} for `;
-        if (counter) counter.textContent = String(sec);
+    switch(type){
+      case 'inhale':
+        await animateScale(SCALE_MIN, SCALE_MAX, DUR);
+        break;
+      case 'holdExpanded':
+        // hold at expanded size
+        bubble.style.transform = `scale(${SCALE_MAX})`;
+        await wait(DUR);
+        break;
+      case 'exhale':
+        await animateScale(SCALE_MAX, SCALE_MIN, DUR);
+        break;
+      case 'holdBase':
+        bubble.style.transform = `scale(${SCALE_MIN})`;
+        await wait(DUR);
+        break;
+    }
+  }
 
-        if (elapsed >= durMs) {
-          stepIdx = (stepIdx + 1) % ACTIVE.length;
-          stepStart = now;
-        }
-        if (running) rafId = requestAnimationFrame(tick);
-      }
+  async function loop(startToken){
+    while (running && startToken === loopToken){
+      await phase('Inhale for', 'inhale');
+      if (!running || startToken !== loopToken) break;
 
-      function start(){
-        if (running) return;
-        running = true;
-        btn.textContent = 'Stop Breath';
-        stepIdx = 0;
-        stepStart = performance.now();
-        const tf = window.getComputedStyle(bubble).transform;
-        if (tf === 'none') setScale(1);
-        rafId = requestAnimationFrame(tick);
-      }
+      await phase('Hold for', 'holdExpanded');
+      if (!running || startToken !== loopToken) break;
 
-      function stop(){
-        running = false;
-        btn.textContent = 'Start Breath';
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = null;
-        label.firstChild.nodeValue = 'Inhale for ';
-        if (counter) counter.textContent = '4';
-        setScale(1);
-      }
+      await phase('Exhale for', 'exhale');
+      if (!running || startToken !== loopToken) break;
 
-      btn.addEventListener('click', ()=> running ? stop() : start());
+      await phase('Hold for', 'holdBase');
+    }
+  }
 
-      // Long-press to toggle protocol (keeps UI minimal)
-      let pressTimer;
-      btn.addEventListener('mousedown', ()=> {
-        pressTimer = setTimeout(()=>{
-          ACTIVE = (ACTIVE === PROTOCOLS.BOX_4_4_4_4) ? PROTOCOLS.COHERENT_6BPM : PROTOCOLS.BOX_4_4_4_4;
-          const name = (ACTIVE === PROTOCOLS.COHERENT_6BPM) ? 'Coherent (6 bpm)' : 'Box (4-4-4-4)';
-          btn.title = `Mode: ${name}`;
-        }, 700);
-      });
-      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt=>{
-        btn.addEventListener(evt, ()=> clearTimeout(pressTimer));
-      });
-    })();
-  </script>
+  function start(){
+    if (running) return;
+    running = true;
+    loopToken++;
+    toggle.textContent = 'Pause';
+    loop(loopToken);
+  }
+
+  function pause(){
+    running = false;
+    toggle.textContent = 'Resume';
+    clearTimers();
+    // Freeze the bubble where it is now
+    const cs = getComputedStyle(bubble).transform;
+    bubble.style.transform = cs === 'none' ? `scale(${SCALE_MIN})` : cs;
+  }
+
+  toggle.addEventListener('click', () => running ? pause() : start());
+
+  // Initialize display
+  setLabel('Inhale for');
+  countEl.textContent = numWord(4);
+})();
+</script>
+
 
   <!-- Your app logic -->
   <script type="module" src="main.js"></script>
