@@ -1,239 +1,252 @@
+code once i took out ongoing tasks
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <link rel="manifest" href="/dailytaskapp/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
   <style>
-    :root{
-      --brand-purple:#845EC2;
-      --brand-green:#66B032;
-      --accent:#008cba;
-      --yellow:#FFD966;
-      --text:#222;
-      --muted:#666;
-      --bg:#f7f7fb;
-      --card:#fff;
-      --radius:14px;
-      --shadow:0 6px 18px rgba(0,0,0,.06);
-      --border:#e9e9f2;
+    html, body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      background-color: #ffffff; box-sizing: border-box; overflow-x: hidden;
     }
+    body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+    header { background-color: #FFD966; padding: 1rem; margin: 0 auto 1rem auto; }
+    header img { max-width: 100px; display: block; margin: 0 auto; }
+    .day-heading { text-align: center; font-size: 2rem; font-weight: bold; margin: 0.50rem 0 0.25rem; color: white; visibility: visible; }
+    header .weather-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.25rem; font-size: 0.95rem; color: #333; }
+    header .weather-content .temp { font-size: 1.2rem; font-weight: bold; color: #333; }
+    header .weather-content .desc { font-style: italic; color: #444; }
+    #affirmation-box { text-align: center; margin-top: 0.75rem; font-style: italic; color: #666; opacity: 0; transition: opacity 1.2s ease-in-out; }
+    #affirmation-box.visible { opacity: 1; }
 
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .container{max-width:960px;margin:0 auto;padding:16px}
+    .day-nav { text-align: center; margin-bottom: 1rem; background: #845EC2; padding: 0.5rem; border-radius: 5px; position: sticky; top: 0; z-index: 999; }
+    .day-nav a { margin: 0 5px; text-decoration: none; color: white; font-weight: bold; }
 
-    /* Header (IDs kept for main.js) */
-    header{
-      background:var(--yellow);
-      border-radius:16px;
-      padding:16px;
-      margin-bottom:16px;
-      box-shadow:var(--shadow);
-      text-align:center;
-    }
-    header img{max-width:80px;display:block;margin:0 auto}
-    .day-heading{margin:.3rem 0 6px 0;font-weight:800}
+    .journal-grid { background-color: white; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin-top: 2rem; }
+    section#journals, section#gratitude { flex: 1 1 300px; background: #CBC3E3; padding: 1rem 1rem 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    section#journals h2, section#gratitude h2 { margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: bold; color: #845EC2; }
+    section#journals textarea, section#gratitude textarea { width: 100%; height: 100px; padding: 12px; margin-bottom: 1.5rem; font-family: Arial; font-size: 1rem; border-radius: 10px; border: 1px solid #bcaecf; box-sizing: border-box; resize: vertical; background: #fff; }
+    section#journals button, section#gratitude button { display: block; margin: 0 auto; padding: 0.7rem 1.5rem; background-color: #845EC2; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; }
 
-    /* Weather compat */
-    #weather{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
-    #weather .temp,#weather .desc,#weather .loc{font-weight:600}
-    #weather .temp{color:#333}
-    #weather .desc{color:#444;font-style:italic}
-    #weather .loc{color:#555}
-    #weather-temp,#weather-desc,#weather-loc{display:inline}
+    .section-label { text-align: center; font-size: 1.4rem; color: #66B032; margin: 2rem 0 1rem 0; font-weight: bold; }
+    #task-list h2 { display: flex; align-items: center; gap: 10px; padding: 1rem; background: #66B032; margin-bottom: 10px; border-radius: 5px; color: white; font-weight: bold; font-size: 1.1rem; }
+    .task-input-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0 2rem 0; justify-content: center; max-width: 600px; }
+    .task-input-group input, .task-input-group button { flex: 1 1 100%; max-width: 100%; }
+    #new-task { width: 70%; max-width: 400px; padding: 0.6rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { padding: 0.6rem 1.2rem; font-size: 1rem; border-radius: 5px; background-color: #845EC2; color: white; border: none; cursor: pointer; }
 
-    .section-label{text-align:center;color:var(--brand-green);font-weight:800;margin:20px 0 12px}
-
-    /* Cards & grid */
-    .grid{display:flex;flex-wrap:wrap;gap:14px}
-    .card{flex:1 1 320px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
-    .card h2{margin:0 0 .6rem 0;color:var(--brand-purple);font-size:1.1rem}
-
-    textarea{
-      width:100%;min-height:110px;border-radius:12px;border:1px solid #d9d9e3;background:#fff;
-      font-family:inherit;padding:12px;box-sizing:border-box;margin-bottom:10px
-    }
-
-    /* Mood chips */
-    .mood-wrap{margin-top:6px}
-    .mood-grid{display:flex;gap:10px;flex-wrap:wrap}
-    .mood-chip{font-size:1.5rem;padding:.4rem .6rem;border-radius:12px;border:2px solid transparent;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.05);cursor:pointer}
-    .mood-chip.active{border-color:var(--brand-purple);background:#f7f3ff}
-    .mood-live{margin-top:8px;text-align:center;color:var(--muted);font-weight:700}
+    footer#quote-footer { background-color: #845EC2; padding: 1.5rem; text-align: center; color: #fff; font-style: italic; font-size: 1rem; margin: 2rem 0 0 0; width: 100%; box-sizing: border-box; }
 
     /* Breathing */
-    #breathing-card{text-align:center}
-    #breath-bubble-wrap{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-      padding:20px 16px 22px; /* extra space so bubble never overlaps */
-    }
-    #breath-bubble{
-      width:150px;height:150px;border-radius:50%;
-      background:radial-gradient(circle,#8fd7ff,var(--accent));
-      box-shadow:0 0 14px rgba(0,140,186,.28),0 8px 20px rgba(0,0,0,.06)
-    }
-    #breath-text{font-weight:800;color:var(--accent);margin:6px 0 2px}
-    @keyframes inhaleK{from{transform:scale(1)}to{transform:scale(1.45)}}
-    @keyframes exhaleK{from{transform:scale(1.45)}to{transform:scale(1)}}
-    .inhale{animation:inhaleK 4s ease-in-out forwards}
-    .exhale{animation:exhaleK 4s ease-in-out forwards}
+    #breath-bubble-container { display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 100%; padding: 4rem 1rem 2rem; margin: 2rem auto; text-align: center; gap: 2rem; }
+    .breathing-tile { background: #CBC3E3; padding: 2rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; margin: 2rem auto; text-align: center; }
+    #breath-bubble { width: 180px; height: 180px; background: radial-gradient(circle, #72c6ff, #008cba); border-radius: 50%; box-shadow: 0 0 20px rgba(0, 140, 186, 0.6), 0 10px 25px rgba(0, 0, 0, 0.15); transform-origin: center; display: block; margin: 0 auto 1.5rem; }
+    #breath-text { font-size: 1.5rem; color: #008cba; font-weight: bold; text-align: center; margin: 2rem 0; display: flex; justify-content: center; align-items: baseline; gap: 0.4rem; }
+    #breath-text span#countdown { font-size: 2rem; color: #66B032; font-weight: bold; }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.5); } }
+    .breathe-animation { animation: breathe 6s ease-in-out infinite; }
 
-    /* Tasks (works with your existing DOM) */
-    #task-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px}
-    #task-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
-    #task-list > *{
-      display:flex;align-items:center;gap:12px;padding:.65rem .85rem;background:#fff;
-      border:1px solid var(--border);border-radius:12px;box-shadow:0 3px 8px rgba(0,0,0,.04)
-    }
-    #task-list input[type="checkbox"]{width:18px;height:18px;accent-color:var(--brand-green);flex:0 0 auto}
-    #task-list label,#task-list .task-text,#task-list .taskTitle{flex:1 1 auto;font-size:1rem;font-weight:600;color:var(--text);line-height:1.3}
-    #task-list input[type="checkbox"]:checked + label,
-    #task-list input[type="checkbox"]:checked ~ .task-text,
-    #task-list input[type="checkbox"]:checked ~ .taskTitle{color:#9aa0a6;text-decoration:line-through}
+    /* Progress ring */
+    #progress-ring-container { display: flex; justify-content: center; align-items: center; margin: 1rem auto; }
+    #progress-ring { transform: rotate(-90deg); overflow: visible; }
+    #progress-ring-bar { transition: stroke-dashoffset 0.4s ease; }
+    #progress-text { text-align: center; font-weight: bold; color: #4b7b2f; margin-bottom: 1.5rem; }
 
-    .task-input-group{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
-    #new-task{flex:1 1 260px;padding:.6rem .8rem;border-radius:10px;border:1px solid #d9d9e3;background:#fff;box-sizing:border-box}
+    /* Mood Picker */
+    #mood { display: none; } /* keep for compatibility, hide visually */
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+    .mood-chip { font-size:1.5rem; padding:.45rem .6rem; border-radius:12px; border:1px solid #bcaecf; background:#fff; cursor:pointer; }
+    .mood-chip[aria-checked="true"] { outline:2px solid #845EC2; outline-offset:2px; }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.25rem; }
+    .mood-label { font-weight: 600; color: #333; }
 
-    /* Footer */
-    footer{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin:18px 0 6px;text-align:center;font-style:italic}
-
-    @media (max-width:768px){#breath-bubble{width:130px;height:130px}}
+    /* Hidden compat block so old queries in main.js don't crash */
+    .compat-hidden { display:none !important; visibility:hidden !important; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- HEADER: main.js fills these -->
     <header>
       <img src="apple-touch-icon.png" alt="App Logo">
       <h1 id="page-title" class="day-heading"></h1>
-
-      <!-- Weather compat -->
-      <div id="weather">
-        <span class="temp" id="weather-temp"></span>
-        <span class="desc" id="weather-desc"></span>
-        <span class="loc"  id="weather-loc"></span>
-      </div>
-
+      <div id="weather" class="weather-content"></div>
       <div id="affirmation-box"></div>
     </header>
 
-    <h2 class="section-label">🧘 Mindfulness Zone</h2>
-    <div class="grid">
-      <!-- Journals -->
-      <section class="card" id="journals-card">
-        <h2>Journals</h2>
-        <textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
-        <textarea id="daily-journal" placeholder="Stream your thoughts…"></textarea>
-        <!-- plain system button -->
-        <div style="text-align:center;margin-top:6px">
-          <button id="save-journal-btn">Save Journals</button>
-        </div>
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
+    </div>
+
+    <h2 style="text-align:center; color:#008cba;">🧘 Mindfulness Zone</h2>
+    <div class="journal-grid">
+      <section id="journals">
+        <h2>Dream Journal</h2><textarea id="dream-journal"></textarea>
+        <h2>Daily Journal</h2><textarea id="daily-journal"></textarea>
+        <button id="save-journal-btn">Save Journals</button>
       </section>
 
-      <!-- Gratitude + Mood -->
-      <section class="card" id="gratitude-card">
-        <h2>Gratitude & Mood</h2>
-        <textarea id="gratitudeEntry" placeholder="What are you grateful for today?"></textarea>
+      <section id="gratitude">
+        <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry"></textarea>
 
-        <div class="mood-wrap">
-          <h3 style="margin:6px 0 6px 0;">Your Mood</h3>
-          <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Sleepy">😪</button>
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Frustrated">😤</button>
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Neutral">😐</button>
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Happy">🙂</button>
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Joyful">😁</button>
-            <button type="button" class="mood-chip" role="radio" aria-checked="false" data-label="Peaceful">😌</button>
-          </div>
-          <div class="mood-live" aria-live="polite">
-            <span id="mood-live-text">— How do you feel?</span>
-          </div>
+        <h2>Your Mood</h2>
+        <!-- ORIGINAL select kept for compatibility (hidden via CSS) -->
+        <select id="mood">
+          <option value="">How do you feel?</option>
+          <option value="😀">Happy</option>
+          <option value="😐">Neutral</option>
+          <option value="😔">Sad</option>
+          <option value="😤">Frustrated</option>
+          <option value="😴">Tired</option>
+          <option value="😌">Peaceful</option>
+        </select>
+
+        <!-- Emoji chip picker -->
+        <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😐" data-label="Neutral">😐</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="🙂" data-label="Okay">🙂</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😀" data-label="Happy">😀</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😌" data-label="Peaceful">😌</button>
+        </div>
+
+        <div class="mood-live">
+          <span id="mood-emoji" style="font-size:2rem; opacity:.5;">—</span>
+          <span id="mood-label" class="mood-label" style="opacity:.7;">How do you feel?</span>
         </div>
       </section>
     </div>
 
-    <!-- Breathing -->
-    <h2 class="section-label">🫁 Breathing Exercise</h2>
-    <section class="card" id="breathing-card">
-      <div id="breath-bubble-wrap">
-        <div id="breath-bubble"></div>
-        <p id="breath-text">Paused</p>
-        <div style="text-align:center">
+    <section id="breathing">
+      <h2 style="text-align:center; color:#008cba; margin:4rem 0 2rem;">Breathing Exercise</h2>
+      <div class="breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text">Inhale for <span id="countdown">4</span></p>
           <button id="breath-toggle-btn">Start Breath</button>
         </div>
       </div>
     </section>
 
-    <!-- Tasks -->
-    <h2 class="section-label">🌱 Today’s Tasks</h2>
-    <section id="task-card">
-      <div id="task-list"></div>
-      <div class="task-input-group">
-        <input type="text" id="new-task" placeholder="Add new task">
-        <button onclick="addTask()">Add Task</button>
-        <button onclick="resetTasks()">Reset All Tasks</button>
-      </div>
-    </section>
+    <h2 class="section-label">🌱 Today's Tasks</h2>
+    <div id="progress-ring-container" aria-label="Task progress">
+      <svg id="progress-ring" width="140" height="140">
+        <circle id="progress-ring-bg" stroke="#e0e0e0" stroke-width="12" fill="transparent" r="60" cx="70" cy="70"></circle>
+        <circle id="progress-ring-bar" stroke="#66B032" stroke-width="12" fill="transparent" r="60" cx="70" cy="70" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"></circle>
+      </svg>
+    </div>
+    <p id="progress-text">0% Complete</p>
 
-    <footer><p id="quote-box">Loading quote…</p></footer>
+    <div id="task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-task" placeholder="Add new task">
+      <button onclick="addTask()">Add Task</button>
+      <button onclick="resetTasks()">Reset All Tasks</button>
+    </div>
+
+    <footer id="quote-footer"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Mood behavior -->
+  <!-- ========== Legacy/compat placeholders (hidden) so main.js doesn't error ========== -->
+  <div class="compat-hidden">
+    <!-- Old rectangular progress bar some scripts might touch -->
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <!-- Ongoing task artifacts (IDs only; safely hidden) -->
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button id="add-ongoing-task-btn">Add Task</button>
+      <button id="reset-ongoing-tasks-btn">Reset Ongoing Tasks</button>
+    </div>
+  </div>
+
+  <!-- ========== Safe guards: define no-op functions if main.js expects them ========== -->
   <script>
-    (function(){
-      const chips=[...document.querySelectorAll('.mood-chip')];
-      const live=document.getElementById('mood-live-text');
-      function setActive(chip){
-        chips.forEach(c=>{c.classList.remove('active');c.setAttribute('aria-checked','false')});
-        chip.classList.add('active');
-        chip.setAttribute('aria-checked','true');
-        live.textContent = `${chip.textContent.trim()} ${chip.dataset.label}`;
+    // Prevent ReferenceErrors if inline handlers or main.js call these
+    window.addOngoingTask = window.addOngoingTask || function(){};
+    window.resetOngoingTasks = window.resetOngoingTasks || function(){};
+    // If legacy code tries to set rectangular progress, keep it harmless
+    window.updateLegacyProgress = window.updateLegacyProgress || function(pct){
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.width = (Number(pct)||0) + '%';
+    };
+  </script>
+
+  <!-- Progress ring helper (unchanged) -->
+  <script>
+    (function () {
+      const radius = 60;
+      const circumference = 2 * Math.PI * radius;
+      window.updateProgressCircle = function (percent) {
+        const pct = Math.max(0, Math.min(100, Number(percent) || 0));
+        const circle = document.getElementById('progress-ring-bar');
+        if (!circle) return;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const label = document.getElementById('progress-text');
+        if (label) label.textContent = `${pct}% Complete`;
+      };
+    })();
+  </script>
+
+  <!-- Mood control behavior (single layout) -->
+  <script>
+    (function () {
+      const moodSelect = document.getElementById("mood");
+      const chips = Array.from(document.querySelectorAll(".mood-chip"));
+      const liveEmoji = document.getElementById("mood-emoji");
+      const liveLabel = document.getElementById("mood-label");
+
+      function clearSelection() {
+        chips.forEach(c => c.setAttribute("aria-checked", "false"));
+        if (moodSelect) moodSelect.value = "";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".5"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".7"; }
       }
-      chips.forEach(chip=>{
-        chip.addEventListener('click',()=>setActive(chip));
-        chip.addEventListener('keydown',e=>{
-          if(e.key===' '||e.key==='Enter'){e.preventDefault();setActive(chip);}
+      function setSelection(emoji, label) {
+        chips.forEach(c => c.setAttribute("aria-checked", c.dataset.emoji === emoji ? "true" : "false"));
+        if (moodSelect) moodSelect.value = emoji;
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
+      }
+
+      const prefill = moodSelect?.value || "";
+      if (prefill) {
+        const chip = chips.find(c => c.dataset.emoji === prefill);
+        if (chip) setSelection(chip.dataset.emoji, chip.dataset.label);
+        else clearSelection();
+      } else {
+        clearSelection();
+      }
+
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setSelection(chip.dataset.emoji, chip.dataset.label);
+          }
         });
       });
     })();
   </script>
 
-  <!-- Breathing 4/4/4/4 with countdown and safe spacing -->
-  <script>
-    (function(){
-      const bubble=document.getElementById('breath-bubble');
-      const text=document.getElementById('breath-text');
-      const btn=document.getElementById('breath-toggle-btn');
-
-      const phases=[
-        {label:'Inhale', className:'inhale', seconds:4},
-        {label:'Hold',   className:'',       seconds:4},
-        {label:'Exhale', className:'exhale', seconds:4},
-        {label:'Hold',   className:'',       seconds:4},
-      ];
-
-      let running=false, step=0, timer=null, tickTimer=null, remaining=0;
-
-      function updateLabel(){ text.textContent = `${phases[step].label} for ${remaining}`; }
-      function clearTimers(){ if(timer){clearTimeout(timer)} if(tickTimer){clearInterval(tickTimer)} timer=tickTimer=null; }
-
-      function advance(){
-        clearTimers();
-        bubble.className = phases[step].className;
-        remaining = phases[step].seconds;
-        updateLabel();
-        tickTimer=setInterval(()=>{ remaining--; if(remaining>=0) updateLabel(); },1000);
-        timer=setTimeout(()=>{ clearTimers(); step=(step+1)%phases.length; if(running) advance(); }, phases[step].seconds*1000);
-      }
-
-      btn.addEventListener('click',()=>{
-        if(!running){ running=true; btn.textContent='Stop Breath'; step=0; advance(); }
-        else{ running=false; btn.textContent='Start Breath'; clearTimers(); bubble.className=''; text.textContent='Paused'; }
-      });
-    })();
-  </script>
-
-  <!-- Your existing app logic -->
+  <!-- Your app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
+
