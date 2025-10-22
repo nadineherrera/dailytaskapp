@@ -38,11 +38,17 @@
       --bubble-max-scale: 1.28;
     }
 
+    /* Time-of-day tint variants */
+    :root.morning { --glow-1:#FFB86B; --glow-2:#6ee7d2; }
+    :root.afternoon{ --glow-1:#8f7ff5; --glow-2:#6ee7d2; }
+    :root.evening { --glow-1:#ff7eb6; --glow-2:#8f7ff5; }
+    :root.night   { --glow-1:#6b8cff; --glow-2:#3fd0c9; }
+
     /* Animated gradient background */
     html, body {
       margin:0; padding:0; height:100%; width:100%;
-      background: radial-gradient(1200px 1200px at 10% 10%, rgba(132,94,194,.25), transparent 60%),
-                  radial-gradient(1200px 1200px at 90% 20%, rgba(102,176,50,.20), transparent 60%),
+      background: radial-gradient(1200px 1200px at 10% 10%, color-mix(in oklab, var(--glow-1) 25%, transparent), transparent 60%),
+                  radial-gradient(1200px 1200px at 90% 20%, color-mix(in oklab, var(--glow-2) 20%, transparent), transparent 60%),
                   linear-gradient(160deg, var(--bg-1), var(--bg-2));
       color: var(--text);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -150,6 +156,15 @@
     .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
     .mood-label { font-weight: 700; color: #eef; }
 
+    /* Streak badge */
+    .streak-badge{
+      display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .7rem;
+      background: linear-gradient(135deg, rgba(143,127,245,.20), rgba(110,231,210,.16));
+      border:1px solid rgba(255,255,255,.14); border-radius:999px; color:#f0f3ff;
+      font-weight:800; box-shadow: 0 6px 18px rgba(0,0,0,.22);
+    }
+    .streak-badge .dot{ width:8px; height:8px; border-radius:50%; background:#6ee7d2; box-shadow:0 0 12px rgba(110,231,210,.6); }
+
     /* Breathing tile */
     .breathing-tile { padding: 24px 16px 28px; }
     #breath-bubble-container {
@@ -167,7 +182,6 @@
       transform-origin:center; transform: scale(1);
       will-change: transform, opacity, filter;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
-      /* extra space between bubble and text */
       margin-bottom: clamp(18px, 3.5vw, 36px);
     }
     #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
@@ -256,6 +270,14 @@
       <h1 id="page-title" class="day-heading"></h1>
       <div id="weather" class="weather-content"></div>
       <div id="affirmation-box"></div>
+
+      <!-- Streak badge -->
+      <div id="streak" style="margin-top:.6rem; text-align:center;">
+        <span id="streak-badge" class="streak-badge" style="display:none;">
+          <span class="dot"></span>
+          <span id="streak-text">0-day streak</span>
+        </span>
+      </div>
     </header>
 
     <!-- Day nav -->
@@ -311,6 +333,16 @@
           <div id="breath-bubble"></div>
           <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
           <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
+
+          <!-- Protocol picker -->
+          <div style="margin-top:.6rem; text-align:center;">
+            <label style="font-size:.85rem; color:#cfe; opacity:.9; margin-right:.4rem;">Mode</label>
+            <select id="breath-mode" class="glass" style="padding:.4rem .7rem; border-radius:12px; background:rgba(255,255,255,.07); color:#fff; border:1px solid rgba(255,255,255,.14);">
+              <option value="BOX_4_4_4_4">Box 4-4-4-4</option>
+              <option value="COHERENT_6BPM">Coherent 6 bpm</option>
+              <option value="RELAX_4_7_8">Relax 4-7-8</option>
+            </select>
+          </div>
         </div>
       </div>
     </section>
@@ -326,8 +358,8 @@
               <stop offset="100%" stop-color="#6ee7d2"></stop>
             </linearGradient>
           </defs>
-        <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
-        <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+          <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
         </svg>
       </div>
       <p id="progress-text">0% Complete</p>
@@ -452,39 +484,68 @@
         }
       };
     })();
+  </script>
 
-    /* ===== Per-task POP confetti (random emojis on task complete) ===== */
-    function burstEmojisAt(x, y, count = 7) {
-      const set = ['🎉','✨','🌟','💫','🎈','🔥','💖','👍','👏','🥳','🌈','🍀','🧠','💪','🪄','😄','🤩','🙌'];
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement('span');
-        s.className = 'emoji-pop';
-        s.textContent = set[Math.floor(Math.random() * set.length)];
-        s.style.left = (x - 8 + (Math.random()*6 - 3)) + 'px';
-        s.style.top  = (y - 8 + (Math.random()*6 - 3)) + 'px';
-        s.style.fontSize = (Math.random() * 10 + 16) + 'px';
-        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px'); // sideways drift
-        document.body.appendChild(s);
-        s.addEventListener('animationend', () => s.remove());
-      }
-    }
+  <!-- Daily affirmations -->
+  <script>
+    (function(){
+      const box = document.getElementById('affirmation-box');
+      if (!box) return;
 
-    // Listen for checkbox completion inside #task-list (non-invasive)
-    (function attachTaskPopListener(){
-      const list = document.getElementById('task-list');
-      if (!list) return;
-      list.addEventListener('change', (e) => {
-        const el = e.target;
-        if (el && el.matches('input[type="checkbox"]') && el.checked) {
-          const rect = el.getBoundingClientRect();
-          burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
-                        rect.top  + rect.height/2 + window.scrollY);
-        }
-      }, true);
+      const affirmations = [
+        "I’m proud of the tiny steps I take.",
+        "I can always return to my breath.",
+        "Today, I choose kindness for myself.",
+        "Progress over perfection.",
+        "I’m learning, growing, and glowing.",
+        "My habits shape my future, gently.",
+        "I am safe to try again.",
+        "Consistency is my superpower."
+      ];
+
+      const daySeed = new Date().toISOString().slice(0,10);
+      let hash = 0; for (let i=0;i<daySeed.length;i++) hash = (hash*31 + daySeed.charCodeAt(i))|0;
+      const pick = affirmations[Math.abs(hash) % affirmations.length];
+
+      box.textContent = pick;
+      box.classList.add('visible');
     })();
   </script>
 
-  <!-- Mood control behavior (unchanged logic) -->
+  <!-- Streak tracking -->
+  <script>
+    (function(){
+      const btn = document.getElementById('save-journal-btn');
+      const gratitude = document.getElementById('gratitudeEntry');
+      const streakBadge = document.getElementById('streak-badge');
+      const streakText  = document.getElementById('streak-text');
+      if (!btn || !gratitude || !streakBadge || !streakText) return;
+
+      const KEY = 'dt_streak_days';
+      function getDays(){
+        try { return new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch { return new Set(); }
+      }
+      function saveDay(){
+        const days = getDays();
+        days.add(new Date().toISOString().slice(0,10));
+        localStorage.setItem(KEY, JSON.stringify([...days]));
+        render();
+      }
+      function render(){
+        const days = getDays();
+        const count = days.size;
+        if (count > 0) {
+          streakBadge.style.display = 'inline-flex';
+          streakText.textContent = `${count}-day streak`;
+        }
+      }
+      btn.addEventListener('click', saveDay);
+      gratitude.addEventListener('change', ()=> gratitude.value.trim() && saveDay());
+      render();
+    })();
+  </script>
+
+  <!-- Mood control behavior (unchanged logic) + mood ambient -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -523,10 +584,93 @@
           }
         });
       });
+
+      // Ambient mood pad (tiny 5s tone)
+      const grid = document.querySelector('.mood-grid');
+      function pad(freq=220, dur=5){
+        try{
+          const ctx = new (window.AudioContext||window.webkitAudioContext)();
+          const o1 = ctx.createOscillator(), g1 = ctx.createGain();
+          const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+          o1.type='sine'; o2.type='triangle';
+          o1.frequency.value = freq;
+          o2.frequency.value = freq*2;
+          g1.gain.value = 0.0001; g2.gain.value = 0.0001;
+          g1.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime+0.1);
+          g2.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime+0.1);
+          g1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur);
+          g2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur);
+          o1.connect(g1).connect(ctx.destination);
+          o2.connect(g2).connect(ctx.destination);
+          o1.start(); o2.start();
+          o1.stop(ctx.currentTime+dur+0.05); o2.stop(ctx.currentTime+dur+0.05);
+        }catch(e){}
+      }
+      const tones = { '😔':174, '😤':196, '😐':220, '🙂':246, '😀':262, '😌':261 };
+      if (grid) {
+        grid.addEventListener('click', (e)=>{
+          const btn = e.target.closest('.mood-chip'); if (!btn) return;
+          const f = tones[btn.dataset.emoji] || 220;
+          pad(f, 5);
+        });
+      }
     })();
   </script>
 
-  <!-- Smooth breathing module (unchanged from your last version) -->
+  <!-- Time-of-day background tint -->
+  <script>
+    (function(){
+      const h = new Date().getHours();
+      const root = document.documentElement;
+      root.classList.remove('morning','afternoon','evening','night');
+      const cls = (h<11) ? 'morning' : (h<17) ? 'afternoon' : (h<21) ? 'evening' : 'night';
+      root.classList.add(cls);
+    })();
+  </script>
+
+  <!-- Per-task POP confetti (random emojis on task complete) + haptics -->
+  <script>
+    /* ===== Per-task POP confetti (random emojis on task complete) ===== */
+    function burstEmojisAt(x, y, count = 7) {
+      const set = ['🎉','✨','🌟','💫','🎈','🔥','💖','👍','👏','🥳','🌈','🍀','🧠','💪','🪄','😄','🤩','🙌'];
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.className = 'emoji-pop';
+        s.textContent = set[Math.floor(Math.random() * set.length)];
+        s.style.left = (x - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.top  = (y - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.fontSize = (Math.random() * 10 + 16) + 'px';
+        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px'); // sideways drift
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+    }
+
+    // Haptics helper
+    function buzz(ms=12){ if (navigator.vibrate) try{ navigator.vibrate(ms); }catch{} }
+
+    // Listen for checkbox completion inside #task-list
+    (function attachTaskPopListener(){
+      const list = document.getElementById('task-list');
+      if (!list) return;
+      list.addEventListener('change', (e) => {
+        const el = e.target;
+        if (el && el.matches('input[type="checkbox"]') && el.checked) {
+          const rect = el.getBoundingClientRect();
+          burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
+                        rect.top  + rect.height/2 + window.scrollY);
+          buzz(10);
+        }
+      }, true);
+    })();
+  </script>
+
+  <!-- Shim so the picker can steer the breathing protocol -->
+  <script>
+    window.getActiveBreathProtocol = null;
+  </script>
+
+  <!-- Smooth breathing module (updated to support protocol picker) -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
@@ -546,14 +690,24 @@
         COHERENT_6BPM: [
           { name: 'Inhale', seconds: 5, targetScale: maxScale },
           { name: 'Exhale', seconds: 5, targetScale: 1.00 },
+        ],
+        RELAX_4_7_8: [
+          { name: 'Inhale', seconds: 4, targetScale: maxScale },
+          { name: 'Hold',   seconds: 7, targetScale: null },
+          { name: 'Exhale', seconds: 8, targetScale: 1.00 },
         ]
       };
-      let ACTIVE = PROTOCOLS.BOX_4_4_4_4;
 
       const easeInOut = (t)=> t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
 
       let running=false, stepIdx=0, rafId=null, stepStart=0;
       let startScale=1, endScale=1, lastRenderedScale=1;
+
+      function activeSeq() {
+        // If picker provided a function, use that. Else fallback to default.
+        const pick = (window.getActiveBreathProtocol && window.getActiveBreathProtocol());
+        return pick || PROTOCOLS.BOX_4_4_4_4;
+      }
 
       function setScale(s){
         lastRenderedScale = s;
@@ -566,7 +720,8 @@
       }
 
       function beginStep(now){
-        const step = ACTIVE[stepIdx];
+        const seq = activeSeq();
+        const step = seq[stepIdx % seq.length];
         stepStart = now;
         startScale = lastRenderedScale;
         endScale = (step.targetScale == null) ? startScale : step.targetScale;
@@ -575,7 +730,8 @@
       }
 
       function tick(now){
-        const step = ACTIVE[stepIdx];
+        const seq = activeSeq();
+        const step = seq[stepIdx % seq.length];
         const dur = step.seconds * 1000;
         const elapsed = now - stepStart;
         const t = Math.min(1, elapsed / dur);
@@ -588,7 +744,7 @@
         if (counter) counter.textContent = String(Math.ceil(remaining / 1000));
 
         if (elapsed >= dur) {
-          stepIdx = (stepIdx + 1) % ACTIVE.length;
+          stepIdx = (stepIdx + 1) % seq.length;
           beginStep(now);
         }
         if (running) rafId = requestAnimationFrame(tick);
@@ -599,9 +755,9 @@
         running = true;
         btn.textContent = 'Stop Breathing Exercise';
 
-        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') {
-          setScale(1);
-        }
+        const tf = window.getComputedStyle(bubble).transform;
+        if (!tf || tf === 'none') setScale(1);
+
         stepIdx = 0;
         const now = performance.now();
         beginStep(now);
@@ -620,20 +776,65 @@
 
       btn.addEventListener('click', ()=> running ? stop() : start());
 
-      // Optional: long-press to toggle protocol
-      let pressTimer;
-      btn.addEventListener('mousedown', ()=> {
-        pressTimer = setTimeout(()=>{
-          ACTIVE = (ACTIVE === PROTOCOLS.BOX_4_4_4_4) ? PROTOCOLS.COHERENT_6BPM : PROTOCOLS.BOX_4_4_4_4;
-          const name = (ACTIVE === PROTOCOLS.COHERENT_6BPM) ? 'Coherent (6 bpm)' : 'Box (4-4-4-4)';
-          btn.title = `Mode: ${name}`;
-        }, 700);
-      });
-      ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt=>{
-        btn.addEventListener(evt, ()=> clearTimeout(pressTimer));
-      });
+      // Vibrate very lightly on phase change
+      if (window.MutationObserver && phaseEl) {
+        const mo = new MutationObserver(()=>{ if (navigator.vibrate) try{ navigator.vibrate(8); }catch{} });
+        mo.observe(phaseEl, { childList:true, characterData:true, subtree:true });
+      }
+
+      // Expose PROTOCOLS so the picker can read exact shapes if needed
+      window.__DEFAULT_PROTOCOLS__ = PROTOCOLS;
     })();
   </script>
+
+  <!-- Protocol picker hook -->
+  <script>
+    (function(){
+      const modeSel = document.getElementById('breath-mode');
+      if (!modeSel) return;
+
+      const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
+      // Independent copy so we can extend safely
+      window.__BREATH_PROTOCOLS__ = {
+        BOX_4_4_4_4: [
+          { name: 'Inhale', seconds: 4, targetScale: maxScale },
+          { name: 'Hold',   seconds: 4, targetScale: null },
+          { name: 'Exhale', seconds: 4, targetScale: 1.00 },
+          { name: 'Hold',   seconds: 4, targetScale: null },
+        ],
+        COHERENT_6BPM: [
+          { name: 'Inhale', seconds: 5, targetScale: maxScale },
+          { name: 'Exhale', seconds: 5, targetScale: 1.00 },
+        ],
+        RELAX_4_7_8: [
+          { name: 'Inhale', seconds: 4, targetScale: maxScale },
+          { name: 'Hold',   seconds: 7, targetScale: null },
+          { name: 'Exhale', seconds: 8, targetScale: 1.00 },
+        ]
+      };
+
+      function setActivePicker(mode){
+        window.getActiveBreathProtocol = () => window.__BREATH_PROTOCOLS__[mode] || window.__BREATH_PROTOCOLS__.BOX_4_4_4_4;
+      }
+
+      modeSel.addEventListener('change', () => {
+        const m = modeSel.value;
+        localStorage.setItem('dt_breath_mode', m);
+        const btn = document.getElementById('breath-toggle-btn');
+        const wasRunning = btn && btn.textContent.toLowerCase().includes('stop');
+        if (wasRunning) btn.click(); // stop
+        setActivePicker(m);
+        if (wasRunning) setTimeout(()=>btn.click(), 40); // restart
+      });
+
+      const saved = localStorage.getItem('dt_breath_mode');
+      const initial = (saved && [...modeSel.options].some(o=>o.value===saved)) ? saved : 'BOX_4_4_4_4';
+      modeSel.value = initial;
+      setActivePicker(initial);
+    })();
+  </script>
+
+  <!-- Tiny haptics on breathing phase change already wired above -->
 
   <!-- Your app logic -->
   <script type="module" src="main.js"></script>
