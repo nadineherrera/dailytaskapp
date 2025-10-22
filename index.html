@@ -173,11 +173,11 @@
 
     #task-list { margin-top: 10px; }
 
-    /* CHANGED: lighter Lavender Glow header for "Today's Tasks" */
+    /* LIGHTER: "Today's Tasks" header */
     #task-list h2 {
       display:flex; align-items:center; gap:10px; padding:1rem;
-      background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(180,160,255,.18));
-      border-radius: 12px; color:#fff; font-weight: 900;
+      background: linear-gradient(135deg, rgba(143,127,245,.22), rgba(180,160,255,.12));
+      border-radius: 12px; color:#f6f6ff; font-weight: 900;
     }
 
     .task-input-group { display:flex; flex-wrap:wrap; gap:.6rem; margin: 1rem 0 2rem; justify-content:center; max-width:640px; margin-inline:auto; }
@@ -188,7 +188,7 @@
     }
     #new-task:focus{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(110,231,210,.12); }
 
-    /* Lavender Glow task buttons */
+    /* Lavender Glow task buttons (kept) */
     .task-input-group button {
       background: linear-gradient(135deg, rgba(143,127,245,.45), rgba(180,160,255,.28));
       border-color: rgba(143,127,245,.65);
@@ -284,8 +284,8 @@
               <stop offset="100%" stop-color="#6ee7d2"></stop>
             </linearGradient>
           </defs>
-        <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
-        <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+          <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
         </svg>
       </div>
       <p id="progress-text">0% Complete</p>
