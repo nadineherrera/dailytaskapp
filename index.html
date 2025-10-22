@@ -13,7 +13,6 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <title>Daily Task App</title>
 
-  <!-- Optional nice font (safe fallback to system) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -33,12 +32,10 @@
       --radius:18px;
       --shadow:0 10px 30px rgba(0,0,0,.25);
 
-      /* breathing bubble sizing (safe & responsive) */
       --bubble-base: clamp(168px, 40vw, 240px);
       --bubble-max-scale: 1.28;
     }
 
-    /* Animated gradient background */
     html, body {
       margin:0; padding:0; height:100%; width:100%;
       background: radial-gradient(1200px 1200px at 10% 10%, rgba(132,94,194,.25), transparent 60%),
@@ -51,9 +48,8 @@
     }
 
     body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-    .container { max-width: 860px; margin: 0 auto; padding: clamp(16px, 3vw, 28px); }
+    .container { max-width: 860px; margin: 0 auto; padding: clamp(16px, 3vw, 28px); position: relative; }
 
-    /* Glassy cards */
     .glass {
       background: var(--card);
       border: 1px solid var(--border);
@@ -62,7 +58,6 @@
       backdrop-filter: blur(10px);
     }
 
-    /* Header */
     header {
       padding: 18px;
       margin: 0 0 16px 0;
@@ -78,17 +73,23 @@
     header img { width:72px; height:72px; display:block; margin: 6px auto 8px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.25)); }
     .day-heading { text-align: center; font-size: clamp(1.6rem, 2.8vw, 2.2rem); font-weight: 800; margin: .4rem 0 .2rem; letter-spacing:.2px; }
 
-    /* Weather + affirmation */
     header .weather-content { display:flex; flex-direction:column; align-items:center; gap:.25rem; font-size:.98rem; color: var(--muted); }
     header .weather-content .temp { font-size:1.1rem; font-weight:800; color: #fff; }
     header .weather-content .desc { font-style: italic; color: #d6d6df; }
     #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
     #affirmation-box.visible { opacity:1; transform:translateY(0); }
 
-    /* Day nav chips (sticky) */
+    /* Sticky weekday bar (pinned) */
     .day-nav {
+      position: sticky;
+      top: calc(env(safe-area-inset-top) + 0px);
+      z-index: 1000;
       text-align:center; margin: 8px 0 18px;
-      position: sticky; top: 6px; z-index: 10;
+      padding: 6px 6px;
+      background: color-mix(in oklab, #0b0b10 70%, transparent);
+      backdrop-filter: blur(8px);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.06);
     }
     .day-nav a {
       display:inline-block; margin: 0 4px; padding:.45rem .8rem;
@@ -98,14 +99,12 @@
     }
     .day-nav a:hover { transform: translateY(-1px); background: var(--chip-on); border-color: rgba(255,255,255,.15); }
 
-    /* Sections */
     h2.section-label {
       text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem);
       color:#bfeadf; margin: 28px 0 14px; font-weight:800; letter-spacing:.3px;
       text-shadow:0 2px 12px rgba(0,0,0,.35);
     }
 
-    /* Journals + Gratitude */
     .journal-grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top: 10px; }
     section#journals, section#gratitude { flex:1 1 320px; padding:16px; }
     section#journals h2, section#gratitude h2 { margin:.2rem 0 .7rem 0; font-size:1.05rem; font-weight:800; color:#e7e7ff; }
@@ -123,7 +122,6 @@
       box-shadow: 0 0 0 6px rgba(143,127,245,.12);
     }
 
-    /* Buttons */
     button, .btn {
       padding:.72rem 1.1rem; font-size:1rem; border-radius:999px; border:1px solid rgba(255,255,255,.14);
       background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
@@ -138,7 +136,6 @@
       border-color: rgba(143,127,245,.55);
     }
 
-    /* Mood chips */
     .mood-grid { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
     .mood-chip {
       font-size:1.45rem; padding:.5rem .7rem; border-radius:14px;
@@ -150,10 +147,9 @@
       border-color: rgba(143,127,245,.55);
       box-shadow: 0 8px 22px rgba(143,127,245,.28);
     }
-    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d73e; }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
     .mood-label { font-weight: 700; color: #eef; }
 
-    /* Breathing tile */
     .breathing-tile { padding: 24px 16px 28px; }
     #breath-bubble-container {
       display:flex; flex-direction:column; align-items:center; justify-content:center; max-width:100%;
@@ -170,14 +166,12 @@
       transform-origin:center; transform: scale(1);
       will-change: transform, opacity, filter;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
-      /* extra space between bubble and text */
       margin-bottom: clamp(18px, 3.5vw, 36px);
     }
     #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
     #breath-text #countdown { font-size: 1.6rem; color: #b6ffe8; font-weight: 900; }
     #breath-toggle-btn { min-width: 180px; }
 
-    /* Tasks / Ring */
     #progress-ring-container { display:flex; justify-content:center; align-items:center; margin: 1rem auto .4rem; }
     #progress-ring { transform: rotate(-90deg); overflow: visible; }
     #progress-ring defs linearGradient stop:first-child { stop-color: #8f7ff5; }
@@ -186,7 +180,6 @@
 
     #task-list { margin-top: 10px; }
 
-    /* LIGHTER: "Today's Tasks" header */
     #task-list h2 {
       display:flex; align-items:center; gap:10px; padding:1rem;
       background: linear-gradient(135deg, rgba(143,127,245,.22), rgba(180,160,255,.12));
@@ -201,13 +194,10 @@
     }
     #new-task:focus{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(110,231,210,.12); }
 
-    /* Footer */
     footer#quote-footer { background: linear-gradient(135deg, rgba(143,127,245,.18), rgba(110,231,210,.14)); padding: 1.2rem; text-align: center; color: #eef; font-style: italic; font-size: 1rem; margin: 1.6rem 0 0 0; border-radius: var(--radius); border: 1px solid var(--border); }
 
-    /* Hidden compat block */
     .compat-hidden { display:none !important; visibility:hidden !important; }
 
-    /* ===== Celebration (falling emoji) ===== */
     .emoji-fall {
       position: fixed;
       top: -40px;
@@ -224,7 +214,6 @@
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
 
-    /* ===== Per-task POP confetti ===== */
     .emoji-pop {
       position: absolute;
       z-index: 9999;
@@ -250,7 +239,7 @@
       <div id="affirmation-box"></div>
     </header>
 
-    <!-- Day nav -->
+    <!-- Day nav (sticky) -->
     <div class="day-nav">
       <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
       <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
@@ -332,11 +321,9 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <footer id="quote-footer" class="glass"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Hidden compat placeholders to avoid errors if legacy code calls them -->
   <div class="compat-hidden">
     <div id="progress-container"><div id="progress-bar"></div></div>
     <h2 class="section-label">♾ Ongoing Tasks</h2>
@@ -348,47 +335,51 @@
     </div>
   </div>
 
-  <!-- No-op guards -->
+  <!-- ===== Audio: reliable init + sounds ===== -->
   <script>
-    window.addOngoingTask = window.addOngoingTask || function(){};
-    window.resetOngoingTasks = window.resetOngoingTasks || function(){};
-    window.updateLegacyProgress = window.updateLegacyProgress || function(pct){
-      const bar = document.getElementById('progress-bar');
-      if (bar) bar.style.width = (Number(pct)||0) + '%';
-    };
-  </script>
+    (function(){
+      let ctx=null, master=null;
+      function ensureAudio(){
+        try{
+          if(!ctx){
+            ctx = new (window.AudioContext || window.webkitAudioContext)();
+            master = ctx.createGain();
+            master.gain.value = 0.12;
+            master.connect(ctx.destination);
+          }
+          if(ctx.state === 'suspended') ctx.resume();
+        }catch(e){}
+        return {ctx, master};
+      }
+      // Prime audio on first user interaction so later programmatic calls can play.
+      ['pointerdown','keydown','touchstart'].forEach(evt=>{
+        document.addEventListener(evt, ensureAudio, {once:true, passive:true});
+      });
 
-  <!-- Progress ring helper (unchanged API) + celebration trigger -->
-  <script>
-    // Simple synth "yay" (no external assets)
-    function playYay() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const master = ctx.createGain();
-        master.gain.value = 0.12;
-        master.connect(ctx.destination);
-
+      // Global fanfare for 100% complete
+      window.playYay = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
         const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
         const now = ctx.currentTime;
-
         freqs.forEach((f, i) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
           osc.frequency.setValueAtTime(f, now + i * 0.02);
           gain.gain.setValueAtTime(0, now + i * 0.02);
-          gain.gain.linearRampToValueAtTime(0.9, now + 0.04 + i * 0.02); // quick attack
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.02); // decay
+          gain.gain.linearRampToValueAtTime(0.9, now + 0.04 + i * 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.02);
           osc.connect(gain).connect(master);
           osc.start(now + i * 0.02);
           osc.stop(now + 0.8);
         });
-
-        // gentle "sparkle" noise burst
-        const bufferSize = 0.2 * ctx.sampleRate;
+        // sparkle noise
+        const dur = 0.2;
+        const bufferSize = dur * ctx.sampleRate;
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        for (let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*(1-i/bufferSize);
         const noise = ctx.createBufferSource();
         noise.buffer = noiseBuffer;
         const noiseGain = ctx.createGain();
@@ -396,12 +387,30 @@
         noise.connect(noiseGain).connect(master);
         noise.start(now + 0.02);
         noise.stop(now + 0.25);
-      } catch(e) {
-        // ignore if autoplay blocked
-      }
-    }
+      };
 
-    // Falling emoji confetti
+      // Soft pop when an individual task is completed
+      window.playPop = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        osc.connect(gain).connect(master);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      };
+    })();
+  </script>
+
+  <!-- Celebration + progress ring -->
+  <script>
     function launchFallingEmojis(count = 26) {
       const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
       for (let i = 0; i < count; i++) {
@@ -410,7 +419,7 @@
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
         span.style.left = Math.random() * 100 + 'vw';
         span.style.fontSize = (Math.random() * 18 + 18) + 'px';
-        const dur = (Math.random() * 2) + 2.8; // 2.8s - 4.8s
+        const dur = (Math.random() * 2) + 2.8;
         span.style.animationDuration = dur + 's';
         span.style.animationDelay = (Math.random() * 0.3) + 's';
         document.body.appendChild(span);
@@ -421,7 +430,7 @@
     (function () {
       const radius = 70;
       const circumference = 2 * Math.PI * radius;
-      window._celebrated = false; // guard so we only fire once at 100%
+      window._celebrated = false;
 
       window.updateProgressCircle = function (percent) {
         const pct = Math.max(0, Math.min(100, Number(percent) || 0));
@@ -432,20 +441,17 @@
         const label = document.getElementById('progress-text');
         if (label) label.textContent = `${pct}% Complete`;
 
-        // Celebration trigger
         if (pct >= 100 && !window._celebrated) {
           window._celebrated = true;
           playYay();
           launchFallingEmojis();
         }
         if (pct < 100 && window._celebrated) {
-          // reset if user goes back below 100
           window._celebrated = false;
         }
       };
     })();
 
-    /* ===== Per-task POP confetti (random emojis on task complete) ===== */
     function burstEmojisAt(x, y, count = 7) {
       const set = ['🎉','✨','🌟','💫','🎈','🔥','💖','👍','👏','🥳','🌈','🍀','🧠','💪','🪄','😄','🤩','🙌'];
       for (let i = 0; i < count; i++) {
@@ -455,13 +461,13 @@
         s.style.left = (x - 8 + (Math.random()*6 - 3)) + 'px';
         s.style.top  = (y - 8 + (Math.random()*6 - 3)) + 'px';
         s.style.fontSize = (Math.random() * 10 + 16) + 'px';
-        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px'); // sideways drift
+        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px');
         document.body.appendChild(s);
         s.addEventListener('animationend', () => s.remove());
       }
     }
 
-    // Listen for checkbox completion inside #task-list (non-invasive)
+    // Hook task checkboxes: pop + sound
     (function attachTaskPopListener(){
       const list = document.getElementById('task-list');
       if (!list) return;
@@ -471,12 +477,13 @@
           const rect = el.getBoundingClientRect();
           burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
                         rect.top  + rect.height/2 + window.scrollY);
+          playPop(); // <-- per-task sound
         }
       }, true);
     })();
   </script>
 
-  <!-- Mood control behavior (restored) -->
+  <!-- Mood control -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -485,16 +492,12 @@
       const liveLabel = document.getElementById("mood-label");
 
       function clearSelection() {
-        chips.forEach(c => {
-          c.setAttribute("aria-checked", "false");
-          c.tabIndex = -1;
-        });
+        chips.forEach(c => { c.setAttribute("aria-checked","false"); c.tabIndex=-1; });
         if (moodSelect) moodSelect.value = "";
         if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".6"; }
         if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".9"; }
-        if (chips[0]) chips[0].tabIndex = 0; // roving focus start
+        if (chips[0]) chips[0].tabIndex = 0;
       }
-
       function setSelection(emoji, label) {
         chips.forEach(c => {
           const active = c.dataset.emoji === emoji;
@@ -506,10 +509,8 @@
         if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
       }
 
-      // Init
       clearSelection();
 
-      // Click + keyboard
       chips.forEach(chip => {
         chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
         chip.addEventListener("keydown", (e) => {
@@ -519,21 +520,17 @@
           }
           const idx = chips.indexOf(chip);
           if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-            e.preventDefault();
-            const next = chips[(idx + 1) % chips.length];
-            next.focus();
+            e.preventDefault(); chips[(idx+1)%chips.length].focus();
           }
           if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-            e.preventDefault();
-            const prev = chips[(idx - 1 + chips.length) % chips.length];
-            prev.focus();
+            e.preventDefault(); chips[(idx-1+chips.length)%chips.length].focus();
           }
         });
       });
     })();
   </script>
 
-  <!-- Smooth breathing module (Box 4-4-4-4 only) -->
+  <!-- Breathing (Box 4-4-4-4 only) -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
@@ -543,10 +540,9 @@
 
       const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
 
-      // Single protocol: BOX 4-4-4-4
       const STEPS = [
         { name: 'Inhale', seconds: 4, targetScale: maxScale },
-        { name: 'Hold',   seconds: 4, targetScale: null }, // stay at current scale
+        { name: 'Hold',   seconds: 4, targetScale: null },
         { name: 'Exhale', seconds: 4, targetScale: 1.00 },
         { name: 'Hold',   seconds: 4, targetScale: null },
       ];
@@ -599,10 +595,7 @@
         if (running) return;
         running = true;
         btn.textContent = 'Stop Breathing Exercise';
-
-        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') {
-          setScale(1);
-        }
+        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') setScale(1);
         stepIdx = 0;
         const now = performance.now();
         beginStep(now);
@@ -620,7 +613,6 @@
       }
 
       btn.addEventListener('click', ()=> running ? stop() : start());
-      // Box only (no alternate modes)
     })();
   </script>
 
