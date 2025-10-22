@@ -167,6 +167,8 @@
       transform-origin:center; transform: scale(1);
       will-change: transform, opacity, filter;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
+      /* NEW: extra space between bubble and text */
+      margin-bottom: clamp(18px, 3.5vw, 36px);
     }
     #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
     #breath-text #countdown { font-size: 1.6rem; color: #b6ffe8; font-weight: 900; }
