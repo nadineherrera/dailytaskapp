@@ -27,12 +27,9 @@
       --text:#e8e8f0;
       --muted:#a7a8b3;
       --brand:#845EC2;
-      --brand-2:#66B032;
       --accent:#00a6d6;
       --chip:#1d2030;
       --chip-on:#23263a;
-      --btn:#2a2f47;
-      --btn-on:#3b4261;
       --radius:18px;
       --shadow:0 10px 30px rgba(0,0,0,.25);
     }
@@ -170,14 +167,13 @@
     /* Tasks / Ring */
     #progress-ring-container { display:flex; justify-content:center; align-items:center; margin: 1rem auto .4rem; }
     #progress-ring { transform: rotate(-90deg); overflow: visible; }
-    /* Add a gradient stroke to the ring */
     #progress-ring defs linearGradient stop:first-child { stop-color: #8f7ff5; }
     #progress-ring defs linearGradient stop:last-child  { stop-color: #6ee7d2; }
     #progress-text { text-align:center; font-weight:800; color:#e7fff6; margin-bottom: 1.1rem; }
 
-    /* Task list area */
     #task-list { margin-top: 10px; }
     #task-list h2 { display:flex; align-items:center; gap:10px; padding:1rem; background: linear-gradient(180deg, rgba(102,176,50,.35), rgba(102,176,50,.15)); border-radius: 12px; color:#0b1b0a; font-weight: 900; }
+
     .task-input-group { display:flex; flex-wrap:wrap; gap:.6rem; margin: 1rem 0 2rem; justify-content:center; max-width:640px; margin-inline:auto; }
     #new-task {
       width: min(420px, 90%); padding:.7rem .9rem; font-size:1rem; border-radius: 999px;
@@ -185,7 +181,17 @@
       outline:none; transition: border-color .2s, background .2s, box-shadow .2s;
     }
     #new-task:focus{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(110,231,210,.12); }
-    .task-input-group button { background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.25)); border-color: rgba(143,127,245,.55); }
+
+    /* >>> Lavender Glow task buttons (no green) <<< */
+    .task-input-group button {
+      background: linear-gradient(135deg, rgba(143,127,245,.45), rgba(180,160,255,.28));
+      border-color: rgba(143,127,245,.65);
+      color: #fff;
+    }
+    .task-input-group button:hover {
+      box-shadow: 0 12px 26px rgba(143,127,245,.28), inset 0 1px 0 rgba(255,255,255,.25);
+      transform: translateY(-1px);
+    }
 
     /* Footer */
     footer#quote-footer { background: linear-gradient(135deg, rgba(143,127,245,.18), rgba(110,231,210,.14)); padding: 1.2rem; text-align: center; color: #eef; font-style: italic; font-size: 1rem; margin: 1.6rem 0 0 0; border-radius: var(--radius); border: 1px solid var(--border); }
@@ -200,9 +206,7 @@
     <header class="glass">
       <img src="apple-touch-icon.png" alt="App Logo">
       <h1 id="page-title" class="day-heading"></h1>
-      <div id="weather" class="weather-content">
-        <!-- main.js fills: temp / desc / loc -->
-      </div>
+      <div id="weather" class="weather-content"></div>
       <div id="affirmation-box"></div>
     </header>
 
@@ -283,7 +287,7 @@
       <div id="task-list"></div>
       <div class="task-input-group">
         <input type="text" id="new-task" placeholder="Add new task">
-        <button onclick="addTask()" class="btn btn-primary">Add Task</button>
+        <button onclick="addTask()" class="btn">Add Task</button>
         <button onclick="resetTasks()" class="btn">Reset All Tasks</button>
       </div>
     </div>
