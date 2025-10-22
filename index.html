@@ -85,21 +85,10 @@
     #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
     #affirmation-box.visible { opacity:1; transform:translateY(0); }
 
-    /* Day nav chips — STICKY upgrade */
+    /* Day nav chips (sticky) */
     .day-nav {
-      position: sticky;
-      top: calc(env(safe-area-inset-top) + 0px); /* pins to very top, respects notches */
-      z-index: 100;                              /* above cards/content */
-      margin: 8px 0 18px;
-      text-align:center;
-
-      /* subtle background + blur to reduce shimmer over content */
-      background: linear-gradient(160deg, rgba(11,11,16,.55), rgba(18,20,29,.35));
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 8px;
+      text-align:center; margin: 8px 0 18px;
+      position: sticky; top: 6px; z-index: 10;
     }
     .day-nav a {
       display:inline-block; margin: 0 4px; padding:.45rem .8rem;
@@ -161,7 +150,7 @@
       border-color: rgba(143,127,245,.55);
       box-shadow: 0 8px 22px rgba(143,127,245,.28);
     }
-    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d73e; }
     .mood-label { font-weight: 700; color: #eef; }
 
     /* Breathing tile */
@@ -212,17 +201,6 @@
     }
     #new-task:focus{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(110,231,210,.12); }
 
-    /* Lavender Glow task buttons (kept) */
-    .task-input-group button {
-      background: linear-gradient(135deg, rgba(143,127,245,.45), rgba(180,160,255,.28));
-      border-color: rgba(143,127,245,.65);
-      color: #fff;
-    }
-    .task-input-group button:hover {
-      box-shadow: 0 12px 26px rgba(143,127,245,.28), inset 0 1px 0 rgba(255,255,255,.25);
-      transform: translateY(-1px);
-    }
-
     /* Footer */
     footer#quote-footer { background: linear-gradient(135deg, rgba(143,127,245,.18), rgba(110,231,210,.14)); padding: 1.2rem; text-align: center; color: #eef; font-style: italic; font-size: 1rem; margin: 1.6rem 0 0 0; border-radius: var(--radius); border: 1px solid var(--border); }
 
@@ -272,7 +250,7 @@
       <div id="affirmation-box"></div>
     </header>
 
-    <!-- Day nav (now truly sticky at the top) -->
+    <!-- Day nav -->
     <div class="day-nav">
       <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
       <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
@@ -340,8 +318,8 @@
               <stop offset="100%" stop-color="#6ee7d2"></stop>
             </linearGradient>
           </defs>
-        <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
-        <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+          <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
         </svg>
       </div>
       <p id="progress-text">0% Complete</p>
@@ -498,6 +476,63 @@
     })();
   </script>
 
+  <!-- Mood control behavior (restored) -->
+  <script>
+    (function () {
+      const moodSelect = document.getElementById("mood");
+      const chips = Array.from(document.querySelectorAll(".mood-chip"));
+      const liveEmoji = document.getElementById("mood-emoji");
+      const liveLabel = document.getElementById("mood-label");
+
+      function clearSelection() {
+        chips.forEach(c => {
+          c.setAttribute("aria-checked", "false");
+          c.tabIndex = -1;
+        });
+        if (moodSelect) moodSelect.value = "";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".6"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".9"; }
+        if (chips[0]) chips[0].tabIndex = 0; // roving focus start
+      }
+
+      function setSelection(emoji, label) {
+        chips.forEach(c => {
+          const active = c.dataset.emoji === emoji;
+          c.setAttribute("aria-checked", active ? "true" : "false");
+          c.tabIndex = active ? 0 : -1;
+        });
+        if (moodSelect) moodSelect.value = emoji;
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
+      }
+
+      // Init
+      clearSelection();
+
+      // Click + keyboard
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setSelection(chip.dataset.emoji, chip.dataset.label);
+          }
+          const idx = chips.indexOf(chip);
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault();
+            const next = chips[(idx + 1) % chips.length];
+            next.focus();
+          }
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault();
+            const prev = chips[(idx - 1 + chips.length) % chips.length];
+            prev.focus();
+          }
+        });
+      });
+    })();
+  </script>
+
   <!-- Smooth breathing module (Box 4-4-4-4 only) -->
   <script>
     (function(){
@@ -585,8 +620,7 @@
       }
 
       btn.addEventListener('click', ()=> running ? stop() : start());
-
-      // Removed: long-press toggle for other modes (Box only now)
+      // Box only (no alternate modes)
     })();
   </script>
 
