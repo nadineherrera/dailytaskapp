@@ -367,10 +367,15 @@
         }catch(e){}
         return {ctx, master};
       }
+      // expose so other blocks can ensure audio right before playing
+      window._ensureAudio = ensureAudio;
+
+      // Prime audio on first user interaction so later programmatic calls can play.
       ['pointerdown','keydown','touchstart'].forEach(evt=>{
         document.addEventListener(evt, ensureAudio, {once:true, passive:true});
       });
 
+      // Global fanfare for 100% complete
       window.playYay = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
@@ -402,6 +407,7 @@
         noise.stop(now + 0.25);
       };
 
+      // Soft pop when an individual task is completed
       window.playPop = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
@@ -453,12 +459,17 @@
         const label = document.getElementById('progress-text');
         if (label) label.textContent = `${pct}% Complete`;
 
-        if (pct >= 100 && !window._celebrated) {
+        // tolerate rounding: treat 99.5+ as complete
+        const reached = pct >= 99.5;
+
+        if (reached && !window._celebrated) {
           window._celebrated = true;
+          // ensure audio context is active at the exact moment of play
+          if (window._ensureAudio) window._ensureAudio();
           playYay();
           launchFallingEmojis();
         }
-        if (pct < 100 && window._celebrated) {
+        if (!reached && window._celebrated) {
           window._celebrated = false;
         }
       };
@@ -479,6 +490,7 @@
       }
     }
 
+    // Hook task checkboxes: pop + sound
     (function attachTaskPopListener(){
       const list = document.getElementById('task-list');
       if (!list) return;
@@ -488,7 +500,7 @@
           const rect = el.getBoundingClientRect();
           burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
                         rect.top  + rect.height/2 + window.scrollY);
-          playPop();
+          playPop(); // per-task sound
         }
       }, true);
     })();
