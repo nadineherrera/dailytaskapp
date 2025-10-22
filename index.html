@@ -85,8 +85,22 @@
     #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
     #affirmation-box.visible { opacity:1; transform:translateY(0); }
 
-    /* Day nav chips */
-    .day-nav { text-align:center; margin: 8px 0 18px; position: sticky; top: 6px; z-index: 10; }
+    /* Day nav chips — STICKY upgrade */
+    .day-nav {
+      position: sticky;
+      top: calc(env(safe-area-inset-top) + 0px); /* pins to very top, respects notches */
+      z-index: 100;                              /* above cards/content */
+      margin: 8px 0 18px;
+      text-align:center;
+
+      /* subtle background + blur to reduce shimmer over content */
+      background: linear-gradient(160deg, rgba(11,11,16,.55), rgba(18,20,29,.35));
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 8px;
+    }
     .day-nav a {
       display:inline-block; margin: 0 4px; padding:.45rem .8rem;
       background: var(--chip); color:#e9ebff; text-decoration:none; border-radius:999px;
@@ -258,7 +272,7 @@
       <div id="affirmation-box"></div>
     </header>
 
-    <!-- Day nav -->
+    <!-- Day nav (now truly sticky at the top) -->
     <div class="day-nav">
       <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
       <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
