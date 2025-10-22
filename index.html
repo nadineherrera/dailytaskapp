@@ -31,7 +31,6 @@
       --chip-on:#23263a;
       --radius:18px;
       --shadow:0 10px 30px rgba(0,0,0,.25);
-
       --bubble-base: clamp(168px, 40vw, 240px);
       --bubble-max-scale: 1.28;
     }
@@ -79,25 +78,43 @@
     #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
     #affirmation-box.visible { opacity:1; transform:translateY(0); }
 
-    /* Sticky weekday bar (pinned) */
-    .day-nav {
+    /* --- Day nav: lighter, rounder, glassy + sticky --- */
+    .day-nav{
       position: sticky;
-      top: calc(env(safe-area-inset-top) + 0px);
+      top: calc(env(safe-area-inset-top) + 6px);
       z-index: 1000;
-      text-align:center; margin: 8px 0 18px;
-      padding: 6px 6px;
-      background: color-mix(in oklab, #0b0b10 70%, transparent);
-      backdrop-filter: blur(8px);
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.06);
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+
+      margin: 8px 0 18px;
+      padding: 12px 14px;
+
+      border-radius: 34px; /* round glass backdrop */
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.28);
     }
-    .day-nav a {
-      display:inline-block; margin: 0 4px; padding:.45rem .8rem;
-      background: var(--chip); color:#e9ebff; text-decoration:none; border-radius:999px;
-      border:1px solid var(--border);
-      transition: transform .12s ease, background .2s ease, border-color .2s;
+    .day-nav a{
+      display: inline-block;
+      padding: .55rem 1rem;
+      border-radius: 999px;                    /* pill */
+      background: rgba(255,255,255,.14);       /* lighter chip */
+      color: #eef3ff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.22);
+      transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 14px rgba(0,0,0,.18);
     }
-    .day-nav a:hover { transform: translateY(-1px); background: var(--chip-on); border-color: rgba(255,255,255,.15); }
+    .day-nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.20);
+      border-color: rgba(255,255,255,.30);
+    }
+    .day-nav a:visited{ color:#eef3ff; }
 
     h2.section-label {
       text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem);
@@ -179,7 +196,6 @@
     #progress-text { text-align:center; font-weight:800; color:#e7fff6; margin-bottom: 1.1rem; }
 
     #task-list { margin-top: 10px; }
-
     #task-list h2 {
       display:flex; align-items:center; gap:10px; padding:1rem;
       background: linear-gradient(135deg, rgba(143,127,245,.22), rgba(180,160,255,.12));
@@ -351,16 +367,14 @@
         }catch(e){}
         return {ctx, master};
       }
-      // Prime audio on first user interaction so later programmatic calls can play.
       ['pointerdown','keydown','touchstart'].forEach(evt=>{
         document.addEventListener(evt, ensureAudio, {once:true, passive:true});
       });
 
-      // Global fanfare for 100% complete
       window.playYay = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
-        const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+        const freqs = [523.25, 659.25, 783.99];
         const now = ctx.currentTime;
         freqs.forEach((f, i) => {
           const osc = ctx.createOscillator();
@@ -374,7 +388,6 @@
           osc.start(now + i * 0.02);
           osc.stop(now + 0.8);
         });
-        // sparkle noise
         const dur = 0.2;
         const bufferSize = dur * ctx.sampleRate;
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -389,7 +402,6 @@
         noise.stop(now + 0.25);
       };
 
-      // Soft pop when an individual task is completed
       window.playPop = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
@@ -467,7 +479,6 @@
       }
     }
 
-    // Hook task checkboxes: pop + sound
     (function attachTaskPopListener(){
       const list = document.getElementById('task-list');
       if (!list) return;
@@ -477,7 +488,7 @@
           const rect = el.getBoundingClientRect();
           burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
                         rect.top  + rect.height/2 + window.scrollY);
-          playPop(); // <-- per-task sound
+          playPop();
         }
       }, true);
     })();
@@ -616,7 +627,6 @@
     })();
   </script>
 
-  <!-- Your app logic -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
