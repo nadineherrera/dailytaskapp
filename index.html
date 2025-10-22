@@ -33,7 +33,7 @@
       --radius:18px;
       --shadow:0 10px 30px rgba(0,0,0,.25);
 
-      /* NEW: breathing bubble sizing (safe & responsive) */
+      /* breathing bubble sizing (safe & responsive) */
       --bubble-base: clamp(168px, 40vw, 240px);
       --bubble-max-scale: 1.28;
     }
@@ -150,12 +150,12 @@
     .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
     .mood-label { font-weight: 700; color: #eef; }
 
-    /* Breathing tile (UPDATED sizing & container height only) */
+    /* Breathing tile */
     .breathing-tile { padding: 24px 16px 28px; }
     #breath-bubble-container {
       display:flex; flex-direction:column; align-items:center; justify-content:center; max-width:100%;
       padding: 16px 12px 6px; text-align:center; gap: 14px;
-      min-height: clamp(340px, 52vw, 460px); /* ensures max scale won't overlap */
+      min-height: clamp(340px, 52vw, 460px);
     }
     #breath-bubble {
       width: var(--bubble-base); height: var(--bubble-base); border-radius: 50%;
@@ -167,7 +167,7 @@
       transform-origin:center; transform: scale(1);
       will-change: transform, opacity, filter;
       filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
-      /* NEW: extra space between bubble and text */
+      /* extra space between bubble and text */
       margin-bottom: clamp(18px, 3.5vw, 36px);
     }
     #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
@@ -214,6 +214,23 @@
 
     /* Hidden compat block */
     .compat-hidden { display:none !important; visibility:hidden !important; }
+
+    /* ===== Celebration (falling emoji) ===== */
+    .emoji-fall {
+      position: fixed;
+      top: -40px;
+      z-index: 9999;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: fallAndFade linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    @keyframes fallAndFade {
+      0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -277,9 +294,7 @@
       <div class="glass breathing-tile">
         <div id="breath-bubble-container">
           <div id="breath-bubble"></div>
-          <!-- UPDATED: explicit phase + countdown -->
           <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
-          <!-- UPDATED: initial label -->
           <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
         </div>
       </div>
@@ -296,8 +311,8 @@
               <stop offset="100%" stop-color="#6ee7d2"></stop>
             </linearGradient>
           </defs>
-          <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
-          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+        <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+        <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
         </svg>
       </div>
       <p id="progress-text">0% Complete</p>
@@ -336,11 +351,71 @@
     };
   </script>
 
-  <!-- Progress ring helper (unchanged API) -->
+  <!-- Progress ring helper (unchanged API) + celebration trigger -->
   <script>
+    // Simple synth "yay" (no external assets)
+    function playYay() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const master = ctx.createGain();
+        master.gain.value = 0.12;
+        master.connect(ctx.destination);
+
+        const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+        const now = ctx.currentTime;
+
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + i * 0.02);
+          gain.gain.setValueAtTime(0, now + i * 0.02);
+          gain.gain.linearRampToValueAtTime(0.9, now + 0.04 + i * 0.02); // quick attack
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.02); // decay
+          osc.connect(gain).connect(master);
+          osc.start(now + i * 0.02);
+          osc.stop(now + 0.8);
+        });
+
+        // gentle "sparkle" noise burst
+        const bufferSize = 0.2 * ctx.sampleRate;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.value = 0.05;
+        noise.connect(noiseGain).connect(master);
+        noise.start(now + 0.02);
+        noise.stop(now + 0.25);
+      } catch(e) {
+        // ignore if autoplay blocked
+      }
+    }
+
+    // Falling emoji confetti
+    function launchFallingEmojis(count = 26) {
+      const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'emoji-fall';
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.fontSize = (Math.random() * 18 + 18) + 'px';
+        const dur = (Math.random() * 2) + 2.8; // 2.8s - 4.8s
+        span.style.animationDuration = dur + 's';
+        span.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(span);
+        span.addEventListener('animationend', () => span.remove());
+      }
+    }
+
     (function () {
       const radius = 70;
       const circumference = 2 * Math.PI * radius;
+      window._celebrated = false; // guard so we only fire once at 100%
+
       window.updateProgressCircle = function (percent) {
         const pct = Math.max(0, Math.min(100, Number(percent) || 0));
         const circle = document.getElementById('progress-ring-bar');
@@ -349,6 +424,17 @@
         circle.style.strokeDashoffset = offset;
         const label = document.getElementById('progress-text');
         if (label) label.textContent = `${pct}% Complete`;
+
+        // Celebration trigger
+        if (pct >= 100 && !window._celebrated) {
+          window._celebrated = true;
+          playYay();
+          launchFallingEmojis();
+        }
+        if (pct < 100 && window._celebrated) {
+          // reset if user goes back below 100
+          window._celebrated = false;
+        }
       };
     })();
   </script>
@@ -395,7 +481,7 @@
     })();
   </script>
 
-  <!-- Smooth breathing module (UPDATED for smoother phases & proper labels) -->
+  <!-- Smooth breathing module (unchanged from your last version) -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
@@ -403,13 +489,12 @@
       const counter = document.getElementById('countdown');
       const btn     = document.getElementById('breath-toggle-btn');
 
-      // Targets respect --bubble-max-scale so the bubble never overflows
       const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
 
       const PROTOCOLS = {
         BOX_4_4_4_4: [
           { name: 'Inhale', seconds: 4, targetScale: maxScale },
-          { name: 'Hold',   seconds: 4, targetScale: null }, // stay where you ended
+          { name: 'Hold',   seconds: 4, targetScale: null },
           { name: 'Exhale', seconds: 4, targetScale: 1.00 },
           { name: 'Hold',   seconds: 4, targetScale: null },
         ],
