@@ -34,10 +34,11 @@
       --bubble-base: clamp(168px, 40vw, 240px);
       --bubble-max-scale: 1.28;
 
-      --cup-w: clamp(56px, 8vw, 72px);
-      --cup-h: clamp(68px, 10vw, 88px);
-      --cup-svg-w: calc(var(--cup-w) * 0.82);
-      --cup-svg-h: calc(var(--cup-h) * 0.68);
+      /* Hydration sizing (adjust here if you want bigger/smaller cups) */
+      --cup-w: clamp(48px, 7vw, 64px);
+      --cup-h: clamp(58px, 8.5vw, 78px);
+      --cup-svg-w: calc(var(--cup-w) * 0.78);
+      --cup-svg-h: calc(var(--cup-h) * 0.64);
     }
 
     html, body {
@@ -62,163 +63,765 @@
       backdrop-filter: blur(10px);
     }
 
-    header { padding: 18px; margin: 0 0 16px 0; position: relative; overflow: hidden; }
-    header img { width:72px; height:72px; display:block; margin: 6px auto 8px; }
-    .day-heading { text-align:center; font-size:clamp(1.6rem, 2.8vw, 2.2rem); font-weight:800; }
+    header {
+      padding: 18px;
+      margin: 0 0 16px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    header:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(600px 180px at 50% -10%, rgba(255,255,255,.08), transparent 60%);
+      pointer-events:none;
+    }
+    header img { width:72px; height:72px; display:block; margin: 6px auto 8px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.25)); }
+    .day-heading { text-align: center; font-size: clamp(1.6rem, 2.8vw, 2.2rem); font-weight: 800; margin: .4rem 0 .2rem; letter-spacing:.2px; }
+
+    header .weather-content { display:flex; flex-direction:column; align-items:center; gap:.25rem; font-size:.98rem; color: var(--muted); }
+    header .weather-content .temp { font-size:1.1rem; font-weight:800; color: #fff; }
+    header .weather-content .desc { font-style: italic; color: #d6d6df; }
+    #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
+    #affirmation-box.visible { opacity:1; transform:translateY(0); }
+
+    /* --- Day nav: lighter, rounder, glassy + sticky --- */
+    .day-nav{
+      position: sticky;
+      top: calc(env(safe-area-inset-top) + 6px);
+      z-index: 1000;
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+
+      margin: 8px 0 18px;
+      padding: 12px 14px;
+
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.28);
+    }
+    .day-nav a{
+      display: inline-block;
+      padding: .55rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      color: #eef3ff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.22);
+      transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 14px rgba(0,0,0,.18);
+    }
+    .day-nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.20);
+      border-color: rgba(255,255,255,.30);
+    }
+    .day-nav a:visited{ color:#eef3ff; }
 
     h2.section-label {
-      text-align:center; font-size:clamp(1.2rem,2vw,1.4rem);
-      color:#bfeadf; margin:28px 0 14px; font-weight:800;
+      text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem);
+      color:#bfeadf; margin: 28px 0 14px; font-weight:800; letter-spacing:.3px;
+      text-shadow:0 2px 12px rgba(0,0,0,.35);
     }
 
-    /* Hydration cups */
-    .hydration-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-    .cup-btn{width:var(--cup-w);height:var(--cup-h);border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;}
-    .cup-svg{width:var(--cup-svg-w);height:var(--cup-svg-h);}
-    .water{transform:scaleY(0);transform-origin:50% 100%;transition:.25s;}
-    .cup-btn.filled .water{transform:scaleY(1);}
-    #hydration-status{text-align:center;margin-top:.4rem;color:#cfe;font-weight:800;}
+    .journal-grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top: 10px; }
+    section#journals, section#gratitude { flex:1 1 320px; padding:16px; }
+    section#journals h2, section#gratitude h2 { margin:.2rem 0 .7rem 0; font-size:1.05rem; font-weight:800; color:#e7e7ff; }
 
-    /* Prompt Roulette */
-    #prompt-box { text-align:center; margin:.8rem 0; font-weight:600; }
-    #prompt-answer { width:100%; padding:.6rem; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:#fff; }
+    textarea{
+      width:100%; height:120px; padding:12px 14px; margin-bottom: 14px;
+      border-radius: 14px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
+      color:#f6f7ff; box-sizing:border-box; resize:vertical;
+      outline:none; transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    textarea::placeholder{ color:#9ea2b7; }
+    textarea:focus{
+      border-color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 0 0 6px rgba(143,127,245,.12);
+    }
 
-    /* Moments Capture */
-    .moment-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0; }
-    .moment-btn { font-size:1.6rem; padding:.6rem .9rem; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; }
-    .moment-count { display:block; font-size:.8rem; color:#cfe; margin-top:.2rem; text-align:center; }
+    button, .btn {
+      padding:.72rem 1.1rem; font-size:1rem; border-radius:999px; border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      color:#fff; cursor:pointer; transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.2);
+      backdrop-filter: blur(6px);
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22); }
+    button:active { transform: translateY(0); }
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.25));
+      border-color: rgba(143,127,245,.55);
+    }
 
-    /* Gratitude Bingo */
-    .bingo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .bingo-cell { padding:1rem; text-align:center; border-radius:12px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06); cursor:pointer; }
-    .bingo-cell.active { background:linear-gradient(135deg,#8f7ff5,#6ee7d2); color:#000; font-weight:700; }
+    .mood-grid { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
+    .mood-chip {
+      font-size:1.45rem; padding:.5rem .7rem; border-radius:14px;
+      border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color:#fff;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .mood-chip[aria-checked="true"] {
+      background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.28));
+      border-color: rgba(143,127,245,.55);
+      box-shadow: 0 8px 22px rgba(143,127,245,.28);
+    }
+    .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
+    .mood-label { font-weight: 700; color: #eef; }
+
+    .breathing-tile { padding: 24px 16px 28px; }
+    #breath-bubble-container {
+      display:flex; flex-direction:column; align-items:center; justify-content:center; max-width:100%;
+      padding: 16px 12px 6px; text-align:center; gap: 14px;
+      min-height: clamp(340px, 52vw, 460px);
+    }
+    #breath-bubble {
+      width: var(--bubble-base); height: var(--bubble-base); border-radius: 50%;
+      background: radial-gradient(ellipse at 30% 30%, #a3e8ff, #38bdf8 55%, #0ea5e9 100%);
+      box-shadow:
+        0 0 40px rgba(56,189,248,.45),
+        0 20px 50px rgba(14,165,233,.22),
+        inset 0 12px 40px rgba(255,255,255,.25);
+      transform-origin:center; transform: scale(1);
+      will-change: transform, opacity, filter;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
+      margin-bottom: clamp(18px, 3.5vw, 36px);
+    }
+    #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
+    #breath-text #countdown { font-size: 1.6rem; color: #b6ffe8; font-weight: 900; }
+    #breath-toggle-btn { min-width: 180px; }
+
+    #progress-ring-container { display:flex; justify-content:center; align-items:center; margin: 1rem auto .4rem; }
+    #progress-ring { transform: rotate(-90deg); overflow: visible; }
+    #progress-ring defs linearGradient stop:first-child { stop-color: #8f7ff5; }
+    #progress-ring defs linearGradient stop:last-child  { stop-color: #6ee7d2; }
+    #progress-text { text-align:center; font-weight:800; color:#e7fff6; margin-bottom: 1.1rem; }
+
+    #task-list { margin-top: 10px; }
+    #task-list h2 {
+      display:flex; align-items:center; gap:10px; padding:1rem;
+      background: linear-gradient(135deg, rgba(143,127,245,.22), rgba(180,160,255,.12));
+      border-radius: 12px; color:#f6f6ff; font-weight: 900;
+    }
+
+    .task-input-group { display:flex; flex-wrap:wrap; gap:.6rem; margin: 1rem 0 2rem; justify-content:center; max-width:640px; margin-inline:auto; }
+    #new-task {
+      width: min(420px, 90%); padding:.7rem .9rem; font-size:1rem; border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color:#fff;
+      outline:none; transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    #new-task:focus{ border-color: rgba(255,255,255,.24); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(110,231,210,.12); }
+
+    footer#quote-footer { background: linear-gradient(135deg, rgba(143,127,245,.18), rgba(110,231,210,.14)); padding: 1.2rem; text-align: center; color: #eef; font-style: italic; font-size: 1rem; margin: 1.6rem 0 0 0; border-radius: var(--radius); border: 1px solid var(--border); }
+
+    .compat-hidden { display:none !important; visibility:hidden !important; }
+
+    .emoji-fall {
+      position: fixed;
+      top: -40px;
+      z-index: 9999;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: fallAndFade linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    @keyframes fallAndFade {
+      0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    .emoji-pop {
+      position: absolute;
+      z-index: 9999;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: popBurst 900ms ease-out forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    @keyframes popBurst {
+      0%   { transform: translate(0,0) scale(.6); opacity: 0; }
+      12%  { opacity: 1; }
+      100% { transform: translate(var(--dx, 0px), -120px) scale(1.2); opacity: 0; }
+    }
+
+    /* --- Hydration --- */
+    .hydration-tile { padding:16px 16px 18px; }
+    .hydration-header {
+      display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:.6rem;
+    }
+    #hydration-goal {
+      appearance:none; background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18);
+      border-radius:12px; padding:.45rem .7rem; font-weight:700;
+    }
+    .hydration-row {
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:6px 0 4px;
+    }
+    .cup-btn {
+      width:var(--cup-w); height:var(--cup-h);
+      border-radius:12px; border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      position: relative; overflow: hidden; /* keep SVG contained */
+    }
+    .cup-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,.25); }
+    .cup-btn.filled {
+      background: linear-gradient(180deg, rgba(110,231,210,.26), rgba(143,127,245,.24));
+      border-color: rgba(143,127,245,.55);
+      box-shadow: 0 8px 18px rgba(143,127,245,.22);
+    }
+
+    /* Make the SVG large and centered */
+    .cup-svg { width:var(--cup-svg-w); height:var(--cup-svg-h); display:block; }
+
+    /* Animate the water “level” by scaling a group from bottom. */
+    .cup-btn .water { transform: scaleY(0); transform-origin: 50% 100%; transition: transform .25s ease; }
+    .cup-btn.filled .water { transform: scaleY(1); }
+
+    /* Optional subtle pulse when it becomes filled */
+    .cup-btn.filled:active { transform: translateY(0) scale(0.98); }
+
+    .hydration-actions {
+      display:flex; gap:.6rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap;
+    }
+    #hydration-status { text-align:center; margin-top:.4rem; color:#cfe; font-weight:800; }
   </style>
 </head>
 <body>
-<div class="container">
-  <!-- Header -->
-  <header class="glass">
-    <img src="apple-touch-icon.png" alt="App Logo">
-    <h1 id="page-title" class="day-heading"></h1>
-    <div id="weather" class="weather-content"></div>
-    <div id="affirmation-box"></div>
-  </header>
+  <div class="container">
+    <!-- Header -->
+    <header class="glass">
+      <img src="apple-touch-icon.png" alt="App Logo">
+      <h1 id="page-title" class="day-heading"></h1>
+      <div id="weather" class="weather-content"></div>
+      <div id="affirmation-box"></div>
+    </header>
 
-  <!-- Day nav -->
-  <div class="day-nav">
-    <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
-    <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
-  </div>
-
-  <!-- Mindfulness Zone -->
-  <h2 class="section-label">🧘 Mindfulness Zone</h2>
-
-  <!-- Prompt Roulette -->
-  <div class="glass" style="padding:16px;margin-bottom:14px;">
-    <h3>🎲 Prompt Roulette</h3>
-    <div id="prompt-box">Press spin to get a reflection prompt</div>
-    <input id="prompt-answer" placeholder="Optional: jot a quick thought..."/>
-    <div style="margin-top:.6rem;text-align:center;">
-      <button id="spin-prompt" class="btn btn-primary">Spin Prompt</button>
-      <button id="reset-prompt" class="btn">Reset</button>
+    <!-- Day nav (sticky) -->
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
     </div>
-  </div>
 
-  <!-- Moments Capture -->
-  <div class="glass" style="padding:16px;margin-bottom:14px;">
-    <h3>✨ Moments Capture</h3>
-    <div class="moment-grid" id="moment-grid"></div>
-    <div style="text-align:center;margin-top:.6rem;">
-      <button id="reset-moments" class="btn">Reset Moments</button>
+    <!-- Journals + Gratitude -->
+    <h2 class="section-label">🧘 Mindfulness Zone</h2>
+    <div class="journal-grid">
+      <section id="journals" class="glass">
+        <h2>Dream Journal</h2><textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+        <h2>Daily Journal</h2><textarea id="daily-journal" placeholder="Let it flow… even one line counts."></textarea>
+        <button id="save-journal-btn" class="btn btn-primary">Save Journals</button>
+      </section>
+
+      <section id="gratitude" class="glass">
+        <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry" placeholder="Name one thing you’re grateful for today…"></textarea>
+
+        <h2>Your Mood</h2>
+        <select id="mood" style="display:none">
+          <option value="">How do you feel?</option>
+          <option value="😀">Happy</option>
+          <option value="😐">Neutral</option>
+          <option value="😔">Sad</option>
+          <option value="😤">Frustrated</option>
+          <option value="😴">Tired</option>
+          <option value="😌">Peaceful</option>
+        </select>
+
+        <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😐" data-label="Neutral">😐</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="🙂" data-label="Okay">🙂</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😀" data-label="Happy">😀</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😌" data-label="Peaceful">😌</button>
+        </div>
+
+        <div class="mood-live">
+          <span id="mood-emoji" style="font-size:2rem; opacity:.8;">—</span>
+          <span id="mood-label" class="mood-label" style="opacity:.95;">How do you feel?</span>
+        </div>
+      </section>
     </div>
-  </div>
 
-  <!-- Gratitude Bingo -->
-  <div class="glass" style="padding:16px;margin-bottom:14px;">
-    <h3>🧡 Gratitude Bingo</h3>
-    <div class="bingo-grid" id="bingo-grid"></div>
-    <div style="text-align:center;margin-top:.6rem;">
-      <button id="reset-bingo" class="btn">Reset Bingo</button>
+    <!-- Breathing -->
+    <section id="breathing">
+      <h2 class="section-label">Breathing Exercise</h2>
+      <div class="glass breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
+          <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hydration -->
+    <h2 class="section-label">💧 Hydration</h2>
+    <div class="glass hydration-tile" id="hydration-card" aria-live="polite">
+      <div class="hydration-header">
+        <strong style="letter-spacing:.2px;">Cups drunk today</strong>
+        <label style="display:flex; align-items:center; gap:.4rem;">
+          <span style="color:#cfe;">Goal</span>
+          <select id="hydration-goal">
+            <option value="6">6</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="hydration-row" class="hydration-row" role="group" aria-label="Water cups"></div>
+
+      <div class="hydration-actions">
+        <button id="cup-add" class="btn btn-primary">+ 1 cup</button>
+        <button id="cup-remove" class="btn">− 1 cup</button>
+        <button id="cup-reset" class="btn">Reset Today</button>
+      </div>
+
+      <div id="hydration-status">0 / 8 cups</div>
     </div>
-  </div>
 
-  <!-- Breathing -->
-  <section id="breathing">
-    <h2 class="section-label">Breathing Exercise</h2>
-    <div class="glass breathing-tile">
-      <div id="breath-bubble-container">
-        <div id="breath-bubble"></div>
-        <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
-        <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
+    <!-- Tasks -->
+    <h2 class="section-label">🌱 Today’s Tasks</h2>
+    <div class="glass" style="padding:16px; margin-bottom:14px;">
+      <div id="progress-ring-container" aria-label="Task progress">
+        <svg id="progress-ring" width="160" height="160">
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#8f7ff5"></stop>
+              <stop offset="100%" stop-color="#6ee7d2"></stop>
+            </linearGradient>
+          </defs>
+          <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+        </svg>
+      </div>
+      <p id="progress-text">0% Complete</p>
+
+      <div id="task-list"></div>
+      <div class="task-input-group">
+        <input type="text" id="new-task" placeholder="Add new task">
+        <button onclick="addTask()" class="btn">Add Task</button>
+        <button onclick="resetTasks()" class="btn">Reset All Tasks</button>
       </div>
     </div>
-  </section>
 
-  <!-- Hydration -->
-  <h2 class="section-label">💧 Hydration</h2>
-  <div class="glass hydration-tile" id="hydration-card">
-    <div class="hydration-header">
-      <strong>Cups drunk today</strong>
-      <label><span style="color:#cfe;">Goal</span>
-        <select id="hydration-goal">
-          <option value="6">6</option><option value="8" selected>8</option>
-          <option value="10">10</option><option value="12">12</option><option value="15">15</option>
-        </select>
-      </label>
-    </div>
-    <div id="hydration-row" class="hydration-row"></div>
-    <div class="hydration-actions">
-      <button id="cup-add" class="btn btn-primary">+ 1 cup</button>
-      <button id="cup-remove" class="btn">− 1 cup</button>
-      <button id="cup-reset" class="btn">Reset Today</button>
-    </div>
-    <div id="hydration-status">0 / 8 cups</div>
+    <footer id="quote-footer" class="glass"><p id="quote-box">Loading quote...</p></footer>
   </div>
 
-  <!-- Tasks -->
-  <h2 class="section-label">🌱 Today’s Tasks</h2>
-  <div class="glass" style="padding:16px; margin-bottom:14px;">
-    <div id="progress-ring-container">
-      <svg id="progress-ring" width="160" height="160">
-        <defs>
-          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#8f7ff5"></stop>
-            <stop offset="100%" stop-color="#6ee7d2"></stop>
-          </linearGradient>
-        </defs>
-        <circle stroke="rgba(255,255,255,.12)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
-        <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
-      </svg>
-    </div>
-    <p id="progress-text">0% Complete</p>
-    <div id="task-list"></div>
+  <div class="compat-hidden">
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
     <div class="task-input-group">
-      <input type="text" id="new-task" placeholder="Add new task">
-      <button onclick="addTask()" class="btn">Add Task</button>
-      <button onclick="resetTasks()" class="btn">Reset All Tasks</button>
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button id="add-ongoing-task-btn">Add Task</button>
+      <button id="reset-ongoing-tasks-btn">Reset Ongoing Tasks</button>
     </div>
   </div>
 
-  <footer id="quote-footer" class="glass"><p id="quote-box">Loading quote...</p></footer>
-</div>
+  <!-- ===== Audio: reliable init + sounds ===== -->
+  <script>
+    (function(){
+      let ctx=null, master=null;
+      function ensureAudio(){
+        try{
+          if(!ctx){
+            ctx = new (window.AudioContext || window.webkitAudioContext)();
+            master = ctx.createGain();
+            master.gain.value = 0.12;
+            master.connect(ctx.destination);
+          }
+          if(ctx.state === 'suspended') ctx.resume();
+        }catch(e){}
+        return {ctx, master};
+      }
+      // expose so other blocks can ensure audio right before playing
+      window._ensureAudio = ensureAudio;
 
-<!-- Prompt/Moments/Bingo Logic -->
-<script>
-const prompts=["What made you smile today?","One thing you learned?","Best part of your morning?","A tiny act of kindness?"];
-document.getElementById("spin-prompt").onclick=()=>{document.getElementById("prompt-box").textContent=prompts[Math.floor(Math.random()*prompts.length)]};
-document.getElementById("reset-prompt").onclick=()=>{document.getElementById("prompt-box").textContent="Press spin to get a reflection prompt";document.getElementById("prompt-answer").value=""};
+      // Prime audio on first user interaction so later programmatic calls can play.
+      ['pointerdown','keydown','touchstart'].forEach(evt=>{
+        document.addEventListener(evt, ensureAudio, {once:true, passive:true});
+      });
 
-const moments=["🌞 Morning","☕ Coffee","🚶 Walk","🎵 Music","💬 Chat","🧠 Focus"];
-const momentGrid=document.getElementById("moment-grid");let momentCounts={};
-moments.forEach(m=>{momentCounts[m]=0;const b=document.createElement("button");b.className="moment-btn";b.innerHTML=m+`<span class="moment-count">0</span>`;b.onclick=()=>{momentCounts[m]++;b.querySelector(".moment-count").textContent=momentCounts[m];};momentGrid.appendChild(b)});
-document.getElementById("reset-moments").onclick=()=>{momentCounts={};momentGrid.querySelectorAll(".moment-btn").forEach(b=>b.querySelector(".moment-count").textContent="0")};
+      // Global fanfare for 100% complete
+      window.playYay = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
+        const freqs = [523.25, 659.25, 783.99];
+        const now = ctx.currentTime;
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + i * 0.02);
+          gain.gain.setValueAtTime(0, now + i * 0.02);
+          gain.gain.linearRampToValueAtTime(0.9, now + 0.04 + i * 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.02);
+          osc.connect(gain).connect(master);
+          osc.start(now + i * 0.02);
+          osc.stop(now + 0.8);
+        });
+        const dur = 0.2;
+        const bufferSize = dur * ctx.sampleRate;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*(1-i/bufferSize);
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.value = 0.05;
+        noise.connect(noiseGain).connect(master);
+        noise.start(now + 0.02);
+        noise.stop(now + 0.25);
+      };
 
-const bingoItems=["A kind person","A song","Fresh air","A small win","Cozy spot","Learned","Tasty meal","Laughed","Nature"];
-const bingo=document.getElementById("bingo-grid");
-bingoItems.forEach(item=>{const c=document.createElement("div");c.className="bingo-cell";c.textContent=item;c.onclick=()=>{c.classList.toggle("active");};bingo.appendChild(c)});
-document.getElementById("reset-bingo").onclick=()=>{bingo.querySelectorAll(".bingo-cell").forEach(c=>c.classList.remove("active"))};
-</script>
+      // Soft pop when an individual task is completed
+      window.playPop = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        osc.connect(gain).connect(master);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      };
+    })();
+  </script>
 
-<script type="module" src="main.js"></script>
+  <!-- Celebration + progress ring -->
+  <script>
+    function launchFallingEmojis(count = 26) {
+      const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'emoji-fall';
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.fontSize = (Math.random() * 18 + 18) + 'px';
+        const dur = (Math.random() * 2) + 2.8;
+        span.style.animationDuration = dur + 's';
+        span.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(span);
+        span.addEventListener('animationend', () => span.remove());
+      }
+    }
+
+    (function () {
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      window._celebrated = false;
+
+      window.updateProgressCircle = function (percent) {
+        const pct = Math.max(0, Math.min(100, Number(percent) || 0));
+        const circle = document.getElementById('progress-ring-bar');
+        if (!circle) return;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const label = document.getElementById('progress-text');
+        if (label) label.textContent = `${pct}% Complete`;
+
+        // tolerate rounding: treat 99.5+ as complete
+        const reached = pct >= 99.5;
+
+        if (reached && !window._celebrated) {
+          window._celebrated = true;
+          if (window._ensureAudio) window._ensureAudio();
+          playYay();
+          launchFallingEmojis();
+        }
+        if (!reached && window._celebrated) {
+          window._celebrated = false;
+        }
+      };
+    })();
+
+    function burstEmojisAt(x, y, count = 7) {
+      const set = ['🎉','✨','🌟','💫','🎈','🔥','💖','👍','👏','🥳','🌈','🍀','🧠','💪','🪄','😄','🤩','🙌'];
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.className = 'emoji-pop';
+        s.textContent = set[Math.floor(Math.random() * set.length)];
+        s.style.left = (x - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.top  = (y - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.fontSize = (Math.random() * 10 + 16) + 'px';
+        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px');
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+    }
+
+    // Hook task checkboxes: pop + sound
+    (function attachTaskPopListener(){
+      const list = document.getElementById('task-list');
+      if (!list) return;
+      list.addEventListener('change', (e) => {
+        const el = e.target;
+        if (el && el.matches('input[type="checkbox"]') && el.checked) {
+          const rect = el.getBoundingClientRect();
+          burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
+                        rect.top  + rect.height/2 + window.scrollY);
+          playPop(); // per-task sound
+        }
+      }, true);
+    })();
+  </script>
+
+  <!-- Mood control -->
+  <script>
+    (function () {
+      const moodSelect = document.getElementById("mood");
+      const chips = Array.from(document.querySelectorAll(".mood-chip"));
+      const liveEmoji = document.getElementById("mood-emoji");
+      const liveLabel = document.getElementById("mood-label");
+
+      function clearSelection() {
+        chips.forEach(c => { c.setAttribute("aria-checked","false"); c.tabIndex=-1; });
+        if (moodSelect) moodSelect.value = "";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".6"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".9"; }
+        if (chips[0]) chips[0].tabIndex = 0;
+      }
+      function setSelection(emoji, label) {
+        chips.forEach(c => {
+          const active = c.dataset.emoji === emoji;
+          c.setAttribute("aria-checked", active ? "true" : "false");
+          c.tabIndex = active ? 0 : -1;
+        });
+        if (moodSelect) moodSelect.value = emoji;
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
+      }
+
+      clearSelection();
+
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setSelection(chip.dataset.emoji, chip.dataset.label);
+          }
+          const idx = chips.indexOf(chip);
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault(); chips[(idx+1)%chips.length].focus();
+          }
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault(); chips[(idx-1+chips.length)%chips.length].focus();
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- Breathing (Box 4-4-4-4 only) -->
+  <script>
+    (function(){
+      const bubble  = document.getElementById('breath-bubble');
+      const phaseEl = document.getElementById('phase');
+      const counter = document.getElementById('countdown');
+      const btn     = document.getElementById('breath-toggle-btn');
+
+      const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
+
+      const STEPS = [
+        { name: 'Inhale', seconds: 4, targetScale: maxScale },
+        { name: 'Hold',   seconds: 4, targetScale: null },
+        { name: 'Exhale', seconds: 4, targetScale: 1.00 },
+        { name: 'Hold',   seconds: 4, targetScale: null },
+      ];
+
+      const easeInOut = (t)=> t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+
+      let running=false, stepIdx=0, rafId=null, stepStart=0;
+      let startScale=1, endScale=1, lastRenderedScale=1;
+
+      function setScale(s){
+        lastRenderedScale = s;
+        bubble.style.transform = `scale(${s})`;
+        const glow = 0.22 + (s-1)*0.5;
+        bubble.style.boxShadow =
+          `0 0 ${40 + (s-1)*60}px rgba(56,189,248,${.3+glow/4}),
+           0 20px ${50 + (s-1)*40}px rgba(14,165,233,${.16+glow/5}),
+           inset 0 12px ${40 + (s-1)*30}px rgba(255,255,255,${.16+glow/6})`;
+      }
+
+      function beginStep(now){
+        const step = STEPS[stepIdx];
+        stepStart = now;
+        startScale = lastRenderedScale;
+        endScale = (step.targetScale == null) ? startScale : step.targetScale;
+        if (phaseEl) phaseEl.textContent = step.name;
+        if (counter) counter.textContent = String(step.seconds);
+      }
+
+      function tick(now){
+        const step = STEPS[stepIdx];
+        const dur = step.seconds * 1000;
+        const elapsed = now - stepStart;
+        const t = Math.min(1, elapsed / dur);
+
+        const eased = (step.targetScale == null) ? 1 : easeInOut(t);
+        const s = startScale + (endScale - startScale) * eased;
+        setScale(s);
+
+        const remaining = Math.max(0, dur - elapsed);
+        if (counter) counter.textContent = String(Math.ceil(remaining / 1000));
+
+        if (elapsed >= dur) {
+          stepIdx = (stepIdx + 1) % STEPS.length;
+          beginStep(now);
+        }
+        if (running) rafId = requestAnimationFrame(tick);
+      }
+
+      function start(){
+        if (running) return;
+        running = true;
+        btn.textContent = 'Stop Breathing Exercise';
+        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') setScale(1);
+        stepIdx = 0;
+        const now = performance.now();
+        beginStep(now);
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function stop(){
+        running = false;
+        btn.textContent = 'Start Breathing Exercise';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        if (phaseEl) phaseEl.textContent = 'Inhale';
+        if (counter) counter.textContent = '4';
+        setScale(1);
+      }
+
+      btn.addEventListener('click', ()=> running ? stop() : start());
+    })();
+  </script>
+
+  <!-- Hydration logic -->
+  <script>
+  (function(){
+    const row   = document.getElementById('hydration-row');
+    const goalEl= document.getElementById('hydration-goal');
+    const add   = document.getElementById('cup-add');
+    const rem   = document.getElementById('cup-remove');
+    const reset = document.getElementById('cup-reset');
+    const stat  = document.getElementById('hydration-status');
+
+    const DATE_KEY = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    const K_STATE  = 'hydration:state';
+    theK_PREF   = 'hydration:goal';
+
+    const savedGoal = parseInt(localStorage.getItem(theK_PREF) || '8', 10);
+    let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
+    goalEl.value = String(goal);
+
+    const getState = () => {
+      try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; }
+    };
+    const setState = (obj) => localStorage.setItem(K_STATE, JSON.stringify(obj));
+
+    const readCount = () => (getState()[DATE_KEY()]?.count ?? 0);
+    const writeCount = (count) => {
+      const all = getState();
+      all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
+      setState(all);
+      // Hook for future Firestore sync:
+      document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
+    };
+
+    // SVG for a single cup. We keep the outline constant and animate the water group scale.
+    function cupSVG(filled){
+      return `
+        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <!-- Cup outline -->
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"
+                fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linejoin="round"/>
+          <!-- Water group that scales from bottom -->
+          <g class="water">
+            <defs>
+              <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6ee7d2"/><stop offset="100%" stop-color="#8f7ff5"/>
+              </linearGradient>
+              <clipPath id="cupClip">
+                <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"/>
+              </clipPath>
+            </defs>
+            <!-- a rounded rectangle that fills the bottom inside the cup shape -->
+            <rect x="6.6" y="10.2" width="10.8" height="9.4" rx="1.6" clip-path="url(#cupClip)" fill="url(#hydroGrad)"/>
+          </g>
+        </svg>`;
+    }
+
+    function render(){
+      const count = readCount();
+      row.innerHTML = '';
+      for(let i=0;i<goal;i++){
+        const btn = document.createElement('button');
+        btn.className = 'cup-btn' + (i < count ? ' filled' : '');
+        btn.innerHTML = cupSVG(i < count);
+        btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
+        btn.title = i < count ? 'Filled' : 'Empty';
+
+        // If starting as filled, ensure the water is visible immediately (no initial pop-in)
+        requestAnimationFrame(()=>{
+          const water = btn.querySelector('.water');
+          if (water) water.style.transform = (i < count) ? 'scaleY(1)' : 'scaleY(0)';
+        });
+
+        btn.addEventListener('click', ()=>{
+          const current = readCount();
+          if(i < current){ writeCount(i); } else { writeCount(i+1); }
+          render();
+          try{ if(window.playPop) window.playPop(); }catch(_){}
+        });
+        row.appendChild(btn);
+      }
+      stat.textContent = `${readCount()} / ${goal} cups`;
+    }
+
+    // ---- events ----
+    goalEl.addEventListener('change', () => {
+      goal = parseInt(goalEl.value, 10) || 8;
+      localStorage.setItem(theK_PREF, String(goal));
+      // clamp today’s count to new goal
+      writeCount(readCount());
+      render();
+    });
+    add.addEventListener('click', () => { writeCount(readCount()+1); render(); });
+    rem.addEventListener('click', () => { writeCount(readCount()-1); render(); });
+    reset.addEventListener('click', () => { writeCount(0); render(); });
+
+    // ---- daily reset at midnight ----
+    (function scheduleMidnightReset(){
+      const now = new Date();
+      const next = new Date(now); next.setHours(24,0,0,0);
+      setTimeout(()=>{ writeCount(0); render(); scheduleMidnightReset(); }, next - now);
+    })();
+
+    // initialize
+    if(!getState()[DATE_KEY()]) writeCount(0);
+    render();
+  })();
+  </script>
+
+  <script type="module" src="main.js"></script>
 </body>
 </html>
