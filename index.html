@@ -78,12 +78,20 @@
     #affirmation-box { text-align:center; margin-top:.75rem; color:#d7f7ee; opacity:0; transform:translateY(4px); transition: opacity 600ms ease, transform 600ms ease; }
     #affirmation-box.visible { opacity:1; transform:translateY(0); }
 
+    /* --- Day nav: lighter, rounder, glassy + sticky --- */
     .day-nav{
       position: sticky;
       top: calc(env(safe-area-inset-top) + 6px);
       z-index: 1000;
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-      margin: 8px 0 18px; padding: 12px 14px;
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+
+      margin: 8px 0 18px;
+      padding: 12px 14px;
+
       border-radius: 34px;
       background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
       border: 1px solid rgba(255,255,255,.14);
@@ -91,16 +99,27 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.28);
     }
     .day-nav a{
-      display: inline-block; padding: .55rem 1rem; border-radius: 999px;
-      background: rgba(255,255,255,.14); color: #eef3ff; text-decoration: none;
+      display: inline-block;
+      padding: .55rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      color: #eef3ff;
+      text-decoration: none;
       border: 1px solid rgba(255,255,255,.22);
       transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 14px rgba(0,0,0,.18);
     }
-    .day-nav a:hover{ transform: translateY(-1px); background: rgba(255,255,255,.20); border-color: rgba(255,255,255,.30); }
+    .day-nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.20);
+      border-color: rgba(255,255,255,.30);
+    }
     .day-nav a:visited{ color:#eef3ff; }
 
-    h2.section-label { text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem); color:#bfeadf; margin: 28px 0 14px; font-weight:800; letter-spacing:.3px; }
+    h2.section-label {
+      text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem);
+      color:#bfeadf; margin: 28px 0 14px; font-weight:800; letter-spacing:.3px;
+    }
 
     .journal-grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top: 10px; }
     section#journals, section#gratitude { flex:1 1 320px; padding:16px; }
@@ -113,17 +132,25 @@
       outline:none; transition: border-color .2s, background .2s, box-shadow .2s;
     }
     textarea::placeholder{ color:#9ea2b7; }
-    textarea:focus{ border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.10); box-shadow: 0 0 0 6px rgba(143,127,245,.12); }
+    textarea:focus{
+      border-color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 0 0 6px rgba(143,127,245,.12);
+    }
 
     button, .btn {
       padding:.72rem 1.1rem; font-size:1rem; border-radius:999px; border:1px solid rgba(255,255,255,.14);
       background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
       color:#fff; cursor:pointer; transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
-      box-shadow: 0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.2); backdrop-filter: blur(6px);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.2);
+      backdrop-filter: blur(6px);
     }
     button:hover { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22); }
     button:active { transform: translateY(0); }
-    .btn-primary{ background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.25)); border-color: rgba(143,127,245,.55); }
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.25));
+      border-color: rgba(143,127,245,.55);
+    }
 
     .mood-grid { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
     .mood-chip {
@@ -131,7 +158,11 @@
       border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); color:#fff;
       transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
     }
-    .mood-chip[aria-checked="true"] { background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.28)); border-color: rgba(143,127,245,.55); box-shadow: 0 8px 22px rgba(143,127,245,.28); }
+    .mood-chip[aria-checked="true"] {
+      background: linear-gradient(135deg, rgba(143,127,245,.35), rgba(110,231,210,.28));
+      border-color: rgba(143,127,245,.55);
+      box-shadow: 0 8px 22px rgba(143,127,245,.28);
+    }
     .mood-live { display:flex; align-items:center; gap:.5rem; justify-content:center; margin-top:.4rem; color:#d6d7e3; }
     .mood-label { font-weight: 700; color: #eef; }
 
@@ -144,9 +175,14 @@
     #breath-bubble {
       width: var(--bubble-base); height: var(--bubble-base); border-radius: 50%;
       background: radial-gradient(ellipse at 30% 30%, #a3e8ff, #38bdf8 55%, #0ea5e9 100%);
-      box-shadow: 0 0 40px rgba(56,189,248,.45), 0 20px 50px rgba(14,165,233,.22), inset 0 12px 40px rgba(255,255,255,.25);
-      transform-origin:center; transform: scale(1); will-change: transform, opacity, filter;
-      filter: drop-shadow(0 12px 24px rgba(0,0,0,.25)); margin-bottom: clamp(18px, 3.5vw, 36px);
+      box-shadow:
+        0 0 40px rgba(56,189,248,.45),
+        0 20px 50px rgba(14,165,233,.22),
+        inset 0 12px 40px rgba(255,255,255,.25);
+      transform-origin:center; transform: scale(1);
+      will-change: transform, opacity, filter;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.25));
+      margin-bottom: clamp(18px, 3.5vw, 36px);
     }
     #breath-text { font-size: 1.25rem; color: #d9fbf4; font-weight: 800; display: flex; justify-content: center; align-items: baseline; gap: .4rem; }
     #breath-text #countdown { font-size: 1.6rem; color: #b6ffe8; font-weight: 900; }
@@ -177,42 +213,66 @@
 
     .compat-hidden { display:none !important; visibility:hidden !important; }
 
-    .emoji-fall { position: fixed; top: -40px; z-index: 9999; pointer-events: none; will-change: transform, opacity; animation: fallAndFade linear forwards; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25)); }
-    @keyframes fallAndFade { 0%{ transform: translateY(-40px) rotate(0deg); opacity: 0; } 8%{ opacity: 1; } 92%{ opacity: 1; } 100%{ transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+    .emoji-fall {
+      position: fixed;
+      top: -40px;
+      z-index: 9999;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: fallAndFade linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    @keyframes fallAndFade {
+      0%   { transform: translateY(-40px) rotate(0deg);   opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
 
-    .emoji-pop { position: absolute; z-index: 9999; pointer-events: none; will-change: transform, opacity; animation: popBurst 900ms ease-out forwards; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25)); }
-    @keyframes popBurst { 0%{ transform: translate(0,0) scale(.6); opacity: 0; } 12%{ opacity: 1; } 100%{ transform: translate(var(--dx, 0px), -120px) scale(1.2); opacity: 0; } }
+    .emoji-pop {
+      position: absolute;
+      z-index: 9999;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: popBurst 900ms ease-out forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+    }
+    @keyframes popBurst {
+      0%   { transform: translate(0,0) scale(.6); opacity: 0; }
+      12%  { opacity: 1; }
+      100% { transform: translate(var(--dx, 0px), -120px) scale(1.2); opacity: 0; }
+    }
 
     /* --- Hydration --- */
     .hydration-tile { padding:16px 16px 18px; }
-    .hydration-header { display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:.6rem; }
-    #hydration-goal { appearance:none; background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:.45rem .7rem; font-weight:700; }
-    .hydration-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:6px 0 4px; }
-
-    /* Cup button visuals */
+    .hydration-header {
+      display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:.6rem;
+    }
+    #hydration-goal {
+      appearance:none; background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18);
+      border-radius:12px; padding:.45rem .7rem; font-weight:700;
+    }
+    .hydration-row {
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:6px 0 4px;
+    }
     .cup-btn {
-      width:38px; height:46px; border-radius:10px; border:1px solid rgba(255,255,255,.16);
+      width:42px; height:52px; border-radius:10px; border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center; /* ensure SVG perfectly centered */
+      cursor:pointer;
       transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
     }
     .cup-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,.25); }
-    .cup-btn.filled { background: linear-gradient(180deg, rgba(110,231,210,.26), rgba(143,127,245,.24)); border-color: rgba(143,127,245,.55); box-shadow: 0 8px 18px rgba(143,127,245,.22); }
-
-    /* SVG cup drawing */
-    .cup-svg { width:24px; height:28px; display:block; }
-    .cup-outline { stroke:rgba(255,255,255,0.95); stroke-width:1.6; filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
-    /* Water animation: scale up from bottom when .filled toggles on */
-    .cup-water {
-      transform-origin:50% 100%;
-      transform: scaleY(0);
-      opacity: 0;
-      transition: transform 220ms ease, opacity 160ms ease;
+    .cup-btn.filled {
+      background: linear-gradient(180deg, rgba(110,231,210,.26), rgba(143,127,245,.24));
+      border-color: rgba(143,127,245,.55);
+      box-shadow: 0 8px 18px rgba(143,127,245,.22);
     }
-    .cup-btn.filled .cup-water { transform: scaleY(1); opacity:.95; }
-
-    .hydration-actions { display:flex; gap:.6rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap; }
+    .cup-btn svg { width:24px; height:30px; display:block; }
+    .cup-water { opacity:.95; }
+    .hydration-actions {
+      display:flex; gap:.6rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap;
+    }
     #hydration-status { text-align:center; margin-top:.4rem; color:#cfe; font-weight:800; }
   </style>
 </head>
@@ -532,8 +592,12 @@
             setSelection(chip.dataset.emoji, chip.dataset.label);
           }
           const idx = chips.indexOf(chip);
-          if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); chips[(idx+1)%chips.length].focus(); }
-          if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); chips[(idx-1+chips.length)%chips.length].focus(); }
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault(); chips[(idx+1)%chips.length].focus();
+          }
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault(); chips[(idx-1+chips.length)%chips.length].focus();
+          }
         });
       });
     })();
@@ -637,13 +701,16 @@
 
     const DATE_KEY = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
     const K_STATE  = 'hydration:state';
-    const K_PREF   = 'hydration:goal';
+       const K_PREF   = 'hydration:goal';
 
+    // ---- state ----
     const savedGoal = parseInt(localStorage.getItem(K_PREF) || '8', 10);
     let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
     goalEl.value = String(goal);
 
-    const getState = () => { try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; } };
+    const getState = () => {
+      try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; }
+    };
     const setState = (obj) => localStorage.setItem(K_STATE, JSON.stringify(obj));
 
     const readCount = () => (getState()[DATE_KEY()]?.count ?? 0);
@@ -651,20 +718,28 @@
       const all = getState();
       all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
       setState(all);
+      // Hook for future sync (if needed)
       document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
     };
 
-    /* SVG always includes the water path; we animate it via CSS */
-    function cupSVG(){
+    // ---- rendering ----
+    function cupSVG(filled){
       return `
-        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <!-- cup outline -->
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-1a5.5 5.5 0 0 1-5.3-5L5 3z"
+                fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.6" />
+          <!-- water -->
+          ${filled ? `
+          <path class="cup-water"
+                d="M6.8 11h10.4l-.6 5a4 4 0 0 1-3.9 3.2h-1a4 4 0 0 1-3.9-3.2l-.6-5z"
+                fill="url(#hydroGrad)"/>` : ``}
           <defs>
             <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#6ee7d2"/><stop offset="100%" stop-color="#8f7ff5"/>
+              <stop offset="0%" stop-color="#6ee7d2"/>
+              <stop offset="100%" stop-color="#8f7ff5"/>
             </linearGradient>
           </defs>
-          <path class="cup-outline" d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z" fill="none"/>
-          <path class="cup-water" d="M6.8 10.5h10.4l-.6 5.1a4 4 0 0 1-3.9 3.4h-1a4 4 0 0 1-3.9-3.4l-.6-5.1z" fill="url(#hydroGrad)"/>
         </svg>`;
     }
 
@@ -674,7 +749,7 @@
       for(let i=0;i<goal;i++){
         const btn = document.createElement('button');
         btn.className = 'cup-btn' + (i < count ? ' filled' : '');
-        btn.innerHTML = cupSVG();
+        btn.innerHTML = cupSVG(i < count);
         btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
         btn.title = i < count ? 'Filled' : 'Empty';
         btn.addEventListener('click', ()=>{
@@ -688,9 +763,11 @@
       stat.textContent = `${readCount()} / ${goal} cups`;
     }
 
+    // ---- events ----
     goalEl.addEventListener('change', () => {
       goal = parseInt(goalEl.value, 10) || 8;
       localStorage.setItem(K_PREF, String(goal));
+      // clamp today’s count to new goal
       writeCount(readCount());
       render();
     });
@@ -698,12 +775,14 @@
     rem.addEventListener('click', () => { writeCount(readCount()-1); render(); });
     reset.addEventListener('click', () => { writeCount(0); render(); });
 
+    // ---- daily reset at midnight ----
     (function scheduleMidnightReset(){
       const now = new Date();
       const next = new Date(now); next.setHours(24,0,0,0);
       setTimeout(()=>{ writeCount(0); render(); scheduleMidnightReset(); }, next - now);
     })();
 
+    // initialize
     if(!getState()[DATE_KEY()]) writeCount(0);
     render();
   })();
