@@ -243,6 +243,36 @@
       12%  { opacity: 1; }
       100% { transform: translate(var(--dx, 0px), -120px) scale(1.2); opacity: 0; }
     }
+
+    /* --- Hydration --- */
+    .hydration-tile { padding:16px 16px 18px; }
+    .hydration-header {
+      display:flex; align-items:center; justify-content:space-between; gap:.8rem; margin-bottom:.6rem;
+    }
+    #hydration-goal {
+      appearance:none; background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.18);
+      border-radius:12px; padding:.45rem .7rem; font-weight:700;
+    }
+    .hydration-row {
+      display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:6px 0 4px;
+    }
+    .cup-btn {
+      width:38px; height:46px; border-radius:10px; border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06); display:grid; place-items:center; cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .cup-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,.25); }
+    .cup-btn.filled {
+      background: linear-gradient(180deg, rgba(110,231,210,.26), rgba(143,127,245,.24));
+      border-color: rgba(143,127,245,.55);
+      box-shadow: 0 8px 18px rgba(143,127,245,.22);
+    }
+    .cup-svg { width:22px; height:26px; opacity:.92; }
+    .cup-water { opacity:.95; }
+    .hydration-actions {
+      display:flex; gap:.6rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap;
+    }
+    #hydration-status { text-align:center; margin-top:.4rem; color:#cfe; font-weight:800; }
   </style>
 </head>
 <body>
@@ -311,6 +341,34 @@
         </div>
       </div>
     </section>
+
+    <!-- Hydration -->
+    <h2 class="section-label">💧 Hydration</h2>
+    <div class="glass hydration-tile" id="hydration-card" aria-live="polite">
+      <div class="hydration-header">
+        <strong style="letter-spacing:.2px;">Cups drunk today</strong>
+        <label style="display:flex; align-items:center; gap:.4rem;">
+          <span style="color:#cfe;">Goal</span>
+          <select id="hydration-goal">
+            <option value="6">6</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="hydration-row" class="hydration-row" role="group" aria-label="Water cups"></div>
+
+      <div class="hydration-actions">
+        <button id="cup-add" class="btn btn-primary">+ 1 cup</button>
+        <button id="cup-remove" class="btn">− 1 cup</button>
+        <button id="cup-reset" class="btn">Reset Today</button>
+      </div>
+
+      <div id="hydration-status">0 / 8 cups</div>
+    </div>
 
     <!-- Tasks -->
     <h2 class="section-label">🌱 Today’s Tasks</h2>
@@ -637,6 +695,99 @@
 
       btn.addEventListener('click', ()=> running ? stop() : start());
     })();
+  </script>
+
+  <!-- Hydration logic -->
+  <script>
+  (function(){
+    const row   = document.getElementById('hydration-row');
+    const goalEl= document.getElementById('hydration-goal');
+    const add   = document.getElementById('cup-add');
+    const rem   = document.getElementById('cup-remove');
+    const reset = document.getElementById('cup-reset');
+    const stat  = document.getElementById('hydration-status');
+
+    const DATE_KEY = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    const K_STATE  = 'hydration:state';
+    const K_PREF   = 'hydration:goal';
+
+    // ---- state ----
+    const savedGoal = parseInt(localStorage.getItem(K_PREF) || '8', 10);
+    let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
+    goalEl.value = String(goal);
+
+    const getState = () => {
+      try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; }
+    };
+    const setState = (obj) => localStorage.setItem(K_STATE, JSON.stringify(obj));
+
+    const readCount = () => (getState()[DATE_KEY()]?.count ?? 0);
+    const writeCount = (count) => {
+      const all = getState();
+      all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
+      setState(all);
+      // Hook for future Firestore sync:
+      document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
+    };
+
+    // ---- rendering ----
+    function cupSVG(filled){
+      return `
+        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.4"/>
+          ${filled ? `<path class="cup-water" d="M6.8 10.5h10.4l-.6 5.1a4 4 0 0 1-3.9 3.4h-1a4 4 0 0 1-3.9-3.4l-.6-5.1z"
+             fill="url(#hydroGrad)"/>` : ``}
+          <defs>
+            <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6ee7d2"/><stop offset="100%" stop-color="#8f7ff5"/>
+            </linearGradient>
+          </defs>
+        </svg>`;
+    }
+
+    function render(){
+      const count = readCount();
+      row.innerHTML = '';
+      for(let i=0;i<goal;i++){
+        const btn = document.createElement('button');
+        btn.className = 'cup-btn' + (i < count ? ' filled' : '');
+        btn.innerHTML = cupSVG(i < count);
+        btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
+        btn.title = i < count ? 'Filled' : 'Empty';
+        btn.addEventListener('click', ()=>{
+          const current = readCount();
+          if(i < current){ writeCount(i); } else { writeCount(i+1); }
+          render();
+          try{ if(window.playPop) window.playPop(); }catch(_){}
+        });
+        row.appendChild(btn);
+      }
+      stat.textContent = `${readCount()} / ${goal} cups`;
+    }
+
+    // ---- events ----
+    goalEl.addEventListener('change', () => {
+      goal = parseInt(goalEl.value, 10) || 8;
+      localStorage.setItem(K_PREF, String(goal));
+      // clamp today’s count to new goal
+      writeCount(readCount());
+      render();
+    });
+    add.addEventListener('click', () => { writeCount(readCount()+1); render(); });
+    rem.addEventListener('click', () => { writeCount(readCount()-1); render(); });
+    reset.addEventListener('click', () => { writeCount(0); render(); });
+
+    // ---- daily reset at midnight ----
+    (function scheduleMidnightReset(){
+      const now = new Date();
+      const next = new Date(now); next.setHours(24,0,0,0);
+      setTimeout(()=>{ writeCount(0); render(); scheduleMidnightReset(); }, next - now);
+    })();
+
+    // initialize
+    if(!getState()[DATE_KEY()]) writeCount(0);
+    render();
+  })();
   </script>
 
   <script type="module" src="main.js"></script>
