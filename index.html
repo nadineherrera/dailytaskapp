@@ -33,6 +33,12 @@
       --shadow:0 10px 30px rgba(0,0,0,.25);
       --bubble-base: clamp(168px, 40vw, 240px);
       --bubble-max-scale: 1.28;
+
+      /* Hydration sizing (adjust here if you want bigger/smaller cups) */
+      --cup-w: clamp(48px, 7vw, 64px);
+      --cup-h: clamp(58px, 8.5vw, 78px);
+      --cup-svg-w: calc(var(--cup-w) * 0.78);
+      --cup-svg-h: calc(var(--cup-h) * 0.64);
     }
 
     html, body {
@@ -119,6 +125,7 @@
     h2.section-label {
       text-align:center; font-size: clamp(1.2rem, 2vw, 1.4rem);
       color:#bfeadf; margin: 28px 0 14px; font-weight:800; letter-spacing:.3px;
+      text-shadow:0 2px 12px rgba(0,0,0,.35);
     }
 
     .journal-grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top: 10px; }
@@ -256,11 +263,13 @@
       display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:6px 0 4px;
     }
     .cup-btn {
-      width:42px; height:52px; border-radius:10px; border:1px solid rgba(255,255,255,.16);
+      width:var(--cup-w); height:var(--cup-h);
+      border-radius:12px; border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
-      display:flex; align-items:center; justify-content:center; /* ensure SVG perfectly centered */
+      display:flex; align-items:center; justify-content:center;
       cursor:pointer;
       transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      position: relative; overflow: hidden; /* keep SVG contained */
     }
     .cup-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,.25); }
     .cup-btn.filled {
@@ -268,8 +277,17 @@
       border-color: rgba(143,127,245,.55);
       box-shadow: 0 8px 18px rgba(143,127,245,.22);
     }
-    .cup-btn svg { width:24px; height:30px; display:block; }
-    .cup-water { opacity:.95; }
+
+    /* Make the SVG large and centered */
+    .cup-svg { width:var(--cup-svg-w); height:var(--cup-svg-h); display:block; }
+
+    /* Animate the water “level” by scaling a group from bottom. */
+    .cup-btn .water { transform: scaleY(0); transform-origin: 50% 100%; transition: transform .25s ease; }
+    .cup-btn.filled .water { transform: scaleY(1); }
+
+    /* Optional subtle pulse when it becomes filled */
+    .cup-btn.filled:active { transform: translateY(0) scale(0.98); }
+
     .hydration-actions {
       display:flex; gap:.6rem; justify-content:center; margin-top:.75rem; flex-wrap:wrap;
     }
@@ -426,11 +444,15 @@
         }catch(e){}
         return {ctx, master};
       }
+      // expose so other blocks can ensure audio right before playing
       window._ensureAudio = ensureAudio;
+
+      // Prime audio on first user interaction so later programmatic calls can play.
       ['pointerdown','keydown','touchstart'].forEach(evt=>{
         document.addEventListener(evt, ensureAudio, {once:true, passive:true});
       });
 
+      // Global fanfare for 100% complete
       window.playYay = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
@@ -462,6 +484,7 @@
         noise.stop(now + 0.25);
       };
 
+      // Soft pop when an individual task is completed
       window.playPop = function(){
         const {ctx, master} = ensureAudio();
         if(!ctx) return;
@@ -513,7 +536,9 @@
         const label = document.getElementById('progress-text');
         if (label) label.textContent = `${pct}% Complete`;
 
+        // tolerate rounding: treat 99.5+ as complete
         const reached = pct >= 99.5;
+
         if (reached && !window._celebrated) {
           window._celebrated = true;
           if (window._ensureAudio) window._ensureAudio();
@@ -541,6 +566,7 @@
       }
     }
 
+    // Hook task checkboxes: pop + sound
     (function attachTaskPopListener(){
       const list = document.getElementById('task-list');
       if (!list) return;
@@ -550,7 +576,7 @@
           const rect = el.getBoundingClientRect();
           burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
                         rect.top  + rect.height/2 + window.scrollY);
-          playPop();
+          playPop(); // per-task sound
         }
       }, true);
     })();
@@ -701,10 +727,9 @@
 
     const DATE_KEY = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
     const K_STATE  = 'hydration:state';
-       const K_PREF   = 'hydration:goal';
+    theK_PREF   = 'hydration:goal';
 
-    // ---- state ----
-    const savedGoal = parseInt(localStorage.getItem(K_PREF) || '8', 10);
+    const savedGoal = parseInt(localStorage.getItem(theK_PREF) || '8', 10);
     let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
     goalEl.value = String(goal);
 
@@ -718,28 +743,30 @@
       const all = getState();
       all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
       setState(all);
-      // Hook for future sync (if needed)
+      // Hook for future Firestore sync:
       document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
     };
 
-    // ---- rendering ----
+    // SVG for a single cup. We keep the outline constant and animate the water group scale.
     function cupSVG(filled){
       return `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <!-- cup outline -->
-          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-1a5.5 5.5 0 0 1-5.3-5L5 3z"
-                fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.6" />
-          <!-- water -->
-          ${filled ? `
-          <path class="cup-water"
-                d="M6.8 11h10.4l-.6 5a4 4 0 0 1-3.9 3.2h-1a4 4 0 0 1-3.9-3.2l-.6-5z"
-                fill="url(#hydroGrad)"/>` : ``}
-          <defs>
-            <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#6ee7d2"/>
-              <stop offset="100%" stop-color="#8f7ff5"/>
-            </linearGradient>
-          </defs>
+        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <!-- Cup outline -->
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"
+                fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linejoin="round"/>
+          <!-- Water group that scales from bottom -->
+          <g class="water">
+            <defs>
+              <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6ee7d2"/><stop offset="100%" stop-color="#8f7ff5"/>
+              </linearGradient>
+              <clipPath id="cupClip">
+                <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"/>
+              </clipPath>
+            </defs>
+            <!-- a rounded rectangle that fills the bottom inside the cup shape -->
+            <rect x="6.6" y="10.2" width="10.8" height="9.4" rx="1.6" clip-path="url(#cupClip)" fill="url(#hydroGrad)"/>
+          </g>
         </svg>`;
     }
 
@@ -752,6 +779,13 @@
         btn.innerHTML = cupSVG(i < count);
         btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
         btn.title = i < count ? 'Filled' : 'Empty';
+
+        // If starting as filled, ensure the water is visible immediately (no initial pop-in)
+        requestAnimationFrame(()=>{
+          const water = btn.querySelector('.water');
+          if (water) water.style.transform = (i < count) ? 'scaleY(1)' : 'scaleY(0)';
+        });
+
         btn.addEventListener('click', ()=>{
           const current = readCount();
           if(i < current){ writeCount(i); } else { writeCount(i+1); }
@@ -766,7 +800,7 @@
     // ---- events ----
     goalEl.addEventListener('change', () => {
       goal = parseInt(goalEl.value, 10) || 8;
-      localStorage.setItem(K_PREF, String(goal));
+      localStorage.setItem(theK_PREF, String(goal));
       // clamp today’s count to new goal
       writeCount(readCount());
       render();
