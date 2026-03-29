@@ -423,12 +423,12 @@ function startBreathingBubble() {
 
   function updateText() {
     if (phase === "Inhale") {
-      text.textContent = "Breathe in";
+      text.textContent = "Breathe in for 5 to 6 seconds";
       bubble.classList.add('breathe-in');
       bubble.classList.remove('breathe-out');
       phase = "Exhale";
     } else {
-      text.textContent = "Breathe out";
+      text.textContent = "Breathe out for 5 to 6 seconds";
       bubble.classList.add('breathe-out');
       bubble.classList.remove('breathe-in');
       phase = "Inhale";
