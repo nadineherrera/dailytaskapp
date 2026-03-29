@@ -317,10 +317,10 @@
       border-radius: 50%;
       background:
         radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(255,255,255,0.22) 28%, transparent 32%),
-        radial-gradient(circle at 50% 40%, #b8ecff 0%, #8ed7f7 44%, #6fc7ef 72%, #57b9e7 100%);
+        radial-gradient(circle at 50% 40%, #E9DFC7 0%, #D8C7A1 44%, #C4AC76 72%, #B89A4C 100%);
       box-shadow:
         inset 0 18px 48px rgba(255,255,255,0.32),
-        0 26px 46px rgba(87,185,231,0.18),
+        0 26px 46px rgba(184,154,76,0.18),
         0 10px 20px rgba(23,21,18,0.08);
       transform-origin:center;
       transform: scale(1);
@@ -340,7 +340,7 @@
 
     #breath-text #countdown {
       font-size:1.6rem;
-      color:#57b9e7;
+      color:#B89A4C;
       font-weight:900;
     }
 
@@ -898,14 +898,14 @@
     })();
   </script>
 
+  <!-- NEW coherent-style breathing block -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
       const phaseEl = document.getElementById('phase');
       const counter = document.getElementById('countdown');
       const btn     = document.getElementById('breath-toggle-btn');
-
-      if (!bubble || !phaseEl || !counter || !btn) return;
+      const textEl  = document.getElementById('breath-text');
 
       const maxScale = parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')
@@ -914,8 +914,8 @@
       const PHASE_SECONDS = 5.5;
 
       const STEPS = [
-        { name: 'Inhale', targetScale: maxScale },
-        { name: 'Exhale', targetScale: 1.0 }
+        { name:'Inhale', targetScale:maxScale, cue:'Breathe in slowly' },
+        { name:'Exhale', targetScale:1.00, cue:'Breathe out gently' }
       ];
 
       const easeInOut = (t) => t < 0.5
@@ -931,16 +931,17 @@
       let lastRenderedScale = 1;
       let lastDisplayed = null;
 
-      function setScale(s) {
+      function setScale(s){
         lastRenderedScale = s;
         bubble.style.transform = `scale(${s})`;
+        const glow = 0.18 + (s - 1) * 0.28;
         bubble.style.boxShadow =
           `inset 0 18px 48px rgba(255,255,255,0.32),
-           0 ${20 + (s - 1) * 34}px ${42 + (s - 1) * 40}px rgba(87,185,231,${0.18 + (s - 1) * 0.18}),
+           0 ${20 + (s - 1) * 34}px ${42 + (s - 1) * 40}px rgba(184,154,76,${0.16 + glow}),
            0 10px 20px rgba(23,21,18,0.08)`;
       }
 
-      function displayCount(secondsRemaining) {
+      function displayCount(secondsRemaining){
         const shown = Math.max(1, Math.ceil(secondsRemaining));
         if (shown !== lastDisplayed) {
           counter.textContent = String(shown);
@@ -948,18 +949,21 @@
         }
       }
 
-      function beginStep(now) {
+      function beginStep(now){
         const step = STEPS[stepIdx];
         stepStart = now;
         startScale = lastRenderedScale;
         endScale = step.targetScale;
         lastDisplayed = null;
 
-        phaseEl.textContent = step.name;
-        counter.textContent = '6';
+        if (phaseEl) phaseEl.textContent = step.name;
+        if (counter) counter.textContent = '6';
+        if (textEl) {
+          textEl.setAttribute('aria-label', `${step.cue}. ${step.name} for 5 to 6 seconds.`);
+        }
       }
 
-      function tick(now) {
+      function tick(now){
         const elapsed = now - stepStart;
         const durationMs = PHASE_SECONDS * 1000;
         const t = Math.min(1, elapsed / durationMs);
@@ -979,7 +983,7 @@
         if (running) rafId = requestAnimationFrame(tick);
       }
 
-      function start() {
+      function start(){
         if (running) return;
         running = true;
         btn.textContent = 'Stop Breathing Exercise';
@@ -991,19 +995,117 @@
         rafId = requestAnimationFrame(tick);
       }
 
-      function stop() {
+      function stop(){
         running = false;
         btn.textContent = 'Start Breathing Exercise';
         btn.setAttribute('aria-pressed', 'false');
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
-        phaseEl.textContent = 'Inhale';
-        counter.textContent = '5';
+        if (phaseEl) phaseEl.textContent = 'Inhale';
+        if (counter) counter.textContent = '5';
+        if (textEl) textEl.setAttribute('aria-label', 'Inhale for 5 to 6 seconds');
         setScale(1);
       }
 
       btn.addEventListener('click', () => running ? stop() : start());
     })();
+  </script>
+
+  <!-- Hydration logic untouched -->
+  <script>
+  (function(){
+    const row   = document.getElementById('hydration-row');
+    const goalEl= document.getElementById('hydration-goal');
+    const add   = document.getElementById('cup-add');
+    const rem   = document.getElementById('cup-remove');
+    const reset = document.getElementById('cup-reset');
+    const stat  = document.getElementById('hydration-status');
+
+    const DATE_KEY = () => new Date().toISOString().slice(0,10);
+    const K_STATE  = 'hydration:state';
+    const theK_PREF = 'hydration:goal';
+
+    const savedGoal = parseInt(localStorage.getItem(theK_PREF) || '8', 10);
+    let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
+    goalEl.value = String(goal);
+
+    const getState = () => {
+      try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; }
+    };
+    const setState = (obj) => localStorage.setItem(K_STATE, JSON.stringify(obj));
+
+    const readCount = () => (getState()[DATE_KEY()]?.count ?? 0);
+    const writeCount = (count) => {
+      const all = getState();
+      all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
+      setState(all);
+      document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
+    };
+
+    function cupSVG(){
+      return `
+        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"
+                fill="none" stroke="rgba(0,0,0,.78)" stroke-width="1.5" stroke-linejoin="round"/>
+          <g class="water">
+            <defs>
+              <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d8c28a"/><stop offset="100%" stop-color="#c6a95a"/>
+              </linearGradient>
+              <clipPath id="cupClip">
+                <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"/>
+              </clipPath>
+            </defs>
+            <rect x="6.6" y="10.2" width="10.8" height="9.4" rx="1.6" clip-path="url(#cupClip)" fill="url(#hydroGrad)"/>
+          </g>
+        </svg>`;
+    }
+
+    function render(){
+      const count = readCount();
+      row.innerHTML = '';
+      for(let i=0;i<goal;i++){
+        const btn = document.createElement('button');
+        btn.className = 'cup-btn' + (i < count ? ' filled' : '');
+        btn.innerHTML = cupSVG();
+        btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
+        btn.title = i < count ? 'Filled' : 'Empty';
+
+        requestAnimationFrame(()=>{
+          const water = btn.querySelector('.water');
+          if (water) water.style.transform = (i < count) ? 'scaleY(1)' : 'scaleY(0)';
+        });
+
+        btn.addEventListener('click', ()=>{
+          const current = readCount();
+          if(i < current){ writeCount(i); } else { writeCount(i+1); }
+          render();
+          try{ if(window.playPop) window.playPop(); }catch(_){}
+        });
+        row.appendChild(btn);
+      }
+      stat.textContent = `${readCount()} / ${goal} cups`;
+    }
+
+    goalEl.addEventListener('change', () => {
+      goal = parseInt(goalEl.value, 10) || 8;
+      localStorage.setItem(theK_PREF, String(goal));
+      writeCount(readCount());
+      render();
+    });
+    add.addEventListener('click', () => { writeCount(readCount()+1); render(); });
+    rem.addEventListener('click', () => { writeCount(readCount()-1); render(); });
+    reset.addEventListener('click', () => { writeCount(0); render(); });
+
+    (function scheduleMidnightReset(){
+      const now = new Date();
+      const next = new Date(now); next.setHours(24,0,0,0);
+      setTimeout(()=>{ writeCount(0); render(); scheduleMidnightReset(); }, next - now);
+    })();
+
+    if(!getState()[DATE_KEY()]) writeCount(0);
+    render();
+  })();
   </script>
 
   <script type="module" src="main.js"></script>
