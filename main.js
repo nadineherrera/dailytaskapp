@@ -443,7 +443,7 @@ function startBreathingBubble() {
     } else {
       clearInterval(intervalId);
       intervalId = null;
-      text.textContent = "Breathe in";
+      text.textContent = "Make sure your mouth is closed";
       bubble.classList.remove('breathe-in', 'breathe-out');
       button.textContent = 'Start';
     }
