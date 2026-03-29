@@ -632,7 +632,7 @@
       <div class="glass breathing-tile">
         <div id="breath-bubble-container">
           <div id="breath-bubble"></div>
-          <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">5.5</span></p>
+          <p id="breath-text"><span id="phase">Inhale</span> <span id="countdown">5</span></p>
           <button id="breath-toggle-btn" class="btn btn-primary" aria-pressed="false">Start Breathing Exercise</button>
         </div>
       </div>
@@ -703,6 +703,7 @@
     </div>
   </div>
 
+  <!-- ===== Audio: reliable init + sounds ===== -->
   <script>
     (function(){
       let ctx=null, master=null;
@@ -775,6 +776,7 @@
     })();
   </script>
 
+  <!-- Celebration + progress ring -->
   <script>
     function launchFallingEmojis(count = 26) {
       const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
@@ -850,6 +852,7 @@
     })();
   </script>
 
+  <!-- Mood control -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -897,7 +900,7 @@
     })();
   </script>
 
-  <!-- Breathing (5.5 in / 5.5 out coherent breathing) -->
+  <!-- Breathing (smooth 5–6 second inhale / exhale, no 5.5 shown) -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
@@ -910,9 +913,11 @@
         getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')
       ) || 1.28;
 
+      const PHASE_SECONDS = 5.5;
+
       const STEPS = [
-        { name: 'Inhale', seconds: 5.5, targetScale: maxScale, cue: 'Breathe in slowly' },
-        { name: 'Exhale', seconds: 5.5, targetScale: 1.00, cue: 'Breathe out gently' }
+        { name:'Inhale', targetScale:maxScale, cue:'Breathe in slowly' },
+        { name:'Exhale', targetScale:1.00, cue:'Breathe out gently' }
       ];
 
       const easeInOut = (t) => t < 0.5
@@ -926,11 +931,7 @@
       let startScale = 1;
       let endScale = 1;
       let lastRenderedScale = 1;
-      let lastDisplayedTenth = null;
-
-      function formatSeconds(value){
-        return value.toFixed(1).replace(/\.0$/, '');
-      }
+      let lastDisplayed = null;
 
       function setScale(s){
         lastRenderedScale = s;
@@ -942,42 +943,41 @@
            inset 0 12px ${40 + (s - 1) * 30}px rgba(255,255,255,${0.16 + glow / 6})`;
       }
 
+      function displayCount(secondsRemaining){
+        const shown = Math.max(1, Math.ceil(secondsRemaining));
+        if (shown !== lastDisplayed) {
+          counter.textContent = String(shown);
+          lastDisplayed = shown;
+        }
+      }
+
       function beginStep(now){
         const step = STEPS[stepIdx];
         stepStart = now;
         startScale = lastRenderedScale;
         endScale = step.targetScale;
-        lastDisplayedTenth = null;
+        lastDisplayed = null;
 
         if (phaseEl) phaseEl.textContent = step.name;
-        if (counter) counter.textContent = formatSeconds(step.seconds);
+        if (counter) counter.textContent = '6';
         if (textEl) {
-          textEl.setAttribute(
-            'aria-label',
-            `${step.cue}. ${step.name} for ${formatSeconds(step.seconds)} seconds.`
-          );
+          textEl.setAttribute('aria-label', `${step.cue}. ${step.name} for 5 to 6 seconds.`);
         }
       }
 
       function tick(now){
-        const step = STEPS[stepIdx];
-        const dur = step.seconds * 1000;
         const elapsed = now - stepStart;
-        const t = Math.min(1, elapsed / dur);
+        const durationMs = PHASE_SECONDS * 1000;
+        const t = Math.min(1, elapsed / durationMs);
 
         const eased = easeInOut(t);
         const s = startScale + (endScale - startScale) * eased;
         setScale(s);
 
-        const remaining = Math.max(0, (dur - elapsed) / 1000);
-        const roundedToTenth = Math.ceil(remaining * 10) / 10;
+        const remaining = Math.max(0, PHASE_SECONDS - (elapsed / 1000));
+        displayCount(remaining);
 
-        if (counter && roundedToTenth !== lastDisplayedTenth) {
-          counter.textContent = formatSeconds(roundedToTenth <= 0 ? step.seconds : roundedToTenth);
-          lastDisplayedTenth = roundedToTenth;
-        }
-
-        if (elapsed >= dur) {
+        if (elapsed >= durationMs) {
           stepIdx = (stepIdx + 1) % STEPS.length;
           beginStep(now);
         }
@@ -1004,8 +1004,8 @@
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
         if (phaseEl) phaseEl.textContent = 'Inhale';
-        if (counter) counter.textContent = '5.5';
-        if (textEl) textEl.setAttribute('aria-label', 'Inhale for 5.5 seconds');
+        if (counter) counter.textContent = '5';
+        if (textEl) textEl.setAttribute('aria-label', 'Inhale for 5 to 6 seconds');
         setScale(1);
       }
 
@@ -1013,6 +1013,7 @@
     })();
   </script>
 
+  <!-- Hydration logic -->
   <script>
   (function(){
     const row   = document.getElementById('hydration-row');
@@ -1043,7 +1044,7 @@
       document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
     };
 
-    function cupSVG(iFilled){
+    function cupSVG(){
       return `
         <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"
@@ -1068,7 +1069,7 @@
       for(let i=0;i<goal;i++){
         const btn = document.createElement('button');
         btn.className = 'cup-btn' + (i < count ? ' filled' : '');
-        btn.innerHTML = cupSVG(i < count);
+        btn.innerHTML = cupSVG();
         btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
         btn.title = i < count ? 'Filled' : 'Empty';
 
