@@ -512,6 +512,52 @@
       font-weight:800;
     }
 
+    .emoji-fall{
+      position:fixed;
+      top:-10vh;
+      pointer-events:none;
+      z-index:9999;
+      animation-name: emojiFall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes emojiFall{
+      0%{
+        transform: translateY(-10vh) rotate(0deg);
+        opacity:0;
+      }
+      10%{
+        opacity:1;
+      }
+      100%{
+        transform: translateY(110vh) rotate(360deg);
+        opacity:0;
+      }
+    }
+
+    .emoji-pop{
+      position:absolute;
+      pointer-events:none;
+      z-index:9999;
+      animation: emojiPop 900ms ease-out forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes emojiPop{
+      0%{
+        transform: translate(0,0) scale(.6);
+        opacity:0;
+      }
+      10%{
+        opacity:1;
+      }
+      100%{
+        transform: translate(var(--dx, 0px), -90px) scale(1.35);
+        opacity:0;
+      }
+    }
+
     @media (max-width: 768px){
       .day-nav {
         border-radius: 24px;
@@ -590,8 +636,8 @@
       <div class="glass breathing-tile">
         <div id="breath-bubble-container">
           <div id="breath-bubble"></div>
-          <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
-          <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
+          <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">5</span></p>
+          <button id="breath-toggle-btn" class="btn btn-primary" aria-pressed="false">Start Breathing Exercise</button>
         </div>
       </div>
     </section>
@@ -860,45 +906,54 @@
     })();
   </script>
 
-  <!-- Breathing (Box 4-4-4-4 only) -->
+  <!-- Breathing (5 in / 5 out, upgraded experience) -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
       const phaseEl = document.getElementById('phase');
       const counter = document.getElementById('countdown');
       const btn     = document.getElementById('breath-toggle-btn');
+      const textEl  = document.getElementById('breath-text');
 
-      const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
+      const maxScale = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')
+      ) || 1.28;
 
       const STEPS = [
-        { name: 'Inhale', seconds: 4, targetScale: maxScale },
-        { name: 'Hold',   seconds: 4, targetScale: null },
-        { name: 'Exhale', seconds: 4, targetScale: 1.00 },
-        { name: 'Hold',   seconds: 4, targetScale: null },
+        { name: 'Inhale', seconds: 5, targetScale: maxScale, cue: 'Breathe in slowly' },
+        { name: 'Exhale', seconds: 5, targetScale: 1.00, cue: 'Breathe out gently' }
       ];
 
-      const easeInOut = (t)=> t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+      const easeInOut = (t) => t < 0.5
+        ? 2 * t * t
+        : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-      let running=false, stepIdx=0, rafId=null, stepStart=0;
-      let startScale=1, endScale=1, lastRenderedScale=1;
+      let running = false;
+      let stepIdx = 0;
+      let rafId = null;
+      let stepStart = 0;
+      let startScale = 1;
+      let endScale = 1;
+      let lastRenderedScale = 1;
 
       function setScale(s){
         lastRenderedScale = s;
         bubble.style.transform = `scale(${s})`;
-        const glow = 0.22 + (s-1)*0.5;
+        const glow = 0.22 + (s - 1) * 0.5;
         bubble.style.boxShadow =
-          `0 0 ${40 + (s-1)*60}px rgba(56,189,248,${.3+glow/4}),
-           0 20px ${50 + (s-1)*40}px rgba(14,165,233,${.16+glow/5}),
-           inset 0 12px ${40 + (s-1)*30}px rgba(255,255,255,${.16+glow/6})`;
+          `0 0 ${40 + (s - 1) * 60}px rgba(56,189,248,${0.3 + glow / 4}),
+           0 20px ${50 + (s - 1) * 40}px rgba(14,165,233,${0.16 + glow / 5}),
+           inset 0 12px ${40 + (s - 1) * 30}px rgba(255,255,255,${0.16 + glow / 6})`;
       }
 
       function beginStep(now){
         const step = STEPS[stepIdx];
         stepStart = now;
         startScale = lastRenderedScale;
-        endScale = (step.targetScale == null) ? startScale : step.targetScale;
+        endScale = step.targetScale;
         if (phaseEl) phaseEl.textContent = step.name;
         if (counter) counter.textContent = String(step.seconds);
+        if (textEl) textEl.setAttribute('aria-label', `${step.cue}. ${step.name} for ${step.seconds} seconds.`);
       }
 
       function tick(now){
@@ -907,7 +962,7 @@
         const elapsed = now - stepStart;
         const t = Math.min(1, elapsed / dur);
 
-        const eased = (step.targetScale == null) ? 1 : easeInOut(t);
+        const eased = easeInOut(t);
         const s = startScale + (endScale - startScale) * eased;
         setScale(s);
 
@@ -918,6 +973,7 @@
           stepIdx = (stepIdx + 1) % STEPS.length;
           beginStep(now);
         }
+
         if (running) rafId = requestAnimationFrame(tick);
       }
 
@@ -925,7 +981,8 @@
         if (running) return;
         running = true;
         btn.textContent = 'Stop Breathing Exercise';
-        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') setScale(1);
+        btn.setAttribute('aria-pressed', 'true');
+        setScale(1);
         stepIdx = 0;
         const now = performance.now();
         beginStep(now);
@@ -935,10 +992,12 @@
       function stop(){
         running = false;
         btn.textContent = 'Start Breathing Exercise';
+        btn.setAttribute('aria-pressed', 'false');
         if (rafId) cancelAnimationFrame(rafId);
         rafId = null;
         if (phaseEl) phaseEl.textContent = 'Inhale';
-        if (counter) counter.textContent = '4';
+        if (counter) counter.textContent = '5';
+        if (textEl) textEl.setAttribute('aria-label', 'Inhale for 5 seconds');
         setScale(1);
       }
 
