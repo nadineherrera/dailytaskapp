@@ -1,230 +1,1048 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elevate Daily</title>
-<meta name="theme-color" content="#f7f7f5">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f7f5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Daily Tasks">
+  <link rel="manifest" href="/dailytaskapp/manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Elevate Daily</title>
 
-<style>
-:root{
-  --bg:#f7f7f5;
-  --card:#ffffff;
-  --text:#1a1a1a;
-  --muted:#6b6b6b;
-  --accent:#c6a95a;
-  --border:rgba(0,0,0,.08);
-  --radius:18px;
-  --shadow:0 10px 30px rgba(0,0,0,.06);
-}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-/* RESET */
-*{box-sizing:border-box;}
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
+  <style>
+    :root{
+      --bg:#f7f7f5;
+      --bg-soft:#f1f0ec;
+      --card:#ffffff;
+      --card-2:#fbfaf7;
+      --border:rgba(0,0,0,.08);
+      --text:#1a1a1a;
+      --muted:#6f6f6f;
+      --brand:#c6a95a;
+      --accent:#d8c28a;
+      --accent-soft:#efe6cf;
+      --radius:20px;
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+      --bubble-base: clamp(168px, 40vw, 240px);
+      --bubble-max-scale: 1.28;
 
-/* LAYOUT */
-.container{
-  max-width:850px;
-  margin:auto;
-  padding:20px;
-}
+      --cup-w: clamp(48px, 7vw, 64px);
+      --cup-h: clamp(58px, 8.5vw, 78px);
+      --cup-svg-w: calc(var(--cup-w) * 0.78);
+      --cup-svg-h: calc(var(--cup-h) * 0.64);
+    }
 
-/* HEADER */
-header{
-  text-align:center;
-  margin-bottom:20px;
-}
+    * { box-sizing:border-box; }
 
-.day-heading{
-  font-size:1.8rem;
-  font-weight:700;
-}
+    html, body {
+      margin:0;
+      padding:0;
+      min-height:100%;
+      width:100%;
+      background: linear-gradient(180deg, #faf9f6 0%, #f4f2ed 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x:hidden;
+    }
 
-/* DAY NAV */
-.day-nav{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:center;
-  margin-bottom:20px;
-}
+    body {
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
 
-.day-nav a{
-  padding:8px 14px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  text-decoration:none;
-  color:var(--text);
-  background:white;
-}
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: clamp(16px, 3vw, 28px);
+      position: relative;
+    }
 
-.day-nav a:hover{
-  background:#f2f2f2;
-}
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: none;
+    }
 
-/* CARDS */
-.glass{
-  background:var(--card);
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  padding:16px;
-  margin-bottom:16px;
-}
+    header {
+      padding: 22px 18px;
+      margin: 0 0 16px 0;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%);
+    }
 
-/* TEXT */
-h2{
-  margin:0 0 10px;
-}
+    header:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(500px 140px at 50% -10%, rgba(198,169,90,.10), transparent 65%);
+      pointer-events:none;
+    }
 
-/* INPUTS */
-textarea,input{
-  width:100%;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  margin-bottom:10px;
-}
+    header img {
+      width:72px;
+      height:72px;
+      display:block;
+      margin: 6px auto 8px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.08));
+    }
 
-textarea:focus,input:focus{
-  outline:none;
-  border-color:var(--accent);
-}
+    .day-heading {
+      text-align:center;
+      font-size: clamp(1.7rem, 2.8vw, 2.25rem);
+      font-weight:800;
+      margin:.4rem 0 .2rem;
+      letter-spacing:-.02em;
+      color: var(--text);
+    }
 
-/* BUTTONS */
-button{
-  padding:10px 16px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:white;
-  cursor:pointer;
-}
+    header .weather-content {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:.25rem;
+      font-size:.98rem;
+      color: var(--muted);
+    }
 
-button:hover{
-  background:#f2f2f2;
-}
+    header .weather-content .temp {
+      font-size:1.1rem;
+      font-weight:800;
+      color: var(--text);
+    }
 
-.btn-primary{
-  background:var(--accent);
-  color:white;
-  border:none;
-}
+    header .weather-content .desc {
+      font-style: italic;
+      color: var(--muted);
+    }
 
-/* BREATHING */
-#breath-bubble{
-  width:200px;
-  height:200px;
-  border-radius:50%;
-  background: radial-gradient(circle, #b8ecff, #6fd3ff);
-  margin:20px auto;
-}
+    #affirmation-box {
+      text-align:center;
+      margin-top:.75rem;
+      color:#7b6a39;
+      opacity:0;
+      transform:translateY(4px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
 
-/* TASKS */
-#task-list{
-  margin-top:10px;
-}
+    #affirmation-box.visible {
+      opacity:1;
+      transform:translateY(0);
+    }
 
-/* FOOTER */
-footer{
-  text-align:center;
-  margin-top:20px;
-  color:var(--muted);
-}
-</style>
+    .day-nav{
+      position: sticky;
+      top: calc(env(safe-area-inset-top) + 6px);
+      z-index: 1000;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      margin: 8px 0 18px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 24px rgba(0,0,0,.05);
+      backdrop-filter: blur(12px);
+    }
+
+    .day-nav a{
+      display:inline-block;
+      padding:.58rem 1rem;
+      border-radius:999px;
+      background: #ffffff;
+      color: var(--text);
+      text-decoration:none;
+      border: 1px solid var(--border);
+      transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,.04);
+    }
+
+    .day-nav a:hover{
+      transform: translateY(-1px);
+      background: var(--card-2);
+      border-color: rgba(198,169,90,.35);
+    }
+
+    .day-nav a:visited { color: var(--text); }
+
+    h2.section-label {
+      text-align:center;
+      font-size: clamp(1.18rem, 2vw, 1.38rem);
+      color: var(--text);
+      margin: 28px 0 14px;
+      font-weight:800;
+      letter-spacing:-.01em;
+      text-shadow:none;
+    }
+
+    .journal-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap:18px;
+      justify-content:center;
+      margin-top:10px;
+    }
+
+    section#journals,
+    section#gratitude {
+      flex:1 1 320px;
+      padding:18px;
+    }
+
+    section#journals h2,
+    section#gratitude h2 {
+      margin:.2rem 0 .7rem 0;
+      font-size:1.02rem;
+      font-weight:800;
+      color: var(--text);
+    }
+
+    textarea{
+      width:100%;
+      height:120px;
+      padding:12px 14px;
+      margin-bottom:14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fcfcfa;
+      color: var(--text);
+      box-sizing:border-box;
+      resize:vertical;
+      outline:none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+    textarea::placeholder{ color:#9a9a9a; }
+
+    textarea:focus{
+      border-color: rgba(198,169,90,.5);
+      background:#ffffff;
+      box-shadow: 0 0 0 5px rgba(198,169,90,.12);
+    }
+
+    button, .btn {
+      padding:.72rem 1.1rem;
+      font-size:1rem;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,.05);
+      backdrop-filter:none;
+    }
+
+    button:hover, .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0,0,0,.06);
+      background:#fdfcf9;
+      border-color: rgba(198,169,90,.35);
+    }
+
+    button:active, .btn:active { transform: translateY(0); }
+
+    .btn-primary{
+      background: linear-gradient(180deg, #d6be7b 0%, #c6a95a 100%);
+      color:#ffffff;
+      border-color:#c6a95a;
+    }
+
+    .btn-primary:hover{
+      background: linear-gradient(180deg, #d9c584 0%, #caad60 100%);
+    }
+
+    .mood-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap:.6rem;
+      justify-content:center;
+    }
+
+    .mood-chip {
+      font-size:1.45rem;
+      padding:.5rem .7rem;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      color: var(--text);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .mood-chip[aria-checked="true"] {
+      background: linear-gradient(180deg, #f3ead6 0%, #eadcb9 100%);
+      border-color: rgba(198,169,90,.55);
+      box-shadow: 0 8px 20px rgba(198,169,90,.18);
+    }
+
+    .mood-live {
+      display:flex;
+      align-items:center;
+      gap:.5rem;
+      justify-content:center;
+      margin-top:.4rem;
+      color: var(--muted);
+    }
+
+    .mood-label { font-weight:700; color: var(--text); }
+
+    .breathing-tile { padding: 24px 16px 28px; }
+
+    #breath-bubble-container {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      max-width:100%;
+      padding:16px 12px 6px;
+      text-align:center;
+      gap:14px;
+      min-height: clamp(340px, 52vw, 460px);
+    }
+
+    #breath-bubble {
+      width: var(--bubble-base);
+      height: var(--bubble-base);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 30% 30%, #b8ecff, #6fd3ff 55%, #39b6ec 100%);
+      box-shadow:
+        0 0 34px rgba(111,211,255,.26),
+        0 18px 36px rgba(57,182,236,.12),
+        inset 0 12px 40px rgba(255,255,255,.4);
+      transform-origin:center;
+      transform: scale(1);
+      will-change: transform, opacity, filter;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.08));
+      margin-bottom: clamp(18px, 3.5vw, 36px);
+    }
+
+    #breath-text {
+      font-size:1.25rem;
+      color: var(--text);
+      font-weight:800;
+      display:flex;
+      justify-content:center;
+      align-items:baseline;
+      gap:.4rem;
+    }
+
+    #breath-text #countdown {
+      font-size:1.6rem;
+      color:#4aa9cf;
+      font-weight:900;
+    }
+
+    #breath-toggle-btn { min-width: 180px; }
+
+    #progress-ring-container {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin: 1rem auto .4rem;
+    }
+
+    #progress-ring { transform: rotate(-90deg); overflow: visible; }
+    #progress-ring defs linearGradient stop:first-child { stop-color: #c6a95a; }
+    #progress-ring defs linearGradient stop:last-child  { stop-color: #eadcb9; }
+
+    #progress-text {
+      text-align:center;
+      font-weight:800;
+      color: var(--text);
+      margin-bottom: 1.1rem;
+    }
+
+    #task-list { margin-top:10px; }
+
+    #task-list h2 {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:1rem;
+      background: linear-gradient(180deg, #fbf8f1 0%, #f4eedf 100%);
+      border-radius: 12px;
+      color: var(--text);
+      font-weight:900;
+      border:1px solid rgba(198,169,90,.18);
+    }
+
+    .task-input-group {
+      display:flex;
+      flex-wrap:wrap;
+      gap:.6rem;
+      margin: 1rem 0 2rem;
+      justify-content:center;
+      max-width:640px;
+      margin-inline:auto;
+    }
+
+    #new-task {
+      width: min(420px, 90%);
+      padding:.7rem .9rem;
+      font-size:1rem;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      color: var(--text);
+      outline:none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+    #new-task:focus{
+      border-color: rgba(198,169,90,.45);
+      background:#ffffff;
+      box-shadow: 0 0 0 5px rgba(198,169,90,.12);
+    }
+
+    footer#quote-footer {
+      background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%);
+      padding: 1.2rem;
+      text-align: center;
+      color: var(--muted);
+      font-style: italic;
+      font-size: 1rem;
+      margin: 1.6rem 0 0 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .compat-hidden {
+      display:none !important;
+      visibility:hidden !important;
+    }
+
+    .emoji-fall,
+    .emoji-pop {
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.12));
+    }
+
+    .hydration-tile { padding:16px 16px 18px; }
+
+    .hydration-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.8rem;
+      margin-bottom:.6rem;
+    }
+
+    #hydration-goal {
+      appearance:none;
+      background:#ffffff;
+      color: var(--text);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:.45rem .7rem;
+      font-weight:700;
+    }
+
+    .hydration-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      padding:6px 0 4px;
+    }
+
+    .cup-btn {
+      width:var(--cup-w);
+      height:var(--cup-h);
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#ffffff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cup-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.06);
+    }
+
+    .cup-btn.filled {
+      background: linear-gradient(180deg, #f3ead6 0%, #eadcb9 100%);
+      border-color: rgba(198,169,90,.45);
+      box-shadow: 0 8px 18px rgba(198,169,90,.16);
+    }
+
+    .cup-svg {
+      width:var(--cup-svg-w);
+      height:var(--cup-svg-h);
+      display:block;
+    }
+
+    .cup-btn .water {
+      transform: scaleY(0);
+      transform-origin: 50% 100%;
+      transition: transform .25s ease;
+    }
+
+    .cup-btn.filled .water { transform: scaleY(1); }
+
+    .cup-btn.filled:active { transform: translateY(0) scale(0.98); }
+
+    .hydration-actions {
+      display:flex;
+      gap:.6rem;
+      justify-content:center;
+      margin-top:.75rem;
+      flex-wrap:wrap;
+    }
+
+    #hydration-status {
+      text-align:center;
+      margin-top:.4rem;
+      color:#7b6a39;
+      font-weight:800;
+    }
+
+    @media (max-width: 768px){
+      .day-nav {
+        border-radius: 24px;
+        padding: 10px;
+      }
+
+      .day-nav a {
+        padding: .55rem .85rem;
+        font-size: .92rem;
+      }
+
+      .journal-grid {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <!-- Header -->
+    <header class="glass">
+      <img src="apple-touch-icon.png" alt="App Logo">
+      <h1 id="page-title" class="day-heading"></h1>
+      <div id="weather" class="weather-content"></div>
+      <div id="affirmation-box"></div>
+    </header>
 
-<div class="container">
+    <!-- Day nav (sticky) -->
+    <div class="day-nav">
+      <a href="?day=Monday">Mon</a><a href="?day=Tuesday">Tue</a><a href="?day=Wednesday">Wed</a>
+      <a href="?day=Thursday">Thu</a><a href="?day=Friday">Fri</a><a href="?day=Saturday">Sat</a><a href="?day=Sunday">Sun</a>
+    </div>
 
-<header>
-  <h1 class="day-heading">Elevate Daily</h1>
-</header>
+    <!-- Journals + Gratitude -->
+    <h2 class="section-label">🧘 Mindfulness Zone</h2>
+    <div class="journal-grid">
+      <section id="journals" class="glass">
+        <h2>Dream Journal</h2><textarea id="dream-journal" placeholder="What did you dream about?"></textarea>
+        <h2>Daily Journal</h2><textarea id="daily-journal" placeholder="Let it flow… even one line counts."></textarea>
+        <button id="save-journal-btn" class="btn btn-primary">Save Journals</button>
+      </section>
 
-<!-- DAY NAV -->
-<div class="day-nav">
-  <a href="#">Mon</a>
-  <a href="#">Tue</a>
-  <a href="#">Wed</a>
-  <a href="#">Thu</a>
-  <a href="#">Fri</a>
-  <a href="#">Sat</a>
-  <a href="#">Sun</a>
-</div>
+      <section id="gratitude" class="glass">
+        <h2>Gratitude Prompt</h2><textarea id="gratitudeEntry" placeholder="Name one thing you’re grateful for today…"></textarea>
 
-<!-- GRATITUDE -->
-<div class="glass">
-  <h2>Gratitude</h2>
-  <textarea placeholder="What are you grateful for today?"></textarea>
-</div>
+        <h2>Your Mood</h2>
+        <select id="mood" style="display:none">
+          <option value="">How do you feel?</option>
+          <option value="😀">Happy</option>
+          <option value="😐">Neutral</option>
+          <option value="😔">Sad</option>
+          <option value="😤">Frustrated</option>
+          <option value="😴">Tired</option>
+          <option value="😌">Peaceful</option>
+        </select>
 
-<!-- JOURNAL -->
-<div class="glass">
-  <h2>Journal</h2>
-  <textarea placeholder="Write your thoughts..."></textarea>
-</div>
+        <div class="mood-grid" role="radiogroup" aria-label="Mood picker">
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😔" data-label="Sad">😔</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😤" data-label="Frustrated">😤</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😐" data-label="Neutral">😐</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="🙂" data-label="Okay">🙂</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😀" data-label="Happy">😀</button>
+          <button type="button" class="mood-chip" role="radio" aria-checked="false" data-emoji="😌" data-label="Peaceful">😌</button>
+        </div>
 
-<!-- BREATHING -->
-<div class="glass">
-  <h2>Breathing</h2>
-  <div id="breath-bubble"></div>
-  <button onclick="startBreathing()">Start</button>
-</div>
+        <div class="mood-live">
+          <span id="mood-emoji" style="font-size:2rem; opacity:.8;">—</span>
+          <span id="mood-label" class="mood-label" style="opacity:.95;">How do you feel?</span>
+        </div>
+      </section>
+    </div>
 
-<!-- TASKS -->
-<div class="glass">
-  <h2>Tasks</h2>
+    <!-- Breathing -->
+    <section id="breathing">
+      <h2 class="section-label">Breathing Exercise</h2>
+      <div class="glass breathing-tile">
+        <div id="breath-bubble-container">
+          <div id="breath-bubble"></div>
+          <p id="breath-text"><span id="phase">Inhale</span> for <span id="countdown">4</span></p>
+          <button id="breath-toggle-btn" class="btn btn-primary">Start Breathing Exercise</button>
+        </div>
+      </div>
+    </section>
 
-  <input id="new-task" placeholder="Add a task">
-  <button class="btn-primary" onclick="addTask()">Add Task</button>
+    <!-- Hydration -->
+    <h2 class="section-label">💧 Hydration</h2>
+    <div class="glass hydration-tile" id="hydration-card" aria-live="polite">
+      <div class="hydration-header">
+        <strong style="letter-spacing:.2px;">Cups drunk today</strong>
+        <label style="display:flex; align-items:center; gap:.4rem;">
+          <span style="color:#7b6a39;">Goal</span>
+          <select id="hydration-goal">
+            <option value="6">6</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+          </select>
+        </label>
+      </div>
 
-  <ul id="task-list"></ul>
-</div>
+      <div id="hydration-row" class="hydration-row" role="group" aria-label="Water cups"></div>
 
-<!-- FOOTER -->
-<footer>
-  Elevate your day with clarity and consistency.
-</footer>
+      <div class="hydration-actions">
+        <button id="cup-add" class="btn btn-primary">+ 1 cup</button>
+        <button id="cup-remove" class="btn">− 1 cup</button>
+        <button id="cup-reset" class="btn">Reset Today</button>
+      </div>
 
-</div>
+      <div id="hydration-status">0 / 8 cups</div>
+    </div>
 
-<script>
-function addTask(){
-  const input=document.getElementById("new-task");
-  const list=document.getElementById("task-list");
+    <!-- Tasks -->
+    <h2 class="section-label">🌱 Today’s Tasks</h2>
+    <div class="glass" style="padding:16px; margin-bottom:14px;">
+      <div id="progress-ring-container" aria-label="Task progress">
+        <svg id="progress-ring" width="160" height="160">
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#8f7ff5"></stop>
+              <stop offset="100%" stop-color="#6ee7d2"></stop>
+            </linearGradient>
+          </defs>
+          <circle stroke="rgba(0,0,0,.10)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80"></circle>
+          <circle id="progress-ring-bar" stroke="url(#ringGrad)" stroke-width="14" fill="transparent" r="70" cx="80" cy="80" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8"></circle>
+        </svg>
+      </div>
+      <p id="progress-text">0% Complete</p>
 
-  if(input.value.trim()==="") return;
+      <div id="task-list"></div>
+      <div class="task-input-group">
+        <input type="text" id="new-task" placeholder="Add new task">
+        <button onclick="addTask()" class="btn">Add Task</button>
+        <button onclick="resetTasks()" class="btn">Reset All Tasks</button>
+      </div>
+    </div>
 
-  const li=document.createElement("li");
-  li.textContent=input.value;
+    <footer id="quote-footer" class="glass"><p id="quote-box">Loading quote...</p></footer>
+  </div>
 
-  li.onclick=()=>li.remove();
+  <div class="compat-hidden">
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <h2 class="section-label">♾ Ongoing Tasks</h2>
+    <div id="ongoing-task-list"></div>
+    <div class="task-input-group">
+      <input type="text" id="new-ongoing-task" placeholder="Add new ongoing task">
+      <button id="add-ongoing-task-btn">Add Task</button>
+      <button id="reset-ongoing-tasks-btn">Reset Ongoing Tasks</button>
+    </div>
+  </div>
 
-  list.appendChild(li);
-  input.value="";
-}
+  <!-- ===== Audio: reliable init + sounds ===== -->
+  <script>
+    (function(){
+      let ctx=null, master=null;
+      function ensureAudio(){
+        try{
+          if(!ctx){
+            ctx = new (window.AudioContext || window.webkitAudioContext)();
+            master = ctx.createGain();
+            master.gain.value = 0.12;
+            master.connect(ctx.destination);
+          }
+          if(ctx.state === 'suspended') ctx.resume();
+        }catch(e){}
+        return {ctx, master};
+      }
+      window._ensureAudio = ensureAudio;
 
-/* BREATHING */
-let breathing=false;
-function startBreathing(){
-  const bubble=document.getElementById("breath-bubble");
-  breathing=!breathing;
+      ['pointerdown','keydown','touchstart'].forEach(evt=>{
+        document.addEventListener(evt, ensureAudio, {once:true, passive:true});
+      });
 
-  if(breathing){
-    bubble.style.transition="transform 5s ease-in-out";
-    bubble.style.transform="scale(1.3)";
-    setTimeout(()=>{
-      bubble.style.transform="scale(1)";
-    },5000);
-  }
-}
-</script>
+      window.playYay = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
+        const freqs = [523.25, 659.25, 783.99];
+        const now = ctx.currentTime;
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now + i * 0.02);
+          gain.gain.setValueAtTime(0, now + i * 0.02);
+          gain.gain.linearRampToValueAtTime(0.9, now + 0.04 + i * 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.02);
+          osc.connect(gain).connect(master);
+          osc.start(now + i * 0.02);
+          osc.stop(now + 0.8);
+        });
 
+        const dur = 0.2;
+        const bufferSize = dur * ctx.sampleRate;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*(1-i/bufferSize);
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.value = 0.05;
+        noise.connect(noiseGain).connect(master);
+        noise.start(now + 0.02);
+        noise.stop(now + 0.25);
+      };
+
+      window.playPop = function(){
+        const {ctx, master} = ensureAudio();
+        if(!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+        osc.connect(gain).connect(master);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      };
+    })();
+  </script>
+
+  <!-- Celebration + progress ring -->
+  <script>
+    function launchFallingEmojis(count = 26) {
+      const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'emoji-fall';
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.fontSize = (Math.random() * 18 + 18) + 'px';
+        const dur = (Math.random() * 2) + 2.8;
+        span.style.animationDuration = dur + 's';
+        span.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(span);
+        span.addEventListener('animationend', () => span.remove());
+      }
+    }
+
+    (function () {
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      window._celebrated = false;
+
+      window.updateProgressCircle = function (percent) {
+        const pct = Math.max(0, Math.min(100, Number(percent) || 0));
+        const circle = document.getElementById('progress-ring-bar');
+        if (!circle) return;
+        const offset = circumference - (pct / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        const label = document.getElementById('progress-text');
+        if (label) label.textContent = `${pct}% Complete`;
+
+        const reached = pct >= 99.5;
+
+        if (reached && !window._celebrated) {
+          window._celebrated = true;
+          if (window._ensureAudio) window._ensureAudio();
+          playYay();
+          launchFallingEmojis();
+        }
+        if (!reached && window._celebrated) {
+          window._celebrated = false;
+        }
+      };
+    })();
+
+    function burstEmojisAt(x, y, count = 7) {
+      const set = ['🎉','✨','🌟','💫','🎈','🔥','💖','👍','👏','🥳','🌈','🍀','🧠','💪','🪄','😄','🤩','🙌'];
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.className = 'emoji-pop';
+        s.textContent = set[Math.floor(Math.random() * set.length)];
+        s.style.left = (x - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.top  = (y - 8 + (Math.random()*6 - 3)) + 'px';
+        s.style.fontSize = (Math.random() * 10 + 16) + 'px';
+        s.style.setProperty('--dx', (Math.random()*2 - 1) * 80 + 'px');
+        document.body.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+    }
+
+    (function attachTaskPopListener(){
+      const list = document.getElementById('task-list');
+      if (!list) return;
+      list.addEventListener('change', (e) => {
+        const el = e.target;
+        if (el && el.matches('input[type="checkbox"]') && el.checked) {
+          const rect = el.getBoundingClientRect();
+          burstEmojisAt(rect.left + rect.width/2 + window.scrollX,
+                        rect.top  + rect.height/2 + window.scrollY);
+          playPop();
+        }
+      }, true);
+    })();
+  </script>
+
+  <!-- Mood control -->
+  <script>
+    (function () {
+      const moodSelect = document.getElementById("mood");
+      const chips = Array.from(document.querySelectorAll(".mood-chip"));
+      const liveEmoji = document.getElementById("mood-emoji");
+      const liveLabel = document.getElementById("mood-label");
+
+      function clearSelection() {
+        chips.forEach(c => { c.setAttribute("aria-checked","false"); c.tabIndex=-1; });
+        if (moodSelect) moodSelect.value = "";
+        if (liveEmoji) { liveEmoji.textContent = "—"; liveEmoji.style.opacity = ".6"; }
+        if (liveLabel) { liveLabel.textContent = "How do you feel?"; liveLabel.style.opacity = ".9"; }
+        if (chips[0]) chips[0].tabIndex = 0;
+      }
+
+      function setSelection(emoji, label) {
+        chips.forEach(c => {
+          const active = c.dataset.emoji === emoji;
+          c.setAttribute("aria-checked", active ? "true" : "false");
+          c.tabIndex = active ? 0 : -1;
+        });
+        if (moodSelect) moodSelect.value = emoji;
+        if (liveEmoji) { liveEmoji.textContent = emoji; liveEmoji.style.opacity = "1"; }
+        if (liveLabel) { liveLabel.textContent = label; liveLabel.style.opacity = "1"; }
+      }
+
+      clearSelection();
+
+      chips.forEach(chip => {
+        chip.addEventListener("click", () => setSelection(chip.dataset.emoji, chip.dataset.label));
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            setSelection(chip.dataset.emoji, chip.dataset.label);
+          }
+          const idx = chips.indexOf(chip);
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+            e.preventDefault(); chips[(idx+1)%chips.length].focus();
+          }
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault(); chips[(idx-1+chips.length)%chips.length].focus();
+          }
+        });
+      });
+    })();
+  </script>
+
+  <!-- Breathing (Box 4-4-4-4 only) -->
+  <script>
+    (function(){
+      const bubble  = document.getElementById('breath-bubble');
+      const phaseEl = document.getElementById('phase');
+      const counter = document.getElementById('countdown');
+      const btn     = document.getElementById('breath-toggle-btn');
+
+      const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bubble-max-scale')) || 1.28;
+
+      const STEPS = [
+        { name: 'Inhale', seconds: 4, targetScale: maxScale },
+        { name: 'Hold',   seconds: 4, targetScale: null },
+        { name: 'Exhale', seconds: 4, targetScale: 1.00 },
+        { name: 'Hold',   seconds: 4, targetScale: null },
+      ];
+
+      const easeInOut = (t)=> t<0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+
+      let running=false, stepIdx=0, rafId=null, stepStart=0;
+      let startScale=1, endScale=1, lastRenderedScale=1;
+
+      function setScale(s){
+        lastRenderedScale = s;
+        bubble.style.transform = `scale(${s})`;
+        const glow = 0.22 + (s-1)*0.5;
+        bubble.style.boxShadow =
+          `0 0 ${40 + (s-1)*60}px rgba(56,189,248,${.3+glow/4}),
+           0 20px ${50 + (s-1)*40}px rgba(14,165,233,${.16+glow/5}),
+           inset 0 12px ${40 + (s-1)*30}px rgba(255,255,255,${.16+glow/6})`;
+      }
+
+      function beginStep(now){
+        const step = STEPS[stepIdx];
+        stepStart = now;
+        startScale = lastRenderedScale;
+        endScale = (step.targetScale == null) ? startScale : step.targetScale;
+        if (phaseEl) phaseEl.textContent = step.name;
+        if (counter) counter.textContent = String(step.seconds);
+      }
+
+      function tick(now){
+        const step = STEPS[stepIdx];
+        const dur = step.seconds * 1000;
+        const elapsed = now - stepStart;
+        const t = Math.min(1, elapsed / dur);
+
+        const eased = (step.targetScale == null) ? 1 : easeInOut(t);
+        const s = startScale + (endScale - startScale) * eased;
+        setScale(s);
+
+        const remaining = Math.max(0, dur - elapsed);
+        if (counter) counter.textContent = String(Math.ceil(remaining / 1000));
+
+        if (elapsed >= dur) {
+          stepIdx = (stepIdx + 1) % STEPS.length;
+          beginStep(now);
+        }
+        if (running) rafId = requestAnimationFrame(tick);
+      }
+
+      function start(){
+        if (running) return;
+        running = true;
+        btn.textContent = 'Stop Breathing Exercise';
+        if (!window.getComputedStyle(bubble).transform || window.getComputedStyle(bubble).transform === 'none') setScale(1);
+        stepIdx = 0;
+        const now = performance.now();
+        beginStep(now);
+        rafId = requestAnimationFrame(tick);
+      }
+
+      function stop(){
+        running = false;
+        btn.textContent = 'Start Breathing Exercise';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        if (phaseEl) phaseEl.textContent = 'Inhale';
+        if (counter) counter.textContent = '4';
+        setScale(1);
+      }
+
+      btn.addEventListener('click', ()=> running ? stop() : start());
+    })();
+  </script>
+
+  <!-- Hydration logic -->
+  <script>
+  (function(){
+    const row   = document.getElementById('hydration-row');
+    const goalEl= document.getElementById('hydration-goal');
+    const add   = document.getElementById('cup-add');
+    const rem   = document.getElementById('cup-remove');
+    const reset = document.getElementById('cup-reset');
+    const stat  = document.getElementById('hydration-status');
+
+    const DATE_KEY = () => new Date().toISOString().slice(0,10);
+    const K_STATE  = 'hydration:state';
+    const theK_PREF = 'hydration:goal';
+
+    const savedGoal = parseInt(localStorage.getItem(theK_PREF) || '8', 10);
+    let goal = [6,8,10,12,15].includes(savedGoal) ? savedGoal : 8;
+    goalEl.value = String(goal);
+
+    const getState = () => {
+      try { return JSON.parse(localStorage.getItem(K_STATE)) || {}; } catch(_) { return {}; }
+    };
+    const setState = (obj) => localStorage.setItem(K_STATE, JSON.stringify(obj));
+
+    const readCount = () => (getState()[DATE_KEY()]?.count ?? 0);
+    const writeCount = (count) => {
+      const all = getState();
+      all[DATE_KEY()] = { count: Math.max(0, Math.min(goal, count)) };
+      setState(all);
+      document.dispatchEvent(new CustomEvent('hydration:updated', {detail:{date:DATE_KEY(), count:all[DATE_KEY()].count, goal}}));
+    };
+
+    function cupSVG(){
+      return `
+        <svg class="cup-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"
+                fill="none" stroke="rgba(0,0,0,.78)" stroke-width="1.5" stroke-linejoin="round"/>
+          <g class="water">
+            <defs>
+              <linearGradient id="hydroGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d8c28a"/><stop offset="100%" stop-color="#c6a95a"/>
+              </linearGradient>
+              <clipPath id="cupClip">
+                <path d="M5 3h14l-1.2 12.5a5.5 5.5 0 0 1-5.3 5h-.98a5.5 5.5 0 0 1-5.3-5L5 3z"/>
+              </clipPath>
+            </defs>
+            <rect x="6.6" y="10.2" width="10.8" height="9.4" rx="1.6" clip-path="url(#cupClip)" fill="url(#hydroGrad)"/>
+          </g>
+        </svg>`;
+    }
+
+    function render(){
+      const count = readCount();
+      row.innerHTML = '';
+      for(let i=0;i<goal;i++){
+        const btn = document.createElement('button');
+        btn.className = 'cup-btn' + (i < count ? ' filled' : '');
+        btn.innerHTML = cupSVG();
+        btn.setAttribute('aria-pressed', i < count ? 'true' : 'false');
+        btn.title = i < count ? 'Filled' : 'Empty';
+
+        requestAnimationFrame(()=>{
+          const water = btn.querySelector('.water');
+          if (water) water.style.transform = (i < count) ? 'scaleY(1)' : 'scaleY(0)';
+        });
+
+        btn.addEventListener('click', ()=>{
+          const current = readCount();
+          if(i < current){ writeCount(i); } else { writeCount(i+1); }
+          render();
+          try{ if(window.playPop) window.playPop(); }catch(_){}
+        });
+        row.appendChild(btn);
+      }
+      stat.textContent = `${readCount()} / ${goal} cups`;
+    }
+
+    goalEl.addEventListener('change', () => {
+      goal = parseInt(goalEl.value, 10) || 8;
+      localStorage.setItem(theK_PREF, String(goal));
+      writeCount(readCount());
+      render();
+    });
+    add.addEventListener('click', () => { writeCount(readCount()+1); render(); });
+    rem.addEventListener('click', () => { writeCount(readCount()-1); render(); });
+    reset.addEventListener('click', () => { writeCount(0); render(); });
+
+    (function scheduleMidnightReset(){
+      const now = new Date();
+      const next = new Date(now); next.setHours(24,0,0,0);
+      setTimeout(()=>{ writeCount(0); render(); scheduleMidnightReset(); }, next - now);
+    })();
+
+    if(!getState()[DATE_KEY()]) writeCount(0);
+    render();
+  })();
+  </script>
+
+  <script type="module" src="main.js"></script>
 </body>
 </html>
