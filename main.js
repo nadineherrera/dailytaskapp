@@ -20,7 +20,7 @@ const db = getFirestore(app);
 // IMPORTANT:
 // Rotate your OpenWeather key separately if it was exposed.
 // Leaving it in frontend JS means it is still public.
-const OPENWEATHER_API_KEY = 'REPLACE_WITH_YOUR_NEW_OPENWEATHER_KEY';
+const OPENWEATHER_API_KEY = 'f38e67d9ff7f31e8bfc0ac3f3e82c45e';
 
 const yaySound = new Audio('377017__elmasmalo1__notification-pop.wav');
 yaySound.volume = 1.0;
