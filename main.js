@@ -418,26 +418,34 @@ function startBreathingBubble() {
   const text = document.getElementById('breath-text');
   const button = document.getElementById('breath-toggle-btn');
 
-  let cycle = ["Inhale", "Hold", "Exhale", "Hold"];
-  let index = 0;
+  let phase = "Inhale";
   let intervalId = null;
 
   function updateText() {
-    text.textContent = `${cycle[index % cycle.length]} for 4`;
-    index++;
-    bubble.classList.toggle('breathe-animation');
+    if (phase === "Inhale") {
+      text.textContent = "Breathe in";
+      bubble.classList.add('breathe-in');
+      bubble.classList.remove('breathe-out');
+      phase = "Exhale";
+    } else {
+      text.textContent = "Breathe out";
+      bubble.classList.add('breathe-out');
+      bubble.classList.remove('breathe-in');
+      phase = "Inhale";
+    }
   }
 
   button.addEventListener('click', () => {
     if (!intervalId) {
       updateText();
-      intervalId = setInterval(updateText, 4000);
-      button.textContent = 'Stop Breath';
+      intervalId = setInterval(updateText, 5500); // 5–6 seconds
+      button.textContent = 'Stop';
     } else {
       clearInterval(intervalId);
       intervalId = null;
-      bubble.classList.remove('breathe-animation');
-      button.textContent = 'Start Breath';
+      text.textContent = "Breathe in";
+      bubble.classList.remove('breathe-in', 'breathe-out');
+      button.textContent = 'Start';
     }
   });
 }
