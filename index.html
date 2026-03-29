@@ -315,15 +315,16 @@
       width: var(--bubble-base);
       height: var(--bubble-base);
       border-radius: 50%;
-      background: radial-gradient(ellipse at 30% 30%, #b8ecff, #6fd3ff 55%, #39b6ec 100%);
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(255,255,255,0.22) 28%, transparent 32%),
+        radial-gradient(circle at 50% 40%, #E9DFC7 0%, #D8C7A1 44%, #C4AC76 72%, #B89A4C 100%);
       box-shadow:
-        0 0 34px rgba(111,211,255,.26),
-        0 18px 36px rgba(57,182,236,.12),
-        inset 0 12px 40px rgba(255,255,255,.4);
+        inset 0 18px 48px rgba(255,255,255,0.32),
+        0 26px 46px rgba(184,154,76,0.18),
+        0 10px 20px rgba(23,21,18,0.08);
       transform-origin:center;
       transform: scale(1);
-      will-change: transform, opacity, filter;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.08));
+      will-change: transform, box-shadow;
       margin-bottom: clamp(18px, 3.5vw, 36px);
     }
 
@@ -339,7 +340,7 @@
 
     #breath-text #countdown {
       font-size:1.6rem;
-      color:#4aa9cf;
+      color:#B89A4C;
       font-weight:900;
     }
 
@@ -703,7 +704,6 @@
     </div>
   </div>
 
-  <!-- ===== Audio: reliable init + sounds ===== -->
   <script>
     (function(){
       let ctx=null, master=null;
@@ -776,7 +776,6 @@
     })();
   </script>
 
-  <!-- Celebration + progress ring -->
   <script>
     function launchFallingEmojis(count = 26) {
       const emojis = ['🎉','✨','🌟','😊','🙌','💖','🥳','🌈'];
@@ -852,7 +851,6 @@
     })();
   </script>
 
-  <!-- Mood control -->
   <script>
     (function () {
       const moodSelect = document.getElementById("mood");
@@ -900,7 +898,7 @@
     })();
   </script>
 
-  <!-- Breathing (smooth 5–6 second inhale / exhale, no 5.5 shown) -->
+  <!-- NEW coherent-style breathing block -->
   <script>
     (function(){
       const bubble  = document.getElementById('breath-bubble');
@@ -936,11 +934,11 @@
       function setScale(s){
         lastRenderedScale = s;
         bubble.style.transform = `scale(${s})`;
-        const glow = 0.22 + (s - 1) * 0.5;
+        const glow = 0.18 + (s - 1) * 0.28;
         bubble.style.boxShadow =
-          `0 0 ${40 + (s - 1) * 60}px rgba(56,189,248,${0.3 + glow / 4}),
-           0 20px ${50 + (s - 1) * 40}px rgba(14,165,233,${0.16 + glow / 5}),
-           inset 0 12px ${40 + (s - 1) * 30}px rgba(255,255,255,${0.16 + glow / 6})`;
+          `inset 0 18px 48px rgba(255,255,255,0.32),
+           0 ${20 + (s - 1) * 34}px ${42 + (s - 1) * 40}px rgba(184,154,76,${0.16 + glow}),
+           0 10px 20px rgba(23,21,18,0.08)`;
       }
 
       function displayCount(secondsRemaining){
@@ -1013,7 +1011,7 @@
     })();
   </script>
 
-  <!-- Hydration logic -->
+  <!-- Hydration logic untouched -->
   <script>
   (function(){
     const row   = document.getElementById('hydration-row');
